@@ -17,7 +17,7 @@ public class AuthService {
     public ResponseEntity<ResponseDTO> login(LoginDTO loginDTO) {
         User user = userService.getUserByEmail(loginDTO.email());
 
-        if(user.getPassword().equals(loginDTO.password())) {
+        if(!user.getPassword().equals(loginDTO.password())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseDTO(403, "Invalid credentails", null));
         }
 
@@ -25,17 +25,7 @@ public class AuthService {
     }
 
     public ResponseEntity<ResponseDTO> register(RegisterDTO registerDTO) {
-        if(userService.existsByEmail(registerDTO.email())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseDTO(409, "Email already exists", null));
-        }
-
-        User user = new User();
-        user.setFirstName(registerDTO.firstname());
-        user.setLastName(registerDTO.lastName());
-        user.setEmail(registerDTO.email());
-
-        // TODO hash
-        user.setPassword(registerDTO.password());
+        User user = userService.createUser(registerDTO);
 
         return ResponseEntity.ok(new ResponseDTO(200, "Register successful", user));
     }
