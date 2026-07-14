@@ -37,7 +37,7 @@ public class UserService {
         }
 
         User user = new User();
-        user.setFirstName(registerDTO.firstname());
+        user.setFirstName(registerDTO.firstName());
         user.setLastName(registerDTO.lastName());
         user.setEmail(registerDTO.email());
         user.setPhoneNumber(registerDTO.phoneNumber());

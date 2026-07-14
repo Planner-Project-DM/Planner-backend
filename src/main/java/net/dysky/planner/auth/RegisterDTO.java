@@ -1,7 +1,7 @@
 package net.dysky.planner.auth;
 
 public record RegisterDTO(
-        String firstname,
+        String firstName,
         String lastName,
         String email,
         String password,
