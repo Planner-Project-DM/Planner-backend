@@ -118,7 +118,7 @@ public class UserServiceTest {
 
         User savedUser = new User();
         savedUser.setId(UUID.randomUUID());
-        savedUser.setFirstName(dto.firstname());
+        savedUser.setFirstName(dto.firstName());
         savedUser.setLastName(dto.lastName());
         savedUser.setEmail(dto.email());
 
@@ -130,7 +130,7 @@ public class UserServiceTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.getEmail()).isEqualTo(dto.email());
-        assertThat(result.getFirstName()).isEqualTo(dto.firstname());
+        assertThat(result.getFirstName()).isEqualTo(dto.firstName());
         verify(userRepository, times(1)).save(any(User.class));
     }
 
