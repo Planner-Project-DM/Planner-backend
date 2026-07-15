@@ -1,9 +1,6 @@
 package net.dysky.planner.user;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,6 +22,9 @@ public class User {
     private String email;
     private String password;
     private String phoneNumber;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     private Boolean isActive = true;
 }
