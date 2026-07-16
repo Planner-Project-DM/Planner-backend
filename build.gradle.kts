@@ -37,6 +37,7 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.withType<Test> {
