@@ -59,7 +59,12 @@ public class AuthService {
 
         User user = userService.createUser(registerDTOWithEncodedPassword);
 
-        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Register successful", "auth/register", user));
+        String token = jwtService.generateToken(user);
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("user", user);
+
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Register successful", "auth/register", response));
     }
 
     public String encodePassword(String rawPassword) {
