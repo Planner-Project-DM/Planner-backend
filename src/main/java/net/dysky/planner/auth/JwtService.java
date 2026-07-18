@@ -19,7 +19,7 @@ public class JwtService {
     private String secretKey;
 
     public String generateToken(User user) {
-        int time = 1000 * 60 * 60 * 24;
+        int time = 1000 * 60 * 60 * 6;
 
         return Jwts.builder()
                 .setSubject(user.getEmail())
