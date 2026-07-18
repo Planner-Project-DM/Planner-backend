@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -142,6 +143,10 @@ public class AuthServiceTest {
         createdUser.setEmail(registerDTO.email());
         when(userService.createUser(any(RegisterDTO.class))).thenReturn(createdUser);
 
+        Map<String, Object> expectedData = new HashMap<>();
+        expectedData.put("user", createdUser);
+        expectedData.put("token", null);
+
         // When
         ResponseEntity<ResponseDTO> responseEntity = authService.register(registerDTO);
 
@@ -151,7 +156,7 @@ public class AuthServiceTest {
         assertEquals(200, responseEntity.getBody().status());
         assertEquals("Register successful", responseEntity.getBody().message());
         assertEquals("auth/register", responseEntity.getBody().url());
-        assertEquals(createdUser, responseEntity.getBody().data());
+        assertEquals(expectedData, responseEntity.getBody().data());
 
         verify(passwordEncoder).encode(registerDTO.password());
         verify(userService).createUser(argThat(dto ->
