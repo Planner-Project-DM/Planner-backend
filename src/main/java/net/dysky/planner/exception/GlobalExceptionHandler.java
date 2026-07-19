@@ -26,6 +26,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(TripNotFoundException.class)
+    public ResponseEntity<ResponseDTO> handleTripNotFound(TripNotFoundException ex, HttpServletRequest request)  {
+        ResponseDTO error = new ResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseDTO> handleUnexpectedError(Exception ex, HttpServletRequest request) {
 
