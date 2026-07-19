@@ -38,19 +38,17 @@ public class TripService {
         trip.setTripCreator(null);
 
         if(createTripDTO.budget() <= 0) {
-            throw new IllegalArgumentException("Budget must be a positive value");
+            throw new RuntimeException("Budget must be a positive value");
         }
 
         trip.setBudget(createTripDTO.budget());
 
-        // TODO
-        trip.setGroup(null);
+        // TODO group
 
         trip.setStartDate(createTripDTO.startDate());
         trip.setEndDate(createTripDTO.endDate());
 
         return tripRepository.save(trip);
-
     }
 
 }
