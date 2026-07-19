@@ -1,6 +1,7 @@
 package net.dysky.planner.user;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,8 @@ public class User {
     private String firstName;
     private String lastName;
 
+    @Email
+    @Column(unique = true)
     private String email;
     private String password;
     private String phoneNumber;
