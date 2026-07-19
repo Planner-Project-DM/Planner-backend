@@ -36,6 +36,6 @@ public class Trip {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
-
+    private LocalDateTime createdAt;
 
 }
