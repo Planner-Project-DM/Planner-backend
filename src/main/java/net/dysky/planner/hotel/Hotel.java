@@ -31,4 +31,7 @@ public class Hotel {
     private String website;
 
     private String description;
+
+    @Embedded
+    private Location location;
 }
