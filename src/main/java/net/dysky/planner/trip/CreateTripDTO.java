@@ -1,13 +1,13 @@
 package net.dysky.planner.trip;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record CreateTripDTO(
         String name,
         String destination,
         Double budget,
         String email,
-        LocalDateTime startDate,
-        LocalDateTime endDate
+        LocalDate startDate,
+        LocalDate endDate
 ) {
 }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dysky.planner.user.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -30,10 +31,10 @@ public class Trip {
 
     private Double budget;
 
-    private String group;
+    private String tripGroup;
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     private LocalDateTime createdAt;
 

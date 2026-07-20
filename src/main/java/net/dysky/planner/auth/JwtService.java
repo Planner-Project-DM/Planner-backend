@@ -23,7 +23,6 @@ public class JwtService {
 
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                .setSubject(user.getRole().name())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + time))
                 .signWith(getSignInKey())
