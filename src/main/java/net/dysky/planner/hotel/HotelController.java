@@ -67,4 +67,19 @@ class HotelController {
         return ResponseEntity.ok(responseDTO);
     }
 
+    @GetMapping("/overpass/{city}")
+    public ResponseEntity<ResponseDTO> getHotelsFromOverpassApi(@PathVariable String city) {
+        OverpassApiDTO overpassApiDTO = hotelService.getHotelsFromOverpassApi(city);
+
+        ResponseDTO responseDTO = new ResponseDTO(
+                LocalDateTime.now(),
+                200,
+                "Hotels retrieved successfully from Overpass API",
+                "/api/hotels/overpass/" + city,
+                overpassApiDTO
+        );
+
+        return ResponseEntity.ok(responseDTO);
+    }
+
 }
