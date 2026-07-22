@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -39,6 +41,11 @@ public class HotelService {
         return hotelRepository.findByName(name);
     }
 
+    @Retryable(
+            retryFor = {RuntimeException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 2000)
+    )
     public OverpassApiDTO getHotelsFromOverpassApi(String city) {
         String query = String.format("""
                 [out:json][timeout:25];
