@@ -29,7 +29,9 @@ public record TagsDTO(
 
         String stars,
 
-        String website
+        String website,
+
+        String description
 
 ) {
 }

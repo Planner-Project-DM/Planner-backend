@@ -34,4 +34,6 @@ public class Hotel {
 
     @Embedded
     private Location location;
+
+    private String stars;
 }

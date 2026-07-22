@@ -1,6 +1,8 @@
 package net.dysky.planner.hotel;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.address.Address;
 import net.dysky.planner.exception.HotelNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,4 +59,41 @@ public class HotelService {
                 .body(OverpassApiDTO.class);
     }
 
+    @Transactional
+    public List<Hotel> saveHotelFromOverpass(OverpassApiDTO overpassApiDTO, String city) {
+
+        for(ElementDTO elementDTO : overpassApiDTO.elements()) {
+            Hotel hotel = new Hotel();
+
+            hotel.setName(elementDTO.tags().name());
+            Address address = Address.builder()
+                    .country(elementDTO.tags().country())
+                    .city(elementDTO.tags().city())
+                    .street(elementDTO.tags().street())
+                    .postalCode(elementDTO.tags().postalCode())
+                    .houseNumber(elementDTO.tags().houseNumber())
+                    .build();
+
+            hotel.setAddress(address);
+
+
+            hotel.setPhoneNumber(elementDTO.tags().phone());
+            hotel.setEmail(elementDTO.tags().email());
+            hotel.setWebsite(elementDTO.tags().website());
+            hotel.setDescription(elementDTO.tags().description());
+
+            Location location = Location.builder()
+                    .latitude(elementDTO.lat())
+                    .longitude(elementDTO.lon())
+                    .build();
+
+            hotel.setLocation(location);
+
+            hotel.setStars(elementDTO.tags().stars());
+
+            hotelRepository.save(hotel);
+        }
+
+        return getHotelsByCity(city);
+    }
 }

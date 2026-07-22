@@ -1,15 +1,13 @@
 package net.dysky.planner.hotel;
 
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.cityVisited.CityVisitedService;
 import net.dysky.planner.response.ResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +19,8 @@ import java.util.UUID;
 class HotelController {
 
     private final HotelService hotelService;
+
+    private final CityVisitedService cityVisitedService;
 
     @GetMapping
     public ResponseEntity<ResponseDTO> getAllHotels(@PageableDefault(size = 10) Pageable pageable) {
@@ -52,9 +52,19 @@ class HotelController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/{city}")
+    // TODO zlaczyc to w jeden enpoint jestli dane miasto jest w bazie to zwracamy z bazy jest nie to z overpass
+    @GetMapping("city/{city}")
     public ResponseEntity<ResponseDTO> getHotelByCity(@PathVariable String city) {
-        List<Hotel> hotels = hotelService.getHotelsByCity(city);
+        List<Hotel> hotels;
+
+        if (cityVisitedService.isCityVisited(city)) {
+             hotels = hotelService.getHotelsByCity(city);
+
+        } else {
+            OverpassApiDTO overpassApiDTO = hotelService.getHotelsFromOverpassApi(city);
+            hotels = hotelService.saveHotelFromOverpass(overpassApiDTO, city);
+            cityVisitedService.markCityASVisited(city);
+        }
 
         ResponseDTO responseDTO = new ResponseDTO(
                 LocalDateTime.now(),
@@ -66,20 +76,4 @@ class HotelController {
 
         return ResponseEntity.ok(responseDTO);
     }
-
-    @GetMapping("/overpass/{city}")
-    public ResponseEntity<ResponseDTO> getHotelsFromOverpassApi(@PathVariable String city) {
-        OverpassApiDTO overpassApiDTO = hotelService.getHotelsFromOverpassApi(city);
-
-        ResponseDTO responseDTO = new ResponseDTO(
-                LocalDateTime.now(),
-                200,
-                "Hotels retrieved successfully from Overpass API",
-                "/api/hotels/overpass/" + city,
-                overpassApiDTO
-        );
-
-        return ResponseEntity.ok(responseDTO);
-    }
-
 }
