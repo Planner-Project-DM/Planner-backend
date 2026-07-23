@@ -3,6 +3,7 @@ package net.dysky.planner.trip;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import net.dysky.planner.group.Group;
 import net.dysky.planner.user.User;
 
 import java.time.LocalDate;
@@ -31,7 +32,8 @@ public class Trip {
 
     private Double budget;
 
-    private String tripGroup;
+    @OneToOne
+    private Group tripGroup;
 
     private LocalDate startDate;
     private LocalDate endDate;
