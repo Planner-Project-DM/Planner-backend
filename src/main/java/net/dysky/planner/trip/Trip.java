@@ -25,7 +25,7 @@ public class Trip {
     @Enumerated(EnumType.STRING)
     private TripStatus status;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "trip_creator_id", referencedColumnName = "id")
     private User tripCreator;
 
@@ -36,6 +36,6 @@ public class Trip {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
 }

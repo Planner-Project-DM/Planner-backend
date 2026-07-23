@@ -3,6 +3,8 @@ package net.dysky.planner.trip;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.exception.TripNotFoundException;
+import net.dysky.planner.user.User;
+import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.UUID;
 public class TripService {
 
     private final TripRepository tripRepository;
+
+    private final UserService userService;
 
     public Trip getTripById(UUID id) {
         return tripRepository.findById(id).orElseThrow(() -> new TripNotFoundException("Trip not found"));
@@ -26,16 +30,24 @@ public class TripService {
         return tripRepository.findByStatus(status);
     }
 
+    public List<Trip> getAllTripsByEmail(String email) {
+        return tripRepository.findAllByTripCreatorEmail(email);
+    }
+
+    public List<Trip> getAllTripsByEmailAndStatus(String email, TripStatus tripStatus) {
+        return tripRepository.findAllByTripCreatorEmailAndStatus(email, tripStatus);
+    }
+
     @Transactional
-    public Trip createTrip(CreateTripDTO createTripDTO) {
+    public Trip createTrip(CreateTripDTO createTripDTO, String email) {
         Trip trip = new Trip();
 
         trip.setName(createTripDTO.name());
         trip.setDestination(createTripDTO.destination());
         trip.setStatus(TripStatus.PLANNED);
 
-        // TODO
-        trip.setTripCreator(null);
+        User user = userService.getUserByEmail(email);
+        trip.setTripCreator(user);
 
         if(createTripDTO.budget() <= 0) {
             throw new RuntimeException("Budget must be a positive value");

@@ -7,4 +7,8 @@ import java.util.UUID;
 
 interface TripRepository extends JpaRepository<Trip, UUID> {
     List<Trip> findByStatus(TripStatus status);
+
+    List<Trip> findAllByTripCreatorEmail(String tripCreatorEmail);
+
+    List<Trip> findAllByTripCreatorEmailAndStatus(String tripCreatorEmail, TripStatus status);
 }

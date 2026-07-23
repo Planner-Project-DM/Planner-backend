@@ -1,6 +1,7 @@
 package net.dysky.planner.trip;
 
 import net.dysky.planner.exception.TripNotFoundException;
+import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,6 +23,9 @@ class TripServiceTest {
 
     @Mock
     private TripRepository tripRepository;
+
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private TripService tripService;
@@ -87,15 +91,16 @@ class TripServiceTest {
     @Test
     void createTrip_shouldSaveAndReturnTrip_whenBudgetIsPositive() {
         // Given
+        String email = " test.test@planner.com";
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusDays(7);
-        CreateTripDTO dto = new CreateTripDTO("Wycieczka do Rzymu", "Rzym", 2500.0, "test.test@planner.com", startDate, endDate);
+        CreateTripDTO dto = new CreateTripDTO("Wycieczka do Rzymu", "Rzym", 2500.0, startDate, endDate);
 
         ArgumentCaptor<Trip> tripCaptor = ArgumentCaptor.forClass(Trip.class);
         when(tripRepository.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        Trip createdTrip = tripService.createTrip(dto);
+        Trip createdTrip = tripService.createTrip(dto, email);
 
         // Then
         assertNotNull(createdTrip);
@@ -114,12 +119,13 @@ class TripServiceTest {
     @Test
     void createTrip_shouldThrowRuntimeException_whenBudgetIsZeroOrNegative() {
         // Given
+        String email = " test.test@planner.com";
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusDays(7);
-        CreateTripDTO dtoWithZeroBudget = new CreateTripDTO("Wycieczka", "Rzym", 0.0, "test.test@planner.com", startDate, endDate);
+        CreateTripDTO dtoWithZeroBudget = new CreateTripDTO("Wycieczka", "Rzym", 0.0, startDate, endDate);
 
         // When & Then
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> tripService.createTrip(dtoWithZeroBudget));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> tripService.createTrip(dtoWithZeroBudget, email));
         assertEquals("Budget must be a positive value", exception.getMessage());
 
         verify(tripRepository, never()).save(any(Trip.class));

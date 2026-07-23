@@ -6,7 +6,6 @@ public record CreateTripDTO(
         String name,
         String destination,
         Double budget,
-        String email,
         LocalDate startDate,
         LocalDate endDate
 ) {
