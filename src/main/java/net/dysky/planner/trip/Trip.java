@@ -1,5 +1,6 @@
 package net.dysky.planner.trip;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class Trip {
 
     @Id
     @GeneratedValue
+    @JsonIgnore
     private UUID id;
 
     private String name;
@@ -27,6 +29,7 @@ public class Trip {
     private TripStatus status;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "trip_creator_id", referencedColumnName = "id")
     private User tripCreator;
 
