@@ -14,7 +14,12 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "trips")
+@Table(name = "trips", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_trip_name_and_creator",
+                columnNames = {"name", "trip_creator_id"}
+        )
+})
 public class Trip {
 
     @Id
