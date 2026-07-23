@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
+import net.dysky.planner.groupUser.GroupUser;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -28,6 +30,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.USER;
+
+    @OneToMany(mappedBy = "user")
+    private List<GroupUser> groupUsers;
 
     private Boolean isActive = true;
 }
