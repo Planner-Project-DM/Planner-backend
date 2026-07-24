@@ -45,7 +45,7 @@ public class HotelService {
 
     @Retryable(
             retryFor = {RuntimeException.class},
-            maxAttempts = 3,
+            maxAttempts = 5,
             backoff = @Backoff(delay = 2000)
     )
     public OverpassApiDTO getHotelsFromOverpassApi(String city) {
