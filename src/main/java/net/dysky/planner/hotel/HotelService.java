@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -56,9 +58,12 @@ public class HotelService {
                 out center body;
                 """,city, city);
 
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("data", query);
+
         return restClient.post()
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body("data=" + query)
+                .body(formData)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (request, response) -> {
                     throw new RuntimeException("Error from Overpass API: " + response.getStatusCode());

@@ -52,7 +52,6 @@ class HotelController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    // TODO zlaczyc to w jeden enpoint jestli dane miasto jest w bazie to zwracamy z bazy jest nie to z overpass
     @GetMapping("city/{city}")
     public ResponseEntity<ResponseDTO> getHotelByCity(@PathVariable String city) {
         List<Hotel> hotels;
