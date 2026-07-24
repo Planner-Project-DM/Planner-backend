@@ -51,12 +51,13 @@ public class HotelService {
     public OverpassApiDTO getHotelsFromOverpassApi(String city) {
         String query = String.format("""
                 [out:json][timeout:25];
+                area["name"="%s"]["admin_level"="8"]->.searchArea;
                 (
-                  node["tourism"="hotel"]["addr:city"="%s"];
-                  way["tourism"="hotel"]["addr:city"="%s"];
+                  node["tourism"="hotel"](area.searchArea);
+                  way["tourism"="hotel"](area.searchArea);
                 );
                 out center body;
-                """,city, city);
+            """, city);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("data", query);
