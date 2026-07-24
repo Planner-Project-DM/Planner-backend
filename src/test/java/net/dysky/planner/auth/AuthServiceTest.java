@@ -53,12 +53,13 @@ public class AuthServiceTest {
     @Test
     void login_ShouldReturnOk_WhenCredentialsAreValid() {
         // Given
-        LoginDTO loginDTO = new LoginDTO("test@dysky.net", "raw_password");
+        LoginDTO loginDTO = new LoginDTO("test@dysky.net", "raw_password", false);
         String mockToken = "mocked-jwt-token";
+        int time = 1000 * 60 * 60 * 24;
 
         when(userService.getUserByEmail(loginDTO.email())).thenReturn(activeUser);
         when(passwordEncoder.matches(loginDTO.password(), activeUser.getPassword())).thenReturn(true);
-        when(jwtService.generateToken(activeUser)).thenReturn(mockToken);
+        when(jwtService.generateToken(activeUser, time)).thenReturn(mockToken);
 
         // When
         ResponseEntity<ResponseDTO> responseEntity = authService.login(loginDTO);
@@ -77,13 +78,13 @@ public class AuthServiceTest {
 
         verify(userService).getUserByEmail(loginDTO.email());
         verify(passwordEncoder).matches(loginDTO.password(), activeUser.getPassword());
-        verify(jwtService).generateToken(activeUser);
+        verify(jwtService).generateToken(activeUser, time);
     }
 
     @Test
     void login_ShouldReturnForbidden_WhenUserIsNotActive() {
         // Given
-        LoginDTO loginDTO = new LoginDTO("inactive@dysky.net", "raw_password");
+        LoginDTO loginDTO = new LoginDTO("inactive@dysky.net", "raw_password", false);
 
         when(userService.getUserByEmail(loginDTO.email())).thenReturn(inactiveUser);
 
@@ -105,7 +106,7 @@ public class AuthServiceTest {
     @Test
     void login_ShouldReturnForbidden_WhenPasswordIsInvalid() {
         // Given
-        LoginDTO loginDTO = new LoginDTO("test@dysky.net", "wrong_password");
+        LoginDTO loginDTO = new LoginDTO("test@dysky.net", "wrong_password", false);
 
         when(userService.getUserByEmail(loginDTO.email())).thenReturn(activeUser);
         when(passwordEncoder.matches(loginDTO.password(), activeUser.getPassword())).thenReturn(false);

@@ -35,7 +35,7 @@ public class AuthControllerTest extends AbstractIntegrationTest {
     @WithMockUser
     void login_ShouldReturnOk_WhenServiceReturnsOk() throws Exception {
         // Given
-        LoginDTO loginDTO = new LoginDTO("test@dysky.net", "password123");
+        LoginDTO loginDTO = new LoginDTO("test@dysky.net", "password123", false);
         ResponseDTO expectedResponse = new ResponseDTO(
                 LocalDateTime.now(),
                 200,
@@ -62,7 +62,7 @@ public class AuthControllerTest extends AbstractIntegrationTest {
     @Test
     void login_ShouldReturnForbidden_WhenCredentialsAreInvalid() throws Exception {
         // Given
-        LoginDTO loginDTO = new LoginDTO("test@dysky.net", "wrong-password");
+        LoginDTO loginDTO = new LoginDTO("test@dysky.net", "wrong-password", false);
         ResponseDTO expectedResponse = new ResponseDTO(
                 LocalDateTime.now(),
                 403,
