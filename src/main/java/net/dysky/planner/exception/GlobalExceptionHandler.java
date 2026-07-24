@@ -79,11 +79,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseDTO> handleUnexpectedError(Exception ex, HttpServletRequest request) {
 
         ResponseDTO error = new ResponseDTO(
-              LocalDateTime.now(),
-              HttpStatus.INTERNAL_SERVER_ERROR.value(),
-              "Internal Server Error",
-              request.getRequestURI(),
-              null
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                ex.getMessage().isBlank() ? "Internal Server Error" : ex.getMessage(),
+                request.getRequestURI(),
+                null
         );
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
