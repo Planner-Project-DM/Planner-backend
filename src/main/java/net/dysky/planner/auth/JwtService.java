@@ -19,9 +19,7 @@ public class JwtService {
     @Value("${jwt.secret.key}")
     private String secretKey;
 
-    public String generateToken(User user) {
-        int time = 1000 * 60 * 60 * 6;
-
+    public String generateToken(User user, int time) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))

@@ -40,7 +40,17 @@ public class AuthService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseDTO(LocalDateTime.now(), 403, "Invalid credentials", "auth/login", null));
         }
 
-        String token = jwtService.generateToken(user);
+        String token;
+
+        if(loginDTO.rememberMe()) {
+            int time = 1000 * 60 * 60 * 24 * 7;
+
+            token = jwtService.generateToken(user, time);
+        } else {
+            int time = 1000 * 60 * 60 * 24;
+
+            token = jwtService.generateToken(user, time);
+        }
 
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
@@ -59,7 +69,8 @@ public class AuthService {
 
         User user = userService.createUser(registerDTOWithEncodedPassword);
 
-        String token = jwtService.generateToken(user);
+        int time = 1000 * 60 * 60 * 8;
+        String token = jwtService.generateToken(user, time);
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
         response.put("user", user);
