@@ -24,7 +24,6 @@ public class Trip {
 
     @Id
     @GeneratedValue
-    @JsonIgnore
     private UUID id;
 
     private String name;
