@@ -52,4 +52,11 @@ class TripController {
 
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<ResponseDTO> updateTrip(@PathVariable UUID id, @RequestBody UpdateTripDTO updateTripDTO) {
+        Trip updatedTrip = tripService.updateTrip(id, updateTripDTO);
+
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Trip updated successfully", "/api/trips/" + id, updatedTrip));
+    }
+
 }

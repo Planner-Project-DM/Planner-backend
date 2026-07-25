@@ -45,6 +45,7 @@ public class Trip {
     private LocalDate startDate;
     private LocalDate endDate;
 
+    @JsonIgnore
     private LocalDateTime createdAt = LocalDateTime.now();
 
 }

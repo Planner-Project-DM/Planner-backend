@@ -63,4 +63,30 @@ public class TripService {
         return tripRepository.save(trip);
     }
 
+    @Transactional
+    public Trip updateTrip(UUID id, UpdateTripDTO updateTripDTO) {
+        Trip trip = getTripById(id);
+
+        if (updateTripDTO.name() != null) {
+            trip.setName(updateTripDTO.name());
+        }
+        if (updateTripDTO.destination() != null) {
+            trip.setDestination(updateTripDTO.destination());
+        }
+        if (updateTripDTO.status() != null) {
+            trip.setStatus(updateTripDTO.status());
+        }
+        if (updateTripDTO.budget() != null) {
+            trip.setBudget(updateTripDTO.budget());
+        }
+        if (updateTripDTO.startDate() != null) {
+            trip.setStartDate(updateTripDTO.startDate());
+        }
+        if (updateTripDTO.endDate() != null) {
+            trip.setEndDate(updateTripDTO.endDate());
+        }
+
+        return tripRepository.save(trip);
+    }
+
 }
