@@ -7,6 +7,8 @@ import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class FriendshipService {
@@ -14,6 +16,14 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
 
     private final UserService userService;
+
+    public List<FriendshipDTO> getFriendships(String email) {
+        User user = userService.getUserByEmail(email);
+
+        List<Friendship> friendships = friendshipRepository.findAllByUserFriends(user);
+
+        return friendships.stream().map(friendship -> mapToFriendshipDTO(friendship, email)).toList();
+    }
 
     @Transactional
     public Friendship createFriendship(CreateFriendshipDTO createFriendshipDTO) {
@@ -35,6 +45,16 @@ public class FriendshipService {
         return friendshipRepository.save(friendship);
     }
 
+    FriendshipDTO mapToFriendshipDTO(Friendship friendship, String email) {
+        User user = friendship.getUserSender().getEmail().equals(email) ? friendship.getUserReceiver() : friendship.getUserSender();
+
+        return new FriendshipDTO(
+                friendship.getId(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName()
+        );
+    }
 
 
 }

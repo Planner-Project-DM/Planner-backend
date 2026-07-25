@@ -1,5 +1,6 @@
 package net.dysky.planner.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class User {
 
     @Id
     @GeneratedValue
+    @JsonIgnore
     private UUID id;
 
     private String firstName;
@@ -25,6 +27,8 @@ public class User {
     @Email
     @Column(unique = true)
     private String email;
+
+    @JsonIgnore
     private String password;
     private String phoneNumber;
 
