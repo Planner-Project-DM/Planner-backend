@@ -1,5 +1,6 @@
 package net.dysky.planner.groupUser;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,11 +17,13 @@ public class GroupUser {
     @Id
     @ManyToOne
     @JoinColumn(name = "group_id")
+    @JsonIgnoreProperties("groupUsers")
     private Group group;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties("groupUsers")
     private User user;
 
     @Enumerated(EnumType.STRING)
