@@ -89,4 +89,10 @@ public class TripService {
         return tripRepository.save(trip);
     }
 
+    @Transactional
+    public void deleteTrip(UUID id) {
+        Trip trip = getTripById(id);
+        tripRepository.delete(trip);
+    }
+
 }

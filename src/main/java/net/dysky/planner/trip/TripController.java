@@ -49,7 +49,6 @@ class TripController {
         Trip trip = tripService.createTrip(createTripDTO, email);
 
         return ResponseEntity.accepted().body(new ResponseDTO(LocalDateTime.now(), 201, "Trip created successfully", "/api/trips", trip));
-
     }
 
     @PatchMapping("/{id}")
@@ -57,6 +56,13 @@ class TripController {
         Trip updatedTrip = tripService.updateTrip(id, updateTripDTO);
 
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Trip updated successfully", "/api/trips/" + id, updatedTrip));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDTO> deleteTrip(@PathVariable UUID id) {
+        tripService.deleteTrip(id);
+
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Trip deleted successfully", "/api/trips/" + id, null));
     }
 
 }
