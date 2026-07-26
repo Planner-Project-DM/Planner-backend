@@ -1,6 +1,7 @@
 package net.dysky.planner.trip;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.response.ResponseDTO;
@@ -44,7 +45,7 @@ class TripController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDTO> createTrip(@RequestBody CreateTripDTO createTripDTO, HttpServletRequest request) {
+    public ResponseEntity<ResponseDTO> createTrip(@Valid @RequestBody CreateTripDTO createTripDTO, HttpServletRequest request) {
         String email = jwtService.extractEmail(request);
         Trip trip = tripService.createTrip(createTripDTO, email);
 
