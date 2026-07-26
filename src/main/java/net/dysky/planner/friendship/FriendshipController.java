@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,6 +49,34 @@ class FriendshipController {
                 "Send request to " + friendship.getUserReceiver().getEmail(),
                 "/api/friendships/create",
                 null)
+        );
+    }
+
+    @PatchMapping("/{id}/accept")
+    public ResponseEntity<ResponseDTO> updateFriendship(@PathVariable("id")UUID id) {
+        Friendship friendship = friendshipService.updateStatusFriendship(id, FriendshipStatus.ACCEPTED);
+
+        return ResponseEntity.ok(new ResponseDTO(
+                LocalDateTime.now(),
+                200,
+                "Friendship accepted successfully",
+                "/api/friendships/" + id + "/accept",
+                friendship
+                )
+        );
+    }
+
+    @PatchMapping("/{id}/reject")
+    public ResponseEntity<ResponseDTO> rejectFriendship(@PathVariable("id")UUID id) {
+        Friendship friendship = friendshipService.updateStatusFriendship(id, FriendshipStatus.REJECTED);
+
+        return ResponseEntity.ok(new ResponseDTO(
+                LocalDateTime.now(),
+                200,
+                "Friendship rejected successfully",
+                "/api/friendships/" + id + "/reject",
+                friendship
+                )
         );
     }
 

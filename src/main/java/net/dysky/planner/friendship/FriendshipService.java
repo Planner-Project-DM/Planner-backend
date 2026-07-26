@@ -9,6 +9,7 @@ import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +39,11 @@ public class FriendshipService {
                 .orElseThrow(() -> new FriendshipNotFoundException("Friendship not found"));
     }
 
+    public Friendship findById(UUID id) {
+        return friendshipRepository.findById(id).orElseThrow(
+                () -> new FriendshipNotFoundException("Friendship with id " + id + " not found"));
+    }
+
     @Transactional
     public Friendship createFriendship(CreateFriendshipDTO createFriendshipDTO) {
         User sender = userService.getUserByEmail(createFriendshipDTO.emailSender());
@@ -55,6 +61,13 @@ public class FriendshipService {
 
         friendship.setStatus(FriendshipStatus.PENDING);
 
+        return friendshipRepository.save(friendship);
+    }
+
+    @Transactional
+    public Friendship updateStatusFriendship(UUID id, FriendshipStatus status) {
+        Friendship friendship = findById(id);
+        friendship.setStatus(status);
         return friendshipRepository.save(friendship);
     }
 
