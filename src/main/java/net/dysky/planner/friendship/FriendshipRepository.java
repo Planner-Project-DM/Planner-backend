@@ -13,6 +13,9 @@ interface FriendshipRepository extends JpaRepository<Friendship, UUID> {
     @Query("SELECT f from Friendship f WHERE (f.userSender = :user OR f.userReceiver = :user) AND f.status = 'ACCEPTED'")
     List<Friendship> findAllByUserFriends(@Param("user") User user);
 
+    @Query("SELECT f from Friendship f WHERE (f.userSender = :user OR f.userReceiver = :user) AND f.status = :status")
+    List<Friendship> findAllByUserFriendsAndStatus(@Param("user") User user, @Param("status") FriendshipStatus status);
+
     @Query("SELECT f FROM Friendship f WHERE ( " +
             "(f.userSender = :user AND f.userReceiver = :friend) OR " +
             "(f.userSender = :friend AND f.userReceiver = :user) " +

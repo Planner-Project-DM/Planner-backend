@@ -26,6 +26,13 @@ public class FriendshipService {
         return friendships.stream().map(friendship -> mapToFriendshipDTO(friendship, email)).toList();
     }
 
+    public List<FriendshipDTO> getFriendshipsByStatus(String email, FriendshipStatus status) {
+        User user = userService.getUserByEmail(email);
+        List<Friendship> friendships = friendshipRepository.findAllByUserFriendsAndStatus(user, status);
+
+        return friendships.stream().map(friendship -> mapToFriendshipDTO(friendship, email)).toList();
+    }
+
     public Friendship getFriendship(User provider, User friend) {
         return friendshipRepository.findFriendshipBy(provider, friend)
                 .orElseThrow(() -> new FriendshipNotFoundException("Friendship not found"));

@@ -20,16 +20,20 @@ class FriendshipController {
     private final JwtService jwtService;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO> getFriendships(HttpServletRequest request) {
+    public ResponseEntity<ResponseDTO> getFriendships(@RequestParam(required = false) FriendshipStatus status, HttpServletRequest request) {
         String email =  jwtService.extractEmail(request);
 
-        List<FriendshipDTO> friendshipList = friendshipService.getFriendships(email);
+        List<FriendshipDTO> friendshipList = (status != null)
+                ? friendshipService.getFriendshipsByStatus(email, status)
+                : friendshipService.getFriendships(email);
+
+        String requestUrl = (status != null) ? "/api/friendships?status=" + status : "/api/friendships";
 
         return ResponseEntity.ok(new ResponseDTO(
                 LocalDateTime.now(),
                 200,
                 "Friendships retrieved successfully",
-                "/api/friendships",
+                requestUrl,
                 friendshipList)
         );
     }
