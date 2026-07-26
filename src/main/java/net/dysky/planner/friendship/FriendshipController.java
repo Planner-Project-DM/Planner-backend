@@ -80,6 +80,20 @@ class FriendshipController {
         );
     }
 
+    @PatchMapping("/{id}/block")
+    public ResponseEntity<ResponseDTO> blockFriendship(@PathVariable("id")UUID id) {
+        Friendship friendship = friendshipService.updateStatusFriendship(id, FriendshipStatus.BLOCKED);
+
+        return ResponseEntity.ok(new ResponseDTO(
+                        LocalDateTime.now(),
+                        200,
+                        "Friendship rejected successfully",
+                        "/api/friendships/" + id + "/reject",
+                        friendship
+                )
+        );
+    }
+
     @DeleteMapping
     public ResponseEntity<ResponseDTO> deleteFriendship(@RequestBody DeleteFriendshipDTO deleteFriendshipDTO, HttpServletRequest request) {
         String email = jwtService.extractEmail(request);
