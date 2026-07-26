@@ -10,7 +10,8 @@ public record ElementDTO(
         BigDecimal lat,
         BigDecimal lon,
         CenterDTO center,
-        TagsDTO tags
+        TagsDTO tags,
+        String tourism
 ) {
     @Override
     public BigDecimal lat() {
