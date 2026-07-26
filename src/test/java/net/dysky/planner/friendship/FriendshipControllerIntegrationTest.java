@@ -13,11 +13,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tools.jackson.databind.ObjectMapper;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Transactional
@@ -120,6 +120,66 @@ public class FriendshipControllerIntegrationTest extends AbstractIntegrationTest
                 .andExpect(jsonPath("$.data[0].email").value(receiverEmail))
                 .andExpect(jsonPath("$.data[0].name").value("Anna"))
                 .andExpect(jsonPath("$.data[0].surname").value("Nowak"))
+                .andExpect(jsonPath("$.createdAt").exists());
+    }
+
+    @Test
+    void deleteFriendship_shouldReturnOk_whenFriendshipIsDeletedSuccessfully() throws Exception {
+        // Given
+        String userEmail = "user@example.com";
+        String friendEmail = "friend@example.com";
+
+        registerUser("Jan", "Kowalski", userEmail);
+        registerUser("Anna", "Nowak", friendEmail);
+
+        User user = userService.getUserByEmail(userEmail);
+        User friend = userService.getUserByEmail(friendEmail);
+
+        Friendship friendship = new Friendship();
+        friendship.setUserSender(user);
+        friendship.setUserReceiver(friend);
+        friendship.setStatus(FriendshipStatus.ACCEPTED);
+        friendshipRepository.saveAndFlush(friendship);
+
+        DeleteFriendshipDTO dto = new DeleteFriendshipDTO(friendEmail);
+
+        when(jwtService.extractEmail(any(HttpServletRequest.class))).thenReturn(userEmail);
+
+        // When & Then
+        mockMvc.perform(delete("/api/friendships")
+                        .with(user(userEmail).roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Friendship deleted successfully"))
+                .andExpect(jsonPath("$.url").value("/api/friendships"))
+                .andExpect(jsonPath("$.createdAt").exists());
+
+        assertTrue(friendshipRepository.findFriendshipBy(user, friend).isEmpty());
+    }
+
+    @Test
+    void deleteFriendship_shouldReturnNotFound_whenFriendshipDoesNotExist() throws Exception {
+        // Given
+        String userEmail = "user@example.com";
+        String friendEmail = "friend@example.com";
+
+        registerUser("Jan", "Kowalski", userEmail);
+        registerUser("Anna", "Nowak", friendEmail);
+
+        DeleteFriendshipDTO dto = new DeleteFriendshipDTO(friendEmail);
+
+        when(jwtService.extractEmail(any(HttpServletRequest.class))).thenReturn(userEmail);
+
+        // When & Then
+        mockMvc.perform(delete("/api/friendships")
+                        .with(user(userEmail).roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.url").value("/api/friendships"))
                 .andExpect(jsonPath("$.createdAt").exists());
     }
 }

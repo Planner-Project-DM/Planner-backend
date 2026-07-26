@@ -1,5 +1,6 @@
 package net.dysky.planner.friendship;
 
+import net.dysky.planner.exception.FriendshipNotFoundException;
 import net.dysky.planner.exception.UserNotFoundException;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
@@ -10,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -165,5 +167,64 @@ class FriendshipServiceTest {
 
         verify(userService, times(1)).getUserByEmail(loggedUserEmail);
         verify(friendshipRepository, times(1)).findAllByUserFriends(receiver);
+    }
+
+    @Test
+    void deleteFriendship_shouldDeleteSuccessfully_whenFriendshipExists() {
+        // Given
+        String userEmail = "user@example.com";
+        String friendEmail = "friend@example.com";
+        DeleteFriendshipDTO dto = new DeleteFriendshipDTO(friendEmail);
+
+        User user = new User();
+        user.setEmail(userEmail);
+
+        User friend = new User();
+        friend.setEmail(friendEmail);
+
+        Friendship friendship = new Friendship();
+        friendship.setUserSender(user);
+        friendship.setUserReceiver(friend);
+
+        when(userService.getUserByEmail(userEmail)).thenReturn(user);
+        when(userService.getUserByEmail(friendEmail)).thenReturn(friend);
+        when(friendshipRepository.findFriendshipBy(user, friend)).thenReturn(Optional.of(friendship));
+
+        // When
+        friendshipService.deleteFriendship(dto, userEmail);
+
+        // Then
+        verify(friendshipRepository, times(1)).delete(friendship);
+        verify(userService, times(1)).getUserByEmail(userEmail);
+        verify(userService, times(1)).getUserByEmail(friendEmail);
+        verify(friendshipRepository, times(1)).findFriendshipBy(user, friend);
+    }
+
+    @Test
+    void deleteFriendship_shouldThrowFriendshipNotFoundException_whenFriendshipDoesNotExist() {
+        // Given
+        String userEmail = "user@example.com";
+        String friendEmail = "friend@example.com";
+        DeleteFriendshipDTO dto = new DeleteFriendshipDTO(friendEmail);
+
+        User user = new User();
+        user.setEmail(userEmail);
+
+        User friend = new User();
+        friend.setEmail(friendEmail);
+
+        when(userService.getUserByEmail(userEmail)).thenReturn(user);
+        when(userService.getUserByEmail(friendEmail)).thenReturn(friend);
+        when(friendshipRepository.findFriendshipBy(user, friend)).thenReturn(Optional.empty());
+
+        // When & Then
+        FriendshipNotFoundException exception = assertThrows(FriendshipNotFoundException.class,
+                () -> friendshipService.deleteFriendship(dto, userEmail));
+
+        assertEquals("Friendship not found", exception.getMessage());
+
+        verify(friendshipRepository, never()).delete(any(Friendship.class));
+        verify(userService, times(1)).getUserByEmail(userEmail);
+        verify(userService, times(1)).getUserByEmail(friendEmail);
     }
 }
