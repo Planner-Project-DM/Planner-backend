@@ -54,6 +54,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+
+    @ExceptionHandler(FriendshipNotFoundException.class)
+    public ResponseEntity<ResponseDTO> handleFriendshipNotFound(FriendshipNotFoundException ex, HttpServletRequest request) {
+        ResponseDTO error = new ResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ResponseDTO> handleDataIntegrityViolation(DataIntegrityViolationException ex, HttpServletRequest request) {
         String message = "Data integrity violation occurred.";

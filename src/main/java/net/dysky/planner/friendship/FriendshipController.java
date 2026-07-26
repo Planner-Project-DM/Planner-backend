@@ -47,4 +47,19 @@ class FriendshipController {
         );
     }
 
+    @DeleteMapping
+    public ResponseEntity<ResponseDTO> deleteFriendship(@RequestBody DeleteFriendshipDTO deleteFriendshipDTO, HttpServletRequest request) {
+        String email = jwtService.extractEmail(request);
+
+        friendshipService.deleteFriendship(deleteFriendshipDTO, email);
+
+        return ResponseEntity.ok(new ResponseDTO(
+                LocalDateTime.now(),
+                200,
+                "Friendship deleted successfully",
+                "/api/friendships",
+                null)
+        );
+    }
+
 }

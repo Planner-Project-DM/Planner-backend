@@ -2,6 +2,7 @@ package net.dysky.planner.friendship;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.exception.FriendshipNotFoundException;
 import net.dysky.planner.exception.UserNotFoundException;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
@@ -25,6 +26,11 @@ public class FriendshipService {
         return friendships.stream().map(friendship -> mapToFriendshipDTO(friendship, email)).toList();
     }
 
+    public Friendship getFriendship(User provider, User friend) {
+        return friendshipRepository.findFriendshipBy(provider, friend)
+                .orElseThrow(() -> new FriendshipNotFoundException("Friendship not found"));
+    }
+
     @Transactional
     public Friendship createFriendship(CreateFriendshipDTO createFriendshipDTO) {
         User sender = userService.getUserByEmail(createFriendshipDTO.emailSender());
@@ -43,6 +49,16 @@ public class FriendshipService {
         friendship.setStatus(FriendshipStatus.PENDING);
 
         return friendshipRepository.save(friendship);
+    }
+
+    @Transactional
+    public void deleteFriendship(DeleteFriendshipDTO deleteFriendshipDTO, String email) {
+        User user = userService.getUserByEmail(email);
+
+        User friend = userService.getUserByEmail(deleteFriendshipDTO.email());
+
+        Friendship friendship =  getFriendship(user, friend);
+        friendshipRepository.delete(friendship);
     }
 
     FriendshipDTO mapToFriendshipDTO(Friendship friendship, String email) {
