@@ -37,20 +37,26 @@ public class TripItemService {
         return tripItemRepository.findAllByAddress_City(city);
     }
 
+    public List<TripItem> findAllByCityAndCategory(String city, TripItemCategory category) {
+        return tripItemRepository.findAllByAddress_CityAndCategory(city, category);
+    }
+
     @Retryable(
             retryFor = {RuntimeException.class},
             maxAttempts = 5,
             backoff = @Backoff(delay = 2000)
     )
-    public OverpassApiDTO getHotelsFromOverpassApi(String city) {
+    public OverpassApiDTO getDataFromOverpassApi(String city) {
         String query = String.format("""
                 [out:json][timeout:25];
-                area["name"="%s"]["admin_level"="8"]->.searchArea;
-                (
-                  node["tourism"~"hotel|hostel|guest_house|apartment"](area.searchArea);
-                  way["tourism"~"hotel|hostel|guest_house|apartment"](area.searchArea);
-                );
-                out center body;
+                    area["name"="%s"]["admin_level"="8"]->.searchArea;
+                    (
+                      node["tourism"~"hotel|hostel|guest_house|apartment|museum|viewpoint|attraction"](area.searchArea);
+                      node["historic"~"castle|monument|ruins"](area.searchArea);
+                      way["tourism"~"hotel|hostel|guest_house|apartment|museum|viewpoint|attraction"](area.searchArea);
+                      way["historic"~"castle|monument|ruins"](area.searchArea);
+                    );
+                    out center body;
             """, city);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -73,7 +79,7 @@ public class TripItemService {
             TripItem tripItem = new TripItem();
 
             tripItem.setName(elementDTO.tags().name());
-            tripItem.setCategory(TripItemCategory.HOTEL);
+
             Address address = Address.builder()
                     .country(elementDTO.tags().country())
                     .city(elementDTO.tags().city())
@@ -97,6 +103,20 @@ public class TripItemService {
             tripItem.setLocation(location);
 
             tripItem.setStars(elementDTO.tags().stars());
+
+            String resolvedCategory = (elementDTO.tags().tourism() != null)
+                    ? elementDTO.tags().tourism()
+                    : elementDTO.tags().historic();
+
+            tripItem.setTourism(resolvedCategory);
+
+            TripItemCategory category = switch (resolvedCategory) {
+                case "hotel", "hostel", "guest_house", "apartment" -> TripItemCategory.HOTEL;
+                case "museum", "viewpoint", "attraction", "castle", "monument", "ruins" -> TripItemCategory.ATTRACTION;
+                default -> TripItemCategory.OTHER;
+            };
+
+            tripItem.setCategory(category);
 
             tripItemRepository.save(tripItem);
         }

@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 interface TripItemRepository extends JpaRepository<TripItem, UUID> {
-    List<TripItem> findAllByAddress_City(String city);
+    List<TripItem> findAllByAddress_City(String addressCity);
+
+    List<TripItem> findAllByAddress_CityAndCategory(String addressCity, TripItemCategory category);
 
     TripItem findByName(String name);
 }

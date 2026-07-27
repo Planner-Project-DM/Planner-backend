@@ -31,7 +31,18 @@ public record TagsDTO(
 
         String website,
 
-        String description
+        String description,
+
+        String tourism,
+        @JsonProperty(value = "historic", access = JsonProperty.Access.WRITE_ONLY)
+        String historic
 
 ) {
+    @Override
+    public String tourism() {
+        if (this.tourism != null) {
+            return this.tourism;
+        }
+        return this.historic;
+    }
 }

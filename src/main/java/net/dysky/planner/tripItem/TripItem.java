@@ -24,6 +24,7 @@ public class TripItem {
 
     private String name;
 
+    @Enumerated(EnumType.STRING)
     private TripItemCategory category;
 
     @Embedded
@@ -44,4 +45,6 @@ public class TripItem {
     private String stars;
 
     private Double price;
+
+    private String tourism;
 }

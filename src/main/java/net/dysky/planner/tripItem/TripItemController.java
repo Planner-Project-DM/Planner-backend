@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,12 +29,13 @@ class TripItemController {
         if(cityVisitedService.isCityVisited(city)) {
             tripItems = tripItemService.findAllByCity(city);
         } else {
-            OverpassApiDTO overpassApiDTO = tripItemService.getHotelsFromOverpassApi(city);
+            OverpassApiDTO overpassApiDTO = tripItemService.getDataFromOverpassApi(city);
             tripItems = tripItemService.saveDataFromOverpass(overpassApiDTO, city);
+            cityVisitedService.markCityASVisited(city);
         }
 
         ResponseDTO responseDTO = new ResponseDTO(
-                java.time.LocalDateTime.now(),
+                LocalDateTime.now(),
                 200,
                 "Trip items retrieved successfully",
                 "/api/trip-items/city/" + city,

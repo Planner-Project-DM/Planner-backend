@@ -1,6 +1,8 @@
 package net.dysky.planner.hotel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -10,8 +12,7 @@ public record ElementDTO(
         BigDecimal lat,
         BigDecimal lon,
         CenterDTO center,
-        TagsDTO tags,
-        String tourism
+        TagsDTO tags
 ) {
     @Override
     public BigDecimal lat() {
