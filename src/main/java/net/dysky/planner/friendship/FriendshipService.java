@@ -2,6 +2,7 @@ package net.dysky.planner.friendship;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.exception.FriendshipExistsException;
 import net.dysky.planner.exception.FriendshipNotFoundException;
 import net.dysky.planner.exception.UserNotFoundException;
 import net.dysky.planner.user.User;
@@ -53,6 +54,10 @@ public class FriendshipService {
         }
 
         User receiver = userService.getUserByEmail(createFriendshipDTO.emailReceiver());
+
+        if(friendshipRepository.existsFriendshipBy(sender, receiver)) {
+            throw new FriendshipExistsException("Friendship already exists");
+        }
 
         Friendship friendship = new Friendship();
 

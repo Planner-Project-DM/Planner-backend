@@ -22,4 +22,8 @@ interface FriendshipRepository extends JpaRepository<Friendship, UUID> {
             ") AND f.status = 'ACCEPTED'")
     Optional<Friendship> findFriendshipBy(@Param("user") User user, @Param("friend") User friend);
 
+    @Query("SELECT COUNT(f) > 0 FROM Friendship f WHERE ( " +
+            "(f.userSender = :user AND f.userReceiver = :friend) OR " +
+            "(f.userSender = :friend AND f.userReceiver = :user))")
+    boolean existsFriendshipBy(@Param("user") User user, @Param("friend") User friend);
 }
