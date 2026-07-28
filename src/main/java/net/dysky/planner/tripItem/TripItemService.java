@@ -78,11 +78,14 @@ public class TripItemService {
         for(ElementDTO elementDTO : overpassApiDTO.elements()) {
             TripItem tripItem = new TripItem();
 
+            if(elementDTO.tags().name() == null || elementDTO.tags().name().isEmpty()) {
+                continue;
+            }
             tripItem.setName(elementDTO.tags().name());
 
             Address address = Address.builder()
                     .country(elementDTO.tags().country())
-                    .city(elementDTO.tags().city())
+                    .city(elementDTO.tags().city() == null ? city : elementDTO.tags().city())
                     .street(elementDTO.tags().street())
                     .postalCode(elementDTO.tags().postalCode())
                     .houseNumber(elementDTO.tags().houseNumber())
