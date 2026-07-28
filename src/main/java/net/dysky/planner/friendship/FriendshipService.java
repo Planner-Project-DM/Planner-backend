@@ -40,6 +40,12 @@ public class FriendshipService {
                 .orElseThrow(() -> new FriendshipNotFoundException("Friendship not found"));
     }
 
+    public List<FriendshipDTO> getMyFriendshipRequest(String email) {
+        List<Friendship> friendships = friendshipRepository.findByUserReceiver_EmailAndStatus(email, FriendshipStatus.PENDING);
+        return friendships.stream().map(friendship -> mapToFriendshipDTO(friendship, email)).toList();
+
+    }
+
     public Friendship findById(UUID id) {
         return friendshipRepository.findById(id).orElseThrow(
                 () -> new FriendshipNotFoundException("Friendship with id " + id + " not found"));

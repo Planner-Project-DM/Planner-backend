@@ -26,4 +26,6 @@ interface FriendshipRepository extends JpaRepository<Friendship, UUID> {
             "(f.userSender = :user AND f.userReceiver = :friend) OR " +
             "(f.userSender = :friend AND f.userReceiver = :user))")
     boolean existsFriendshipBy(@Param("user") User user, @Param("friend") User friend);
+
+    List<Friendship> findByUserReceiver_EmailAndStatus(String userReceiverEmail, FriendshipStatus status);
 }

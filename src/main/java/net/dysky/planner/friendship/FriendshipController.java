@@ -39,6 +39,21 @@ class FriendshipController {
         );
     }
 
+    @GetMapping("/my-requests")
+    public ResponseEntity<ResponseDTO> getMyFriendshipRequests(HttpServletRequest request) {
+        String email =  jwtService.extractEmail(request);
+
+        List<FriendshipDTO> friendshipList = friendshipService.getMyFriendshipRequest(email);
+
+        return ResponseEntity.ok(new ResponseDTO(
+                LocalDateTime.now(),
+                200,
+                "Friendship requests retrieved successfully",
+                "/api/friendships/my-requests",
+                friendshipList)
+        );
+    }
+
     @PostMapping("/create")
     public ResponseEntity<ResponseDTO> createFriendship(@RequestBody CreateFriendshipDTO createFriendshipDTO) {
         Friendship friendship = friendshipService.createFriendship(createFriendshipDTO);
