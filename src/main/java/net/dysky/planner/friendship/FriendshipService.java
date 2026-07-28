@@ -55,6 +55,10 @@ public class FriendshipService {
 
         User receiver = userService.getUserByEmail(createFriendshipDTO.emailReceiver());
 
+        if(sender.getEmail().equals(receiver.getEmail())) {
+            throw new FriendshipExistsException("You cannot send a friendship request to yourself");
+        }
+
         if(friendshipRepository.existsFriendshipBy(sender, receiver)) {
             throw new FriendshipExistsException("Friendship already exists");
         }
