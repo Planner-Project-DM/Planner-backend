@@ -39,4 +39,10 @@ public class TripItineraryService {
         return tripItineraryRepository.save(tripItinerary);
     }
 
+    @Transactional
+    public void deleteTripItinerary(UUID tripId, UUID tripItemId) {
+        TripTripItemsId tripTripItemsId = new TripTripItemsId(tripId, tripItemId);
+        tripItineraryRepository.deleteById(tripTripItemsId);
+    }
+
 }

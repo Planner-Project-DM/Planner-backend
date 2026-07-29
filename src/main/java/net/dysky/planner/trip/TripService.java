@@ -114,13 +114,20 @@ public class TripService {
         tripItineraryService.addTripItinerary(trip, tripItem);
     }
 
+    @Transactional
     public void updateTripItemInTrip(UUID tripId,  UpdateTripItineraryDTO updateTripItineraryDTO) {
-        System.out.println("===> SZUKAMY W BAZIE NAZWY: '" + updateTripItineraryDTO.name() + "'");
-
         TripItem tripItem = tripItemService.findByName(updateTripItineraryDTO.name());
         Trip trip = getTripById(tripId);
 
         tripItineraryService.updateTripItinerary(trip, tripItem, updateTripItineraryDTO.price());
+    }
+
+    @Transactional
+    public void removeTripItemFromTrip(UUID tripId, String name) {
+        Trip trip = getTripById(tripId);
+        TripItem tripItem = tripItemService.findByName(name);
+
+        tripItineraryService.deleteTripItinerary(trip.getId(), tripItem.getId());
     }
 
 }
