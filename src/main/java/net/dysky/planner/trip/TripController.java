@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.response.ResponseDTO;
+import net.dysky.planner.tripitinerary.CreateTripItineraryDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +65,20 @@ class TripController {
         tripService.deleteTrip(id);
 
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Trip deleted successfully", "/api/trips/" + id, null));
+    }
+
+    @PostMapping("/{id}/add-item")
+    public ResponseEntity<ResponseDTO> addTripItem(@PathVariable UUID id, @RequestBody CreateTripItineraryDTO createTripItineraryDTO) {
+        tripService.addTripItemToTrip(id, createTripItineraryDTO);
+
+        return ResponseEntity.ok(new ResponseDTO(
+                LocalDateTime.now(),
+                200,
+                "Trip item added successfully",
+                "/api/trips/" + id + "/add-item",
+                null
+                )
+        );
     }
 
 }

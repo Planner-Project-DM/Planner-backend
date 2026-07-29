@@ -3,6 +3,11 @@ package net.dysky.planner.trip;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.exception.TripNotFoundException;
+import net.dysky.planner.tripItem.TripItem;
+import net.dysky.planner.tripItem.TripItemService;
+import net.dysky.planner.tripitinerary.CreateTripItineraryDTO;
+import net.dysky.planner.tripitinerary.TripItinerary;
+import net.dysky.planner.tripitinerary.TripItineraryService;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
@@ -15,6 +20,10 @@ import java.util.UUID;
 public class TripService {
 
     private final TripRepository tripRepository;
+
+    private final TripItemService tripItemService;
+
+    private final TripItineraryService tripItineraryService;
 
     private final UserService userService;
 
@@ -93,6 +102,15 @@ public class TripService {
     public void deleteTrip(UUID id) {
         Trip trip = getTripById(id);
         tripRepository.delete(trip);
+    }
+
+    @Transactional
+    public TripItinerary addTripItemToTrip(UUID tripId, CreateTripItineraryDTO createTripItineraryDTO) {
+        Trip trip = getTripById(tripId);
+
+        TripItem tripItem = tripItemService.findByName(createTripItineraryDTO.tripItemName());
+
+        return tripItineraryService.add(trip, tripItem, createTripItineraryDTO.price());
     }
 
 }

@@ -5,10 +5,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import net.dysky.planner.group.Group;
+import net.dysky.planner.tripitinerary.TripItinerary;
 import net.dysky.planner.user.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -44,6 +46,9 @@ public class Trip {
 
     private LocalDate startDate;
     private LocalDate endDate;
+
+    @OneToMany(mappedBy = "trip")
+    private List<TripItinerary> tripItineraries;
 
     @JsonIgnore
     private LocalDateTime createdAt = LocalDateTime.now();

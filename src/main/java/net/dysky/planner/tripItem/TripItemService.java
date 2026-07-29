@@ -33,6 +33,10 @@ public class TripItemService {
                 () -> new TripNotFoundException("Trip item not found with id: " + id));
     }
 
+    public TripItem findByName(String name) {
+        return tripItemRepository.findByName(name);
+    }
+
     public List<TripItem> findAllByCity(String city) {
         return tripItemRepository.findAllByAddress_City(city);
     }
