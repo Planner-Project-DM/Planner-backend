@@ -6,6 +6,7 @@ import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.tripItem.TripItem;
 import net.dysky.planner.tripItem.TripItemService;
 import net.dysky.planner.tripitinerary.CreateTripItineraryDTO;
+import net.dysky.planner.tripitinerary.TripItineraryDTO;
 import net.dysky.planner.tripitinerary.TripItineraryService;
 import net.dysky.planner.tripitinerary.UpdateTripItineraryDTO;
 import net.dysky.planner.user.User;
@@ -109,7 +110,7 @@ public class TripService {
     public void addTripItemToTrip(UUID tripId, CreateTripItineraryDTO createTripItineraryDTO) {
         Trip trip = getTripById(tripId);
 
-        TripItem tripItem = tripItemService.findByName(createTripItineraryDTO.tripItemName());
+        TripItem tripItem = tripItemService.findByName(createTripItineraryDTO.name());
 
         tripItineraryService.addTripItinerary(trip, tripItem);
     }

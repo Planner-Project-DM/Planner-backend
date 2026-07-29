@@ -6,6 +6,7 @@ import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripItem.TripItem;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor

@@ -1,6 +1,7 @@
 package net.dysky.planner.trip;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,7 +49,7 @@ public class Trip {
     private LocalDate endDate;
 
     @OneToMany(mappedBy = "trip")
-    @JsonIgnore
+    @JsonIgnoreProperties("trip")
     private List<TripItinerary> tripItineraries;
 
     @JsonIgnore
