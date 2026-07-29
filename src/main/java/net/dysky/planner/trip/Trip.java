@@ -48,6 +48,7 @@ public class Trip {
     private LocalDate endDate;
 
     @OneToMany(mappedBy = "trip")
+    @JsonIgnore
     private List<TripItinerary> tripItineraries;
 
     @JsonIgnore

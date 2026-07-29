@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.response.ResponseDTO;
 import net.dysky.planner.tripitinerary.CreateTripItineraryDTO;
+import net.dysky.planner.tripitinerary.UpdateTripItineraryDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -76,6 +77,20 @@ class TripController {
                 200,
                 "Trip item added successfully",
                 "/api/trips/" + id + "/add-item",
+                null
+                )
+        );
+    }
+
+    @PutMapping("/{id}/set-price")
+    public ResponseEntity<ResponseDTO> updateTripItem(@PathVariable UUID id, @RequestBody UpdateTripItineraryDTO updateTripItineraryDTO) {
+        tripService.updateTripItemInTrip(id, updateTripItineraryDTO);
+
+        return ResponseEntity.ok(new ResponseDTO(
+                LocalDateTime.now(),
+                200,
+                "Trip item updated successfully",
+                "/api/trips/" + id + "/update-item",
                 null
                 )
         );

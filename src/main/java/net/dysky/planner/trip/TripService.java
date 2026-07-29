@@ -6,8 +6,8 @@ import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.tripItem.TripItem;
 import net.dysky.planner.tripItem.TripItemService;
 import net.dysky.planner.tripitinerary.CreateTripItineraryDTO;
-import net.dysky.planner.tripitinerary.TripItinerary;
 import net.dysky.planner.tripitinerary.TripItineraryService;
+import net.dysky.planner.tripitinerary.UpdateTripItineraryDTO;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,8 @@ public class TripService {
     private final UserService userService;
 
     public Trip getTripById(UUID id) {
-        return tripRepository.findById(id).orElseThrow(() -> new TripNotFoundException("Trip not found"));
+        return tripRepository.findById(id).orElseThrow(
+                () -> new TripNotFoundException("Trip not found"));
     }
 
     public List<Trip> getAllTrips() {
@@ -105,12 +106,21 @@ public class TripService {
     }
 
     @Transactional
-    public TripItinerary addTripItemToTrip(UUID tripId, CreateTripItineraryDTO createTripItineraryDTO) {
+    public void addTripItemToTrip(UUID tripId, CreateTripItineraryDTO createTripItineraryDTO) {
         Trip trip = getTripById(tripId);
 
         TripItem tripItem = tripItemService.findByName(createTripItineraryDTO.tripItemName());
 
-        return tripItineraryService.add(trip, tripItem, createTripItineraryDTO.price());
+        tripItineraryService.addTripItinerary(trip, tripItem);
+    }
+
+    public void updateTripItemInTrip(UUID tripId,  UpdateTripItineraryDTO updateTripItineraryDTO) {
+        System.out.println("===> SZUKAMY W BAZIE NAZWY: '" + updateTripItineraryDTO.name() + "'");
+
+        TripItem tripItem = tripItemService.findByName(updateTripItineraryDTO.name());
+        Trip trip = getTripById(tripId);
+
+        tripItineraryService.updateTripItinerary(trip, tripItem, updateTripItineraryDTO.price());
     }
 
 }
