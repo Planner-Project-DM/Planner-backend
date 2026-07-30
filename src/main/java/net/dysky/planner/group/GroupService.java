@@ -3,6 +3,7 @@ package net.dysky.planner.group;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.groupUser.CreateGroupUserDTO;
 import net.dysky.planner.groupUser.GroupRole;
+import net.dysky.planner.groupUser.GroupUser;
 import net.dysky.planner.groupUser.GroupUserService;
 import net.dysky.planner.trip.TripService;
 import net.dysky.planner.trip.UpdateTripDTO;
@@ -49,5 +50,19 @@ public class GroupService {
         }
 
         groupUserService.add(new CreateGroupUserDTO(group, userToAdd, GroupRole.MEMBER));
+    }
+
+    public void deleteFromGroup(RemoveFromGroupDTO removeFromGroupDTO, String email) {
+        Group group = findByName(removeFromGroupDTO.name());
+
+        User userToRemove = userService.getUserByEmail(removeFromGroupDTO.email());
+
+        if(!groupUserService.isUserInGroup(removeFromGroupDTO.name(), email)) {
+            throw new RuntimeException("User is not on the group");
+        }
+
+        GroupUser groupUser = groupUserService.findByGroupAndUser(group, userToRemove);
+
+        groupUserService.remove(groupUser);
     }
 }

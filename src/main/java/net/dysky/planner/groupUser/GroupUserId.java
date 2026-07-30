@@ -1,5 +1,6 @@
 package net.dysky.planner.groupUser;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,6 +8,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter

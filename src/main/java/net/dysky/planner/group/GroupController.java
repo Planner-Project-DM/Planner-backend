@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.response.ResponseDTO;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -38,4 +35,14 @@ class GroupController {
 
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "/api/groups/add", "User added to group successfully", null));
     }
+
+    @DeleteMapping("/remove-user")
+    public ResponseEntity<ResponseDTO> removeFromGroup(@RequestBody RemoveFromGroupDTO removeFromGroupDTO, HttpServletRequest request) {
+        String email = jwtService.extractEmail(request);
+
+        groupService.deleteFromGroup(removeFromGroupDTO, email);
+
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "/api/groups/remove", "User removed from group successfully", null));
+    }
+
 }
