@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import net.dysky.planner.groupUser.CreateGroupUserDTO;
 import net.dysky.planner.groupUser.GroupRole;
 import net.dysky.planner.groupUser.GroupUserService;
+import net.dysky.planner.trip.TripService;
+import net.dysky.planner.trip.UpdateTripDTO;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
@@ -18,17 +20,20 @@ public class GroupService {
 
     private final UserService userService;
 
+    private final TripService tripService;
+
     public Group findByName(String name) {
         return groupRepository.findByName(name).orElseThrow(
                 () -> new RuntimeException("Group not found"));
     }
 
     public Group createGroup(CreateGroupDTO createGroupDTO, String OwnerEmail) {
+
         Group group = new Group();
-
         group.setName(createGroupDTO.name());
-
         Group createdGroup = groupRepository.save(group);
+
+        tripService.updateTrip(createGroupDTO.tripId(), new UpdateTripDTO(null, null, null, null, null, null, createdGroup));
 
         groupUserService.add(new CreateGroupUserDTO(createdGroup, userService.getUserByEmail(OwnerEmail), GroupRole.OWNER));
         return createdGroup;

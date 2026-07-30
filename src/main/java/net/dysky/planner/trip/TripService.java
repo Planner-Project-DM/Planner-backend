@@ -96,6 +96,9 @@ public class TripService {
         if (updateTripDTO.endDate() != null) {
             trip.setEndDate(updateTripDTO.endDate());
         }
+        if(updateTripDTO.group() != null) {
+            trip.setTripGroup(updateTripDTO.group());
+        }
 
         return tripRepository.save(trip);
     }
