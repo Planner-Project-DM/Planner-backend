@@ -11,6 +11,8 @@ import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class GroupService {
@@ -28,20 +30,20 @@ public class GroupService {
                 () -> new RuntimeException("Group not found"));
     }
 
-    public Group createGroup(CreateGroupDTO createGroupDTO, String OwnerEmail) {
+    public Group createGroup(UUID tripId, CreateGroupDTO createGroupDTO, String OwnerEmail) {
 
         Group group = new Group();
         group.setName(createGroupDTO.name());
         Group createdGroup = groupRepository.save(group);
 
-        tripService.updateTrip(createGroupDTO.tripId(), new UpdateTripDTO(null, null, null, null, null, null, createdGroup));
+        tripService.updateTrip(tripId, new UpdateTripDTO(null, null, null, null, null, null, createdGroup));
 
         groupUserService.add(new CreateGroupUserDTO(createdGroup, userService.getUserByEmail(OwnerEmail), GroupRole.OWNER));
         return createdGroup;
     }
 
-    public void addToGroup(AddToGroupDTO addToGroupDTO, String email) {
-        Group group = findByName(addToGroupDTO.name());
+    public void addToGroup(UUID tripId, AddToGroupDTO addToGroupDTO, String email) {
+        Group group = tripService.getTripById(tripId).getTripGroup();
 
         User userToAdd = userService.getUserByEmail(addToGroupDTO.email());
 
@@ -52,7 +54,7 @@ public class GroupService {
         groupUserService.add(new CreateGroupUserDTO(group, userToAdd, GroupRole.MEMBER));
     }
 
-    public void deleteFromGroup(RemoveFromGroupDTO removeFromGroupDTO, String email) {
+    public void deleteFromGroup(UUID tripId, RemoveFromGroupDTO removeFromGroupDTO, String email) {
         Group group = findByName(removeFromGroupDTO.name());
 
         User userToRemove = userService.getUserByEmail(removeFromGroupDTO.email());
