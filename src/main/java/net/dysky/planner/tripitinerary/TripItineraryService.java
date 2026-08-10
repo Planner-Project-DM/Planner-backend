@@ -22,6 +22,11 @@ public class TripItineraryService {
                 () -> new RuntimeException("Trip Itinerary not found"));
     }
 
+    public Double getTotalCostByTripId(UUID tripId) {
+        List<TripItinerary> tripItineraries = tripItineraryRepository.findAllByTripId(tripId);
+        return tripItineraries.stream().mapToDouble(TripItinerary::getPrice).sum();
+    }
+
     @Transactional
     public TripItinerary addTripItinerary(Trip trip, TripItem tripItem) {
         TripItinerary tripItinerary = new TripItinerary();

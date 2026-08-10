@@ -6,7 +6,6 @@ import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.tripItem.TripItem;
 import net.dysky.planner.tripItem.TripItemService;
 import net.dysky.planner.tripitinerary.CreateTripItineraryDTO;
-import net.dysky.planner.tripitinerary.TripItineraryDTO;
 import net.dysky.planner.tripitinerary.TripItineraryService;
 import net.dysky.planner.tripitinerary.UpdateTripItineraryDTO;
 import net.dysky.planner.user.User;
@@ -47,6 +46,19 @@ public class TripService {
 
     public List<Trip> getAllTripsByEmailAndStatus(String email, TripStatus tripStatus) {
         return tripRepository.findAllByTripCreatorEmailAndStatus(email, tripStatus);
+    }
+
+    @Transactional
+    public Trip updateTripCosts(UUID tripId) {
+        Trip trip = getTripById(tripId);
+        Double totalCost = tripItineraryService.getTotalCostByTripId(tripId);
+        if(totalCost + trip.getBudget() > trip.getBudget()) {
+            throw new RuntimeException("Total cost exceeds budget");
+        }
+
+        trip.setActualCost(totalCost);
+
+        return tripRepository.save(trip);
     }
 
     @Transactional
@@ -116,6 +128,8 @@ public class TripService {
         TripItem tripItem = tripItemService.findByName(createTripItineraryDTO.name());
 
         tripItineraryService.addTripItinerary(trip, tripItem);
+
+        updateTripCosts(tripId);
     }
 
     @Transactional
@@ -124,6 +138,8 @@ public class TripService {
         Trip trip = getTripById(tripId);
 
         tripItineraryService.updateTripItinerary(trip, tripItem, updateTripItineraryDTO.price());
+
+        updateTripCosts(tripId);
     }
 
     @Transactional
@@ -132,6 +148,8 @@ public class TripService {
         TripItem tripItem = tripItemService.findByName(name);
 
         tripItineraryService.deleteTripItinerary(trip.getId(), tripItem.getId());
+
+        updateTripCosts(tripId);
     }
 
 }

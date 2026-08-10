@@ -42,6 +42,8 @@ public class Trip {
 
     private Double budget;
 
+    private Double actualCost = 0.0;
+
     @OneToOne
     private Group tripGroup;
 
