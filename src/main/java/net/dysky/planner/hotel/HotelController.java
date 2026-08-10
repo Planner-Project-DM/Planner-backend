@@ -20,8 +20,6 @@ class HotelController {
 
     private final HotelService hotelService;
 
-    private final CityVisitedService cityVisitedService;
-
     @GetMapping
     public ResponseEntity<ResponseDTO> getAllHotels(@PageableDefault(size = 10) Pageable pageable) {
         Page<Hotel> hotels = hotelService.getAllHotels(pageable);
@@ -52,27 +50,4 @@ class HotelController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("city/{city}")
-    public ResponseEntity<ResponseDTO> getHotelByCity(@PathVariable String city) {
-        List<Hotel> hotels;
-
-        if (cityVisitedService.isCityVisited(city)) {
-             hotels = hotelService.getHotelsByCity(city);
-
-        } else {
-            OverpassApiDTO overpassApiDTO = hotelService.getHotelsFromOverpassApi(city);
-            hotels = hotelService.saveHotelFromOverpass(overpassApiDTO, city);
-            cityVisitedService.markCityASVisited(city);
-        }
-
-        ResponseDTO responseDTO = new ResponseDTO(
-                LocalDateTime.now(),
-                200,
-                "Hotels retrieved successfully",
-                "/api/hotels/" + city,
-                hotels
-        );
-
-        return ResponseEntity.ok(responseDTO);
-    }
 }
