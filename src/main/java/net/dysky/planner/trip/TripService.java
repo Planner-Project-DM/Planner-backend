@@ -3,6 +3,8 @@ package net.dysky.planner.trip;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.exception.TripNotFoundException;
+import net.dysky.planner.group.CreateGroupDTO;
+import net.dysky.planner.group.GroupService;
 import net.dysky.planner.tripItem.TripItem;
 import net.dysky.planner.tripItem.TripItemService;
 import net.dysky.planner.tripitinerary.CreateTripItineraryDTO;
@@ -26,6 +28,8 @@ public class TripService {
     private final TripItineraryService tripItineraryService;
 
     private final UserService userService;
+
+    private final GroupService groupService;
 
     public Trip getTripById(UUID id) {
         return tripRepository.findById(id).orElseThrow(
@@ -79,6 +83,7 @@ public class TripService {
         trip.setBudget(createTripDTO.budget());
 
         // TODO group
+        trip.setTripGroup(groupService.createGroup(new CreateGroupDTO(""), email));
 
         trip.setStartDate(createTripDTO.startDate());
         trip.setEndDate(createTripDTO.endDate());

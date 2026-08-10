@@ -5,13 +5,10 @@ import net.dysky.planner.groupUser.CreateGroupUserDTO;
 import net.dysky.planner.groupUser.GroupRole;
 import net.dysky.planner.groupUser.GroupUser;
 import net.dysky.planner.groupUser.GroupUserService;
-import net.dysky.planner.trip.TripService;
-import net.dysky.planner.trip.UpdateTripDTO;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -23,45 +20,36 @@ public class GroupService {
 
     private final UserService userService;
 
-    private final TripService tripService;
-
     public Group findByName(String name) {
         return groupRepository.findByName(name).orElseThrow(
                 () -> new RuntimeException("Group not found"));
     }
 
-    public Group createGroup(UUID tripId, CreateGroupDTO createGroupDTO, String OwnerEmail) {
-
+    public Group createGroup(CreateGroupDTO createGroupDTO, String OwnerEmail) {
         Group group = new Group();
         group.setName(createGroupDTO.name());
         Group createdGroup = groupRepository.save(group);
-
-        tripService.updateTrip(tripId, new UpdateTripDTO(null, null, null, null, null, null, createdGroup));
 
         groupUserService.add(new CreateGroupUserDTO(createdGroup, userService.getUserByEmail(OwnerEmail), GroupRole.OWNER));
         return createdGroup;
     }
 
-    public void addToGroup(UUID tripId, AddToGroupDTO addToGroupDTO, String email) {
-        Group group = tripService.getTripById(tripId).getTripGroup();
+    public void addToGroup(Group group, AddToGroupDTO addToGroupDTO) {
+
+        boolean alreadyInGroup = group.getGroupUsers().stream()
+                .anyMatch(gu -> gu.getUser().getEmail().equals(addToGroupDTO.email()));
+        if (alreadyInGroup) throw new RuntimeException("User is already in the group");
 
         User userToAdd = userService.getUserByEmail(addToGroupDTO.email());
-
-        if(!groupUserService.isUserInGroup(addToGroupDTO.name(), email)) {
-            throw new RuntimeException("User is on the group");
-        }
-
         groupUserService.add(new CreateGroupUserDTO(group, userToAdd, GroupRole.MEMBER));
     }
 
-    public void deleteFromGroup(UUID tripId, RemoveFromGroupDTO removeFromGroupDTO, String email) {
-        Group group = findByName(removeFromGroupDTO.name());
-
+    public void deleteFromGroup(Group group, RemoveFromGroupDTO removeFromGroupDTO) {
         User userToRemove = userService.getUserByEmail(removeFromGroupDTO.email());
 
-        if(!groupUserService.isUserInGroup(removeFromGroupDTO.name(), email)) {
-            throw new RuntimeException("User is not on the group");
-        }
+        boolean inGroup = group.getGroupUsers().stream()
+                .anyMatch(gu -> gu.getUser().getEmail().equals(removeFromGroupDTO.email()));
+        if (!inGroup) throw new RuntimeException("User is not in the group");
 
         GroupUser groupUser = groupUserService.findByGroupAndUser(group, userToRemove);
 

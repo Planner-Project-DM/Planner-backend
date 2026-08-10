@@ -1,6 +1,7 @@
 package net.dysky.planner.trip;
 
 import net.dysky.planner.exception.TripNotFoundException;
+import net.dysky.planner.group.GroupService;
 import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,9 @@ class TripServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private GroupService groupService;
 
     @InjectMocks
     private TripService tripService;
