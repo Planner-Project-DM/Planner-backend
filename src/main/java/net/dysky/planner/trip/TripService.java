@@ -127,16 +127,6 @@ public class TripService {
     }
 
     @Transactional
-    public void updateTripItemInTrip(UUID tripId,  UpdateTripItineraryDTO updateTripItineraryDTO) {
-        TripItem tripItem = tripItemService.findByName(updateTripItineraryDTO.name());
-        Trip trip = getTripById(tripId);
-
-        tripItineraryService.updateTripItinerary(trip, tripItem, updateTripItineraryDTO.price());
-
-        updateTripCosts(tripId);
-    }
-
-    @Transactional
     public void removeTripItemFromTrip(UUID tripId, String name) {
         Trip trip = getTripById(tripId);
         TripItem tripItem = tripItemService.findByName(name);

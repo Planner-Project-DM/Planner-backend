@@ -68,20 +68,6 @@ class TripController {
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Trip deleted successfully", "/api/trips/" + id, null));
     }
 
-    @PutMapping("/{id}/set-price")
-    public ResponseEntity<ResponseDTO> updateTripItem(@PathVariable UUID id, @RequestBody UpdateTripItineraryDTO updateTripItineraryDTO) {
-        tripService.updateTripItemInTrip(id, updateTripItineraryDTO);
-
-        return ResponseEntity.ok(new ResponseDTO(
-                LocalDateTime.now(),
-                200,
-                "Trip item updated successfully",
-                "/api/trips/" + id + "/update-item",
-                null
-                )
-        );
-    }
-
     @DeleteMapping("/{id}/remove-item")
     public ResponseEntity<ResponseDTO> removeTripItem(@PathVariable UUID id, @RequestParam String name) {
         tripService.removeTripItemFromTrip(id, name);

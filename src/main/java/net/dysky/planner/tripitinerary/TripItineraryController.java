@@ -36,4 +36,22 @@ class TripItineraryController {
         );
     }
 
+    @PutMapping
+    public ResponseEntity<ResponseDTO> updateTripItem(@PathVariable UUID id, @RequestBody UpdateTripItineraryDTO updateTripItineraryDTO) {
+        Trip trip = tripService.getTripById(id);
+
+        tripItineraryService.updateTripItinerary(trip, updateTripItineraryDTO);
+        tripService.updateTripCosts(id);
+
+        return ResponseEntity.ok(new ResponseDTO(
+                LocalDateTime.now(),
+                200,
+                "Trip item updated successfully",
+                "/api/trips/" + id + "/update-item",
+                null
+            )
+        );
+    }
+
+
 }

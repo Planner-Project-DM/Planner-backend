@@ -43,9 +43,9 @@ public class TripItineraryService {
     }
 
     @Transactional
-    public TripItinerary updateTripItinerary(Trip trip, TripItem tripItem, Double price) {
-        TripItinerary tripItinerary = findById(trip.getId(), tripItem.getId());
-        tripItinerary.setPrice(price);
+    public TripItinerary updateTripItinerary(Trip trip, UpdateTripItineraryDTO updateTripItineraryDTO) {
+        TripItinerary tripItinerary = findById(trip.getId(), updateTripItineraryDTO.tripItemId());
+        tripItinerary.setPrice(updateTripItineraryDTO.price());
 
         return tripItineraryRepository.save(tripItinerary);
     }
