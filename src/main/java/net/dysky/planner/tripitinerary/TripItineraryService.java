@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripItem.TripItem;
+import net.dysky.planner.tripItem.TripItemService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.UUID;
 public class TripItineraryService {
 
     private final TripItineraryRepository tripItineraryRepository;
+
+    private final TripItemService tripItemService;
 
     public TripItinerary findById(UUID tripId, UUID tripItemId) {
         TripTripItemsId tripTripItemsId = new TripTripItemsId(tripId, tripItemId);
@@ -28,7 +31,9 @@ public class TripItineraryService {
     }
 
     @Transactional
-    public TripItinerary addTripItinerary(Trip trip, TripItem tripItem) {
+    public TripItinerary addTripItinerary(Trip trip, CreateTripItineraryDTO createTripItineraryDTO) {
+        TripItem tripItem = tripItemService.findById(createTripItineraryDTO.tripItemId());
+
         TripItinerary tripItinerary = new TripItinerary();
 
         tripItinerary.setTrip(trip);

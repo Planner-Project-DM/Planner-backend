@@ -56,7 +56,7 @@ public class TripService {
     public Trip updateTripCosts(UUID tripId) {
         Trip trip = getTripById(tripId);
         Double totalCost = tripItineraryService.getTotalCostByTripId(tripId);
-        if(totalCost + trip.getBudget() > trip.getBudget()) {
+        if(totalCost > trip.getBudget()) {
             throw new RuntimeException("Total cost exceeds budget");
         }
 
@@ -124,17 +124,6 @@ public class TripService {
     public void deleteTrip(UUID id) {
         Trip trip = getTripById(id);
         tripRepository.delete(trip);
-    }
-
-    @Transactional
-    public void addTripItemToTrip(UUID tripId, CreateTripItineraryDTO createTripItineraryDTO) {
-        Trip trip = getTripById(tripId);
-
-        TripItem tripItem = tripItemService.findByName(createTripItineraryDTO.name());
-
-        tripItineraryService.addTripItinerary(trip, tripItem);
-
-        updateTripCosts(tripId);
     }
 
     @Transactional
