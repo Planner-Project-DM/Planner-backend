@@ -53,5 +53,20 @@ class TripItineraryController {
         );
     }
 
+    @DeleteMapping
+    public ResponseEntity<ResponseDTO> deleteTripItem(@PathVariable UUID id, @RequestParam UUID tripItemId) {
+        tripItineraryService.deleteTripItinerary(id, tripItemId);
+        tripService.updateTripCosts(id);
+
+        return ResponseEntity.ok(new ResponseDTO(
+                LocalDateTime.now(),
+                200,
+                "Trip item deleted successfully",
+                "/api/trips/" + id + "/delete-item",
+                null
+            )
+        );
+    }
+
 
 }
