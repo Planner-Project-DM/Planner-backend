@@ -26,8 +26,8 @@ public class TripItineraryService {
                 () -> new RuntimeException("Trip Itinerary not found"));
     }
 
-    public boolean existsByTripItem(UUID tripItemId) {
-        return tripItineraryRepository.existsByTripItem_Id(tripItemId);
+    public boolean existsByTripItem(Trip trip, UUID tripItemId) {
+        return tripItineraryRepository.existsByTripAndTripItem_Id(trip, tripItemId);
     }
 
     public Double getTotalCostByTripId(UUID tripId) {
@@ -39,7 +39,7 @@ public class TripItineraryService {
     public TripItinerary addTripItinerary(Trip trip, CreateTripItineraryDTO createTripItineraryDTO) {
         TripItem tripItem = tripItemService.findById(createTripItineraryDTO.tripItemId());
 
-        if(existsByTripItem(tripItem.getId())) {
+        if(existsByTripItem(trip, tripItem.getId())) {
             throw new TripFoundException("Trip Item already exists in the itinerary");
         }
 
