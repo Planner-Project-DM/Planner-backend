@@ -32,7 +32,6 @@ public class TripItem {
 
     private String phoneNumber;
 
-    @Email
     private String email;
 
     private String website;
