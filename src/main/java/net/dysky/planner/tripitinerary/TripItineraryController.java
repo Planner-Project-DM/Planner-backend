@@ -30,7 +30,7 @@ class TripItineraryController {
                 LocalDateTime.now(),
                 200,
                 "Trip item added successfully",
-                "/api/trips/" + id + "/add-item",
+                "/api/trips/" + id + "/item",
                 null
             )
         );
@@ -47,7 +47,7 @@ class TripItineraryController {
                 LocalDateTime.now(),
                 200,
                 "Trip item updated successfully",
-                "/api/trips/" + id + "/update-item",
+                "/api/trips/" + id + "/item",
                 null
             )
         );
@@ -62,7 +62,7 @@ class TripItineraryController {
                 LocalDateTime.now(),
                 200,
                 "Trip item deleted successfully",
-                "/api/trips/" + id + "/delete-item",
+                "/api/trips/" + id + "/item",
                 null
             )
         );
