@@ -56,4 +56,20 @@ class TripScheduleController {
         );
     }
 
+    @DeleteMapping
+    public ResponseEntity<ResponseDTO> deleteScheduleFromTrip(@PathVariable("id") UUID id, @RequestParam("scheduleId") UUID scheduleId) {
+
+        tripScheduleService.deleteScheduleFromTrip(id, scheduleId);
+
+        return ResponseEntity.ok(
+                new ResponseDTO(
+                        LocalDateTime.now(),
+                        200,
+                        "Schedule deleted successfully",
+                        "/api/trips/" + id + "/schedules",
+                        null
+                )
+        );
+    }
+
 }

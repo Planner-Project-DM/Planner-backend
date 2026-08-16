@@ -4,11 +4,18 @@ import lombok.RequiredArgsConstructor;
 import net.dysky.planner.trip.Trip;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+
+    public Schedule getScheduleById(UUID scheduleId) {
+        return scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalArgumentException("Schedule not found"));
+    }
 
     public Schedule addSchedule(Trip trip, CreateScheduleDTO createScheduleDTO) {
         Schedule schedule = new Schedule();
@@ -36,6 +43,12 @@ public class ScheduleService {
         schedule.setEndTime(createScheduleDTO.endTime());
 
         return scheduleRepository.save(schedule);
+    }
+
+    public void deleteSchedule(UUID scheduleId) {
+        Schedule schedule = getScheduleById(scheduleId);
+
+        scheduleRepository.delete(schedule);
     }
 
 }
