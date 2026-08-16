@@ -5,8 +5,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.response.ResponseDTO;
-import net.dysky.planner.tripitinerary.CreateTripItineraryDTO;
-import net.dysky.planner.tripitinerary.UpdateTripItineraryDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

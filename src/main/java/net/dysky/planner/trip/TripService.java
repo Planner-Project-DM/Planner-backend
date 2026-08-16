@@ -2,14 +2,14 @@ package net.dysky.planner.trip;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.exception.BudgetNotPositiveException;
+import net.dysky.planner.exception.TripFoundException;
 import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.group.CreateGroupDTO;
 import net.dysky.planner.group.GroupService;
 import net.dysky.planner.tripItem.TripItem;
 import net.dysky.planner.tripItem.TripItemService;
-import net.dysky.planner.tripitinerary.CreateTripItineraryDTO;
 import net.dysky.planner.tripitinerary.TripItineraryService;
-import net.dysky.planner.tripitinerary.UpdateTripItineraryDTO;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
@@ -67,6 +67,11 @@ public class TripService {
 
     @Transactional
     public Trip createTrip(CreateTripDTO createTripDTO, String email) {
+
+        if(tripRepository.existsByNameAndTripCreator_Email(createTripDTO.name(), email)) {
+            throw new TripFoundException("Trip with the same name already exists for this user.");
+        }
+
         Trip trip = new Trip();
 
         trip.setName(createTripDTO.name());
@@ -77,12 +82,11 @@ public class TripService {
         trip.setTripCreator(user);
 
         if(createTripDTO.budget() <= 0) {
-            throw new RuntimeException("Budget must be a positive value");
+            throw new BudgetNotPositiveException("Budget must be a positive value");
         }
 
         trip.setBudget(createTripDTO.budget());
 
-        // TODO group
         trip.setTripGroup(groupService.createGroup(new CreateGroupDTO(""), email));
 
         trip.setStartDate(createTripDTO.startDate());

@@ -11,4 +11,6 @@ interface TripRepository extends JpaRepository<Trip, UUID> {
     List<Trip> findAllByTripCreatorEmail(String tripCreatorEmail);
 
     List<Trip> findAllByTripCreatorEmailAndStatus(String tripCreatorEmail, TripStatus status);
+
+    boolean existsByNameAndTripCreator_Email(String name, String tripCreatorEmail);
 }

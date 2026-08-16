@@ -12,14 +12,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Transactional
@@ -30,6 +32,9 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private JwtService jwtService;
@@ -65,11 +70,9 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void getTrips_shouldReturnAllTrips_whenStatusIsNotProvided() throws Exception {
-        // Given
         createAndSaveTrip("Paryż 2024", "Paryż", TripStatus.PLANNED);
         createAndSaveTrip("Londyn 2024", "Londyn", TripStatus.COMPLETED);
 
-        // When & Then
         mockMvc.perform(get("/api/trips")
                         .with(user("user@example.com").roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -83,11 +86,9 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void getTrips_shouldReturnFilteredTrips_whenStatusIsProvided() throws Exception {
-        // Given
         createAndSaveTrip("Paryż 2024", "Paryż", TripStatus.PLANNED);
         createAndSaveTrip("Londyn 2024", "Londyn", TripStatus.COMPLETED);
 
-        // When & Then
         mockMvc.perform(get("/api/trips")
                         .with(user("user@example.com").roles("USER"))
                         .param("status", "PLANNED")
@@ -103,11 +104,9 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void getTripById_shouldReturnTrip_whenIdIsValid() throws Exception {
-        // Given
         Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
         UUID id = savedTrip.getId();
 
-        // When & Then
         mockMvc.perform(get("/api/trips/{id}", id)
                         .with(user("user@example.com").roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -117,5 +116,120 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.url").value("/api/trips/" + id))
                 .andExpect(jsonPath("$.data.name").value("Rzym 2024"))
                 .andExpect(jsonPath("$.createdAt").exists());
+    }
+
+    @Test
+    void getTripById_shouldReturnNotFound_whenTripDoesNotExist() throws Exception {
+        UUID randomId = UUID.randomUUID();
+
+        mockMvc.perform(get("/api/trips/{id}", randomId)
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Trip not found"))
+                .andExpect(jsonPath("$.url").value("/api/trips/" + randomId))
+                .andExpect(jsonPath("$.createdAt").exists());
+    }
+
+    @Test
+    void createTrip_shouldReturnInternalServerError_whenBudgetIsZeroOrNegative() throws Exception {
+        CreateTripDTO invalidDto = new CreateTripDTO("Wycieczka", "Rzym", -100.0, LocalDate.now(), LocalDate.now().plusDays(5));
+
+        mockMvc.perform(post("/api/trips")
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Budget must be a positive value"))
+                .andExpect(jsonPath("$.url").value("/api/trips"))
+                .andExpect(jsonPath("$.createdAt").exists());
+    }
+
+    @Test
+    void createTrip_shouldReturnBadRequest_whenDataIsInvalid() throws Exception {
+        CreateTripDTO invalidDto = new CreateTripDTO("", "", -100.0, null, null);
+
+        mockMvc.perform(post("/api/trips")
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void createTrip_shouldReturnConflict_whenTripNameAlreadyExistsForUser() throws Exception {
+        createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
+
+        CreateTripDTO duplicateDto = new CreateTripDTO("Rzym 2024", "Włochy", 3000.0, LocalDate.now(), LocalDate.now().plusDays(5));
+
+        mockMvc.perform(post("/api/trips")
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(duplicateDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value("Trip with the same name already exists for this user."))
+                .andExpect(jsonPath("$.url").value("/api/trips"));
+    }
+
+    @Test
+    void updateTrip_shouldPartiallyUpdateTrip_whenDataIsValid() throws Exception {
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
+        UUID id = savedTrip.getId();
+
+        UpdateTripDTO updateDto = new UpdateTripDTO("Włochy 2024", null, null, 2000.0, null, null, null);
+
+        mockMvc.perform(patch("/api/trips/{id}", id)
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Trip updated successfully"))
+                .andExpect(jsonPath("$.data.name").value("Włochy 2024"))
+                .andExpect(jsonPath("$.data.destination").value("Rzym"))
+                .andExpect(jsonPath("$.data.budget").value(2000.0))
+                .andExpect(jsonPath("$.createdAt").exists());
+    }
+
+    @Test
+    void updateTrip_shouldReturnNotFound_whenTripDoesNotExist() throws Exception {
+        UUID randomId = UUID.randomUUID();
+        UpdateTripDTO updateDto = new UpdateTripDTO("Nowa Nazwa", null, null, null, null, null, null);
+
+        mockMvc.perform(patch("/api/trips/{id}", randomId)
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void deleteTrip_shouldDeleteSuccessfully_whenTripExists() throws Exception {
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
+        UUID id = savedTrip.getId();
+
+        mockMvc.perform(delete("/api/trips/{id}", id)
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Trip deleted successfully"));
+
+        assertFalse(tripRepository.findById(id).isPresent());
+    }
+
+    @Test
+    void deleteTrip_shouldReturnNotFound_whenTripDoesNotExist() throws Exception {
+        UUID randomId = UUID.randomUUID();
+
+        mockMvc.perform(delete("/api/trips/{id}", randomId)
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404));
     }
 }
