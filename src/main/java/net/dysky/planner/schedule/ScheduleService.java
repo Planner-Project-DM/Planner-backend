@@ -1,6 +1,7 @@
 package net.dysky.planner.schedule;
 
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.trip.Trip;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -9,10 +10,14 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
 
-    public Schedule addSchedule(CreateScheduleDTO createScheduleDTO) {
+    public Schedule addSchedule(Trip trip, CreateScheduleDTO createScheduleDTO) {
         Schedule schedule = new Schedule();
 
         schedule.setTripItem(createScheduleDTO.tripItem());
+
+        if(createScheduleDTO.startTime().isAfter(trip.getStartDate().atStartOfDay()) && createScheduleDTO.endTime().isBefore(trip.getEndDate().atTime(23, 59))) {
+            throw new IllegalArgumentException("Schedule must be within the trip dates");
+        }
 
         if(createScheduleDTO.startTime().isAfter(createScheduleDTO.endTime())) {
             throw new IllegalArgumentException("End time must be after start time");
