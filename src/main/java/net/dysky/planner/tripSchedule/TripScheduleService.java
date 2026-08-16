@@ -28,7 +28,7 @@ public class TripScheduleService {
     public TripSchedule addScheduleToTrip(Trip trip, CreateTripScheduleDTO dto) {
         TripItem tripItem = tripItemService.findById(dto.tripItemId());
 
-        Schedule schedule = scheduleService.addSchedule(new CreateScheduleDTO(tripItem, dto.startTime(), dto.endTime()));
+        Schedule schedule = scheduleService.addSchedule(trip, new CreateScheduleDTO(tripItem, dto.startTime(), dto.endTime()));
 
         TripSchedule tripSchedule = new TripSchedule();
 
