@@ -2,6 +2,7 @@ package net.dysky.planner.tripSchedule;
 
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.response.ResponseDTO;
+import net.dysky.planner.schedule.ScheduleResponseDTO;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ class TripScheduleController {
         Trip trip = tripService.getTripById(id);
 
         List<TripSchedule> schedules = tripScheduleService.getAllSchedulesForTrip(trip);
+        List<ScheduleResponseDTO> response = schedules.stream().map(tripScheduleService::mapToDTO).toList();
 
         return ResponseEntity.ok(
                 new ResponseDTO(
@@ -32,7 +34,7 @@ class TripScheduleController {
                         200,
                         "Schedules retrieved successfully",
                         "/api/trips/" + id + "/schedules",
-                        schedules
+                        response
                 )
         );
     }

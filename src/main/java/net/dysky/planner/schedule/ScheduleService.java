@@ -15,7 +15,8 @@ public class ScheduleService {
 
         schedule.setTripItem(createScheduleDTO.tripItem());
 
-        if(createScheduleDTO.startTime().isAfter(trip.getStartDate().atStartOfDay()) && createScheduleDTO.endTime().isBefore(trip.getEndDate().atTime(23, 59))) {
+        if(createScheduleDTO.startTime().isBefore(trip.getStartDate().atStartOfDay()) &&
+                createScheduleDTO.endTime().isBefore(trip.getEndDate().atTime(23, 59))) {
             throw new IllegalArgumentException("Schedule must be within the trip dates");
         }
 
@@ -36,4 +37,5 @@ public class ScheduleService {
 
         return scheduleRepository.save(schedule);
     }
+
 }

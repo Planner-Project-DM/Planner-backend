@@ -22,7 +22,7 @@ public class Schedule {
     @GeneratedValue
     private UUID id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "trip_item_id", referencedColumnName = "id")
     private TripItem tripItem;
 

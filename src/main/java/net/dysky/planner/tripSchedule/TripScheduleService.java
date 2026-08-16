@@ -1,9 +1,7 @@
 package net.dysky.planner.tripSchedule;
 
 import lombok.RequiredArgsConstructor;
-import net.dysky.planner.schedule.CreateScheduleDTO;
-import net.dysky.planner.schedule.Schedule;
-import net.dysky.planner.schedule.ScheduleService;
+import net.dysky.planner.schedule.*;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripItem.TripItem;
 import net.dysky.planner.tripItem.TripItemService;
@@ -37,5 +35,18 @@ public class TripScheduleService {
         return tripScheduleRepository.save(tripSchedule);
     }
 
+    public ScheduleResponseDTO mapToDTO(TripSchedule tripSchedule) {
+        TripItemSummaryDTO tripItemSummaryDTO = new TripItemSummaryDTO(
+                tripSchedule.schedule.getTripItem().getId(),
+                tripSchedule.schedule.getTripItem().getName()
+        );
+
+        return new ScheduleResponseDTO(
+                tripSchedule.schedule.getId(),
+                tripItemSummaryDTO,
+                tripSchedule.schedule.getStartTime().toString(),
+                tripSchedule.schedule.getEndTime().toString()
+        );
+    }
 
 }
