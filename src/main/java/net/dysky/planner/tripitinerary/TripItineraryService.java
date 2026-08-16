@@ -2,6 +2,7 @@ package net.dysky.planner.tripitinerary;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.exception.TripFoundException;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripItem.TripItem;
 import net.dysky.planner.tripItem.TripItemService;
@@ -25,6 +26,10 @@ public class TripItineraryService {
                 () -> new RuntimeException("Trip Itinerary not found"));
     }
 
+    public boolean existsByTripItem(UUID tripItemId) {
+        return tripItineraryRepository.existsByTripItem_Id(tripItemId);
+    }
+
     public Double getTotalCostByTripId(UUID tripId) {
         List<TripItinerary> tripItineraries = tripItineraryRepository.findAllByTripId(tripId);
         return tripItineraries.stream().mapToDouble(TripItinerary::getPrice).sum();
@@ -33,6 +38,10 @@ public class TripItineraryService {
     @Transactional
     public TripItinerary addTripItinerary(Trip trip, CreateTripItineraryDTO createTripItineraryDTO) {
         TripItem tripItem = tripItemService.findById(createTripItineraryDTO.tripItemId());
+
+        if(existsByTripItem(tripItem.getId())) {
+            throw new TripFoundException("Trip Item already exists in the itinerary");
+        }
 
         TripItinerary tripItinerary = new TripItinerary();
 

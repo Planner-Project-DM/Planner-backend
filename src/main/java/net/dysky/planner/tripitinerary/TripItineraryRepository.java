@@ -9,4 +9,6 @@ interface TripItineraryRepository extends JpaRepository<TripItinerary, TripTripI
 
     List<TripItinerary> findAllByTripId(UUID tripId);
 
+    boolean existsByTripItem_Id(UUID tripItemId);
+
 }
