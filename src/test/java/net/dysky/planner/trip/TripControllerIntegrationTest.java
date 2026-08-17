@@ -133,7 +133,7 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void createTrip_shouldReturnInternalServerError_whenBudgetIsZeroOrNegative() throws Exception {
+    void createTrip_shouldReturnBadRequest_whenBudgetIsZeroOrNegative() throws Exception {
         CreateTripDTO invalidDto = new CreateTripDTO("Wycieczka", "Rzym", -100.0, LocalDate.now(), LocalDate.now().plusDays(5));
 
         mockMvc.perform(post("/api/trips")
@@ -175,6 +175,31 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void createTrip_shouldCreateAndReturnAccepted_whenDataIsValid() throws Exception {
+        // Given
+        CreateTripDTO dto = new CreateTripDTO(
+                "Japonia 2026",
+                "Tokio",
+                5000.0,
+                LocalDate.now(),
+                LocalDate.now().plusDays(10)
+        );
+
+        // When & Then
+        mockMvc.perform(post("/api/trips")
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.status").value(201))
+                .andExpect(jsonPath("$.message").value("Trip created successfully"))
+                .andExpect(jsonPath("$.url").value("/api/trips"))
+                .andExpect(jsonPath("$.data.name").value("Japonia 2026"))
+                .andExpect(jsonPath("$.data.destination").value("Tokio"))
+                .andExpect(jsonPath("$.createdAt").exists());
+    }
+
+    @Test
     void updateTrip_shouldPartiallyUpdateTrip_whenDataIsValid() throws Exception {
         Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
         UUID id = savedTrip.getId();
@@ -205,6 +230,25 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void updateTrip_shouldNotChangeAnything_whenAllFieldsInDtoAreNull() throws Exception {
+        // Given
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
+        UUID id = savedTrip.getId();
+
+        UpdateTripDTO emptyDto = new UpdateTripDTO(null, null, null, null, null, null, null);
+
+        // When & Then
+        mockMvc.perform(patch("/api/trips/{id}", id)
+                        .with(user("user@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(emptyDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data.name").value("Rzym 2024"))
+                .andExpect(jsonPath("$.data.destination").value("Rzym"));
     }
 
     @Test
