@@ -41,6 +41,12 @@ public class TripScheduleService {
         return tripScheduleRepository.save(tripSchedule);
     }
 
+    public TripSchedule updateScheduleInTrip(Trip trip, UpdateScheduleDTO dto) {
+        Schedule schedule =  scheduleService.updateSchedule(trip, dto);
+
+        return findByTripAndSchedule(trip.getId(), schedule.getId());
+    }
+
     public void deleteScheduleFromTrip(UUID tripId, UUID scheduleId) {
         TripSchedule tripSchedule = findByTripAndSchedule(tripId, scheduleId);
 

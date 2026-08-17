@@ -2,6 +2,7 @@ package net.dysky.planner.schedule;
 
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripItem.TripItem;
+import net.dysky.planner.tripSchedule.UpdateScheduleDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -162,6 +163,149 @@ class ScheduleServiceTest {
         assertEquals("Schedule overlaps with an existing schedule", exception.getMessage());
         verify(scheduleRepository, times(1)).existsOverlapping(startTime, endTime);
         verify(scheduleRepository, never()).save(any(Schedule.class));
+    }
+
+    @Test
+    void updateSchedule_shouldUpdateAndSave_whenDataIsValidAndTripItemIsDifferent() {
+        UUID scheduleId = UUID.randomUUID();
+        UUID existingItemId = UUID.randomUUID();
+        UUID newItemId = UUID.randomUUID();
+
+        Trip trip = new Trip();
+        trip.setStartDate(LocalDate.of(2026, 8, 1));
+        trip.setEndDate(LocalDate.of(2026, 8, 10));
+
+        LocalDateTime startTime = LocalDateTime.of(2026, 8, 3, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2026, 8, 3, 12, 0);
+        UpdateScheduleDTO dto = new UpdateScheduleDTO(scheduleId, newItemId, startTime, endTime);
+
+        TripItem existingItem = new TripItem();
+        existingItem.setId(existingItemId);
+
+        Schedule existingSchedule = new Schedule();
+        existingSchedule.setId(scheduleId);
+        existingSchedule.setTripItem(existingItem);
+
+        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
+        when(scheduleRepository.existsOverlapping(startTime, endTime)).thenReturn(false);
+        when(scheduleRepository.save(any(Schedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        scheduleService.updateSchedule(trip, dto);
+
+        assertEquals(startTime, existingSchedule.getStartTime());
+        assertEquals(endTime, existingSchedule.getEndTime());
+        verify(scheduleRepository, times(1)).save(existingSchedule);
+    }
+
+    @Test
+    void updateSchedule_shouldThrowException_whenTripItemIsNull() {
+        UUID scheduleId = UUID.randomUUID();
+        Trip trip = new Trip();
+        trip.setStartDate(LocalDate.of(2026, 8, 1));
+        trip.setEndDate(LocalDate.of(2026, 8, 10));
+
+        LocalDateTime startTime = LocalDateTime.of(2026, 8, 3, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2026, 8, 3, 12, 0);
+
+        UpdateScheduleDTO dto = new UpdateScheduleDTO(scheduleId, null, startTime, endTime);
+
+        Schedule existingSchedule = new Schedule();
+        existingSchedule.setId(scheduleId);
+
+        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> scheduleService.updateSchedule(trip, dto));
+
+        assertEquals("Trip item cannot be null", exception.getMessage());
+        verify(scheduleRepository, never()).save(any(Schedule.class));
+    }
+
+    @Test
+    void updateSchedule_shouldThrowException_whenTripItemIsSameAsCurrent() {
+        UUID scheduleId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+        Trip trip = new Trip();
+        trip.setStartDate(LocalDate.of(2026, 8, 1));
+        trip.setEndDate(LocalDate.of(2026, 8, 10));
+
+        LocalDateTime startTime = LocalDateTime.of(2026, 8, 3, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2026, 8, 3, 12, 0);
+
+        UpdateScheduleDTO dto = new UpdateScheduleDTO(scheduleId, itemId, startTime, endTime);
+
+        TripItem existingItem = new TripItem();
+        existingItem.setId(itemId);
+
+        Schedule existingSchedule = new Schedule();
+        existingSchedule.setId(scheduleId);
+        existingSchedule.setTripItem(existingItem);
+
+        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> scheduleService.updateSchedule(trip, dto));
+
+        assertEquals("Trip item is the same as the current one", exception.getMessage());
+        verify(scheduleRepository, never()).save(any(Schedule.class));
+    }
+
+    @Test
+    void isDateValid_shouldThrowException_whenDatesAreOutsideTrip() {
+        LocalDateTime tripStart = LocalDateTime.of(2026, 8, 1, 0, 0);
+        LocalDateTime tripEnd = LocalDateTime.of(2026, 8, 10, 23, 59);
+
+        LocalDateTime startTime = LocalDateTime.of(2026, 7, 31, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2026, 7, 31, 12, 0);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> scheduleService.isDateValid(startTime, endTime, tripStart, tripEnd));
+
+        assertEquals("Schedule must be within the trip dates", exception.getMessage());
+    }
+
+    @Test
+    void isDateValid_shouldThrowException_whenEndTimeIsBeforeStartTime() {
+        LocalDateTime tripStart = LocalDateTime.of(2026, 8, 1, 0, 0);
+        LocalDateTime tripEnd = LocalDateTime.of(2026, 8, 10, 23, 59);
+
+        LocalDateTime startTime = LocalDateTime.of(2026, 8, 2, 12, 0);
+        LocalDateTime endTime = LocalDateTime.of(2026, 8, 2, 10, 0);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> scheduleService.isDateValid(startTime, endTime, tripStart, tripEnd));
+
+        assertEquals("End time must be after start time", exception.getMessage());
+    }
+
+    @Test
+    void isDateValid_shouldThrowException_whenStartAndEndTimesAreSame() {
+        LocalDateTime tripStart = LocalDateTime.of(2026, 8, 1, 0, 0);
+        LocalDateTime tripEnd = LocalDateTime.of(2026, 8, 10, 23, 59);
+
+        LocalDateTime startTime = LocalDateTime.of(2026, 8, 2, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2026, 8, 2, 10, 0);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> scheduleService.isDateValid(startTime, endTime, tripStart, tripEnd));
+
+        assertEquals("Start time and end time cannot be the same", exception.getMessage());
+    }
+
+    @Test
+    void isDateValid_shouldThrowException_whenScheduleOverlapsWithExisting() {
+        LocalDateTime tripStart = LocalDateTime.of(2026, 8, 1, 0, 0);
+        LocalDateTime tripEnd = LocalDateTime.of(2026, 8, 10, 23, 59);
+
+        LocalDateTime startTime = LocalDateTime.of(2026, 8, 2, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2026, 8, 2, 12, 0);
+
+        when(scheduleRepository.existsOverlapping(startTime, endTime)).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> scheduleService.isDateValid(startTime, endTime, tripStart, tripEnd));
+
+        assertEquals("Schedule overlaps with an existing schedule", exception.getMessage());
     }
 
     @Test

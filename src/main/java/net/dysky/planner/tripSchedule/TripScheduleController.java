@@ -44,6 +44,7 @@ class TripScheduleController {
         Trip trip = tripService.getTripById(id);
 
         TripSchedule tripSchedule = tripScheduleService.addScheduleToTrip(trip, dto);
+        ScheduleResponseDTO response = tripScheduleService.mapToDTO(tripSchedule);
 
         return ResponseEntity.ok(
                 new ResponseDTO(
@@ -51,7 +52,26 @@ class TripScheduleController {
                         200,
                         "Schedule added successfully",
                         "/api/trips/" + id + "/schedules",
-                        null
+                        response
+                )
+        );
+    }
+
+    @PutMapping
+    public ResponseEntity<ResponseDTO> updateScheduleInTrip(@PathVariable("id") UUID id, @RequestBody UpdateScheduleDTO dto) {
+        Trip trip = tripService.getTripById(id);
+
+        TripSchedule updated = tripScheduleService.updateScheduleInTrip(trip, dto);
+
+        ScheduleResponseDTO response = tripScheduleService.mapToDTO(updated);
+
+        return ResponseEntity.ok(
+                new ResponseDTO(
+                        LocalDateTime.now(),
+                        200,
+                        "Schedule updated successfully",
+                        "/api/trips/" + id + "/schedules",
+                        response
                 )
         );
     }
