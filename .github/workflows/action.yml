@@ -9,6 +9,10 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-22.04
+    env:
+      DATABASE_TEST_URL: ${{ secrets.DATABASE_TEST_URL }}
+      DATABASE_TEST_USERNAME: ${{ secrets.DATABASE_TEST_USERNAME }}
+      DATABASE_TEST_PASSWORD: ${{ secrets.DATABASE_TEST_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
