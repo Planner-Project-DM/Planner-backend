@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import net.dysky.planner.address.Address;
 import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.hotel.ElementDTO;
-import net.dysky.planner.hotel.Hotel;
 import net.dysky.planner.hotel.Location;
 import net.dysky.planner.hotel.OverpassApiDTO;
 import org.springframework.http.HttpStatusCode;
