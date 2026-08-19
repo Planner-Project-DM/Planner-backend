@@ -1,4 +1,4 @@
-package net.dysky.planner.tripItem;
+package net.dysky.planner.tripitem;
 
 public enum TripItemCategory {
     HOTEL,

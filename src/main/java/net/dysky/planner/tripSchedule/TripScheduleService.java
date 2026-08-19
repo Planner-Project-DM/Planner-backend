@@ -3,8 +3,8 @@ package net.dysky.planner.tripSchedule;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.schedule.*;
 import net.dysky.planner.trip.Trip;
-import net.dysky.planner.tripItem.TripItem;
-import net.dysky.planner.tripItem.TripItemService;
+import net.dysky.planner.tripitem.TripItem;
+import net.dysky.planner.tripitem.TripItemService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

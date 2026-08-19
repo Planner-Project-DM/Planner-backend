@@ -1,8 +1,8 @@
 package net.dysky.planner.tripitinerary;
 
 import net.dysky.planner.trip.Trip;
-import net.dysky.planner.tripItem.TripItem;
-import net.dysky.planner.tripItem.TripItemService;
+import net.dysky.planner.tripitem.TripItem;
+import net.dysky.planner.tripitem.TripItemService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

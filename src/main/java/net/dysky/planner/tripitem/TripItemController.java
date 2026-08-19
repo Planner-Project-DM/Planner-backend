@@ -1,4 +1,4 @@
-package net.dysky.planner.tripItem;
+package net.dysky.planner.tripitem;
 
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.cityVisited.CityVisitedService;

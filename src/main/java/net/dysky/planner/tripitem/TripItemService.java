@@ -1,4 +1,4 @@
-package net.dysky.planner.tripItem;
+package net.dysky.planner.tripitem;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

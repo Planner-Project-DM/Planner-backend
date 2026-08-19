@@ -1,6 +1,6 @@
 package net.dysky.planner.schedule;
 
-import net.dysky.planner.tripItem.TripItem;
+import net.dysky.planner.tripitem.TripItem;
 
 import java.time.LocalDateTime;
 

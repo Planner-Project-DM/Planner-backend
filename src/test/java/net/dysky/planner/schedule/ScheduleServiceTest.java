@@ -1,7 +1,7 @@
 package net.dysky.planner.schedule;
 
 import net.dysky.planner.trip.Trip;
-import net.dysky.planner.tripItem.TripItem;
+import net.dysky.planner.tripitem.TripItem;
 import net.dysky.planner.tripSchedule.UpdateScheduleDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

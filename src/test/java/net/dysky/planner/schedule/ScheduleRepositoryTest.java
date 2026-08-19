@@ -2,7 +2,7 @@ package net.dysky.planner.schedule;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import net.dysky.planner.tripItem.TripItem;
+import net.dysky.planner.tripitem.TripItem;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
