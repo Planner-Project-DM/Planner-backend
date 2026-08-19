@@ -23,7 +23,7 @@ class GroupController {
 
         groupService.addToGroup(group, addToGroupDTO);
 
-        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "/api/groups/add", "User added to group successfully", null));
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User added to group successfully", "/api/groups/add", null));
     }
 
     @DeleteMapping("/members")
@@ -32,7 +32,7 @@ class GroupController {
 
         groupService.deleteFromGroup(group, removeFromGroupDTO);
 
-        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "/api/groups/remove", "User removed from group successfully", null));
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User removed from group successfully", "/api/groups/remove", null));
     }
 
 }

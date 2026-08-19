@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dysky.planner.groupUser.GroupUser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,5 +22,5 @@ public class Group {
     private String name;
 
     @OneToMany(mappedBy = "group")
-    private List<GroupUser> groupUsers;
+    private List<GroupUser> groupUsers = new ArrayList<>();
 }
