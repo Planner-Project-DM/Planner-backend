@@ -2,7 +2,6 @@ package net.dysky.planner.tripSchedule;
 
 import net.dysky.planner.AbstractIntegrationTest;
 import net.dysky.planner.exception.TripNotFoundException;
-import net.dysky.planner.schedule.CreateScheduleDTO;
 import net.dysky.planner.schedule.ScheduleResponseDTO;
 import net.dysky.planner.schedule.TripItemSummaryDTO;
 import net.dysky.planner.trip.Trip;
