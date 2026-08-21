@@ -2,22 +2,24 @@ package net.dysky.planner.group;
 
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.response.ResponseDTO;
+import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/trips/{id}/group")
+@RequestMapping("/api/trips/{id}/group/members")
 class GroupController {
 
     private final TripService tripService;
     private final GroupService groupService;
 
-    @PostMapping("/members")
+    @PostMapping
     public ResponseEntity<ResponseDTO> addToGroup(@PathVariable UUID id, @RequestBody AddToGroupDTO addToGroupDTO) {
         Group group = tripService.getTripById(id).getTripGroup();
 
@@ -26,7 +28,16 @@ class GroupController {
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User added to group successfully", "/api/groups/add", null));
     }
 
-    @DeleteMapping("/members")
+    @PutMapping
+    public ResponseEntity<ResponseDTO> updateGroupMember(@PathVariable UUID id, @RequestBody List<UpdateGroupMemberDTO> updateGroupMemberDTO) {
+        Trip trip = tripService.getTripById(id);
+
+        groupService.updateGroupMember(trip, trip.getTripGroup(), updateGroupMemberDTO);
+
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Group information updated successfully", "/api/groups/update", null));
+    }
+
+    @DeleteMapping
     public ResponseEntity<ResponseDTO> removeFromGroup(@PathVariable UUID id, @RequestBody RemoveFromGroupDTO removeFromGroupDTO) {
         Group group = tripService.getTripById(id).getTripGroup();
 

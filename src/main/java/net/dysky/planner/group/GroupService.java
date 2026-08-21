@@ -4,13 +4,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.exception.UserInGroupException;
 import net.dysky.planner.exception.UserNotFoundException;
-import net.dysky.planner.groupUser.CreateGroupUserDTO;
-import net.dysky.planner.groupUser.GroupRole;
-import net.dysky.planner.groupUser.GroupUser;
-import net.dysky.planner.groupUser.GroupUserService;
+import net.dysky.planner.groupUser.*;
+import net.dysky.planner.trip.Trip;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -44,6 +44,22 @@ public class GroupService {
 
         User userToAdd = userService.getUserByEmail(addToGroupDTO.email());
         groupUserService.add(new CreateGroupUserDTO(group, userToAdd, GroupRole.MEMBER));
+    }
+
+    public void updateGroupMember(Trip trip, Group group, List<UpdateGroupMemberDTO> dtos) {
+        if(dtos.isEmpty()) return;
+
+        dtos.stream().filter(dto -> groupUserService.findByGroupAndUser(group, userService.getUserByEmail(dto.email())) == null)
+                .findFirst()
+                .ifPresent(dto -> {
+                    throw new UserNotFoundException("User " + dto.email() + " is not in the group");
+                });
+
+        List<UpdateGroupUserDTO> list = dtos.stream()
+                        .map(dto -> new UpdateGroupUserDTO(group, userService.getUserByEmail(dto.email()), dto.role() != null ? dto.role() : null, dto.balance()))
+                        .toList();
+
+        groupUserService.update(trip, list);
     }
 
     public void deleteFromGroup(Group group, RemoveFromGroupDTO removeFromGroupDTO) {

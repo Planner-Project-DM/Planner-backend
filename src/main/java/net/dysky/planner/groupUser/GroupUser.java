@@ -27,6 +27,7 @@ public class GroupUser {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    private GroupRole role;
+    private GroupRole role = GroupRole.MEMBER;
 
+    private Double balance = 0.0;
 }

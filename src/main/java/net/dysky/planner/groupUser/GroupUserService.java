@@ -1,9 +1,13 @@
 package net.dysky.planner.groupUser;
 
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.exception.BalanceOverBudgetException;
 import net.dysky.planner.group.Group;
+import net.dysky.planner.trip.Trip;
 import net.dysky.planner.user.User;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -24,6 +28,29 @@ public class GroupUserService {
         groupUser.setRole(createGroupUserDTO.role());
 
         return groupUserRepository.save(groupUser);
+    }
+
+    public void update(Trip trip, List<UpdateGroupUserDTO> updateGroupUserDTOList) {
+
+        double totalBalanceChange = updateGroupUserDTOList.stream().mapToDouble(dto -> dto.balance() != null ? dto.balance() : 0).sum();
+
+        if(totalBalanceChange > trip.getBudget()) {
+            throw new BalanceOverBudgetException("Total balance of group users exceeds total cost of trip");
+        }
+
+        for(UpdateGroupUserDTO dto : updateGroupUserDTOList) {
+            GroupUser groupUser = findByGroupAndUser(dto.group(), dto.user());
+
+            if (dto.role() != null) {
+                groupUser.setRole(dto.role());
+            }
+
+            if(dto.balance() != null) {
+                groupUser.setBalance(dto.balance());
+            }
+
+            groupUserRepository.save(groupUser);
+        }
     }
 
     public boolean isUserInGroup(String groupName, String userEmail) {
