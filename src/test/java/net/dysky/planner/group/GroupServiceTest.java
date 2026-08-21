@@ -85,7 +85,7 @@ class GroupServiceTest {
         Group group = new Group();
         group.setGroupUsers(new ArrayList<>());
 
-        AddToGroupDTO dto = new AddToGroupDTO("Adventure Team", "newmember@domain.com");
+        AddToGroupDTO dto = new AddToGroupDTO("newmember@domain.com");
         User userToAdd = mock(User.class);
 
         when(userService.getUserByEmail("newmember@domain.com")).thenReturn(userToAdd);
@@ -106,7 +106,7 @@ class GroupServiceTest {
         when(existingUser.getEmail()).thenReturn("member@domain.com");
         group.setGroupUsers(List.of(existingGroupUser));
 
-        AddToGroupDTO dto = new AddToGroupDTO("Adventure Team", "member@domain.com");
+        AddToGroupDTO dto = new AddToGroupDTO("member@domain.com");
 
         assertThatThrownBy(() -> groupService.addToGroup(group, dto))
                 .isInstanceOf(RuntimeException.class)

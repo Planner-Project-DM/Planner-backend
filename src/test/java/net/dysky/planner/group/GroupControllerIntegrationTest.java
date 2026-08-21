@@ -95,7 +95,7 @@ public class GroupControllerIntegrationTest extends AbstractIntegrationTest {
         when(tripService.getTripById(tripId)).thenReturn(mockTrip);
         when(mockTrip.getTripGroup()).thenReturn(group);
 
-        AddToGroupDTO dto = new AddToGroupDTO("Adam", "secondary@example.com");
+        AddToGroupDTO dto = new AddToGroupDTO("secondary@example.com");
 
         mockMvc.perform(post("/api/trips/{id}/group/members", tripId)
                         .with(user("user@example.com").roles("USER"))
@@ -124,7 +124,7 @@ public class GroupControllerIntegrationTest extends AbstractIntegrationTest {
         when(tripService.getTripById(tripId)).thenReturn(mockTrip);
         when(mockTrip.getTripGroup()).thenReturn(group);
 
-        AddToGroupDTO dto = new AddToGroupDTO("Adam", "secondary@example.com");
+        AddToGroupDTO dto = new AddToGroupDTO("secondary@example.com");
 
         mockMvc.perform(post("/api/trips/{id}/group/members", tripId)
                         .with(user("user@example.com").roles("USER"))
