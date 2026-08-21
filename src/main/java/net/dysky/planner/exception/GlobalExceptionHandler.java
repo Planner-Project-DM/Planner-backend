@@ -140,6 +140,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(BalanceOverBudgetException.class)
+    public ResponseEntity<ResponseDTO> handleBalanceOverBudget(BalanceOverBudgetException ex, HttpServletRequest request) {
+        ResponseDTO error = new ResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ResponseDTO> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
         ResponseDTO error = new ResponseDTO(
