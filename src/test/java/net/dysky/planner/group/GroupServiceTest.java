@@ -19,6 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import net.dysky.planner.groupUser.GroupRole;
+import net.dysky.planner.groupUser.UpdateGroupUserDTO;
+import net.dysky.planner.trip.Trip;
+import net.dysky.planner.exception.UserNotFoundException;
+import org.mockito.ArgumentCaptor;
+import java.util.Arrays;
 
 @ExtendWith(MockitoExtension.class)
 class GroupServiceTest {
@@ -151,5 +157,54 @@ class GroupServiceTest {
                 .hasMessage("User is not in the group");
 
         verify(groupUserService, never()).remove(any());
+    }
+
+    @Test
+    void updateGroupMember_shouldReturnWhenDtosEmpty() {
+        Trip trip = mock(Trip.class);
+        Group group = new Group();
+        groupService.updateGroupMember(trip, group, new ArrayList<>());
+        verifyNoInteractions(userService, groupUserService);
+    }
+
+    @Test
+    void updateGroupMember_shouldThrowWhenUserNotInGroup() {
+        Trip trip = mock(Trip.class);
+        Group group = new Group();
+        UpdateGroupMemberDTO dto = new UpdateGroupMemberDTO("notin@domain.com", null, 0.0);
+        User user = mock(User.class);
+        when(userService.getUserByEmail("notin@domain.com")).thenReturn(user);
+        when(groupUserService.findByGroupAndUser(group, user)).thenReturn(null);
+
+        assertThatThrownBy(() -> groupService.updateGroupMember(trip, group, List.of(dto)))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage("User notin@domain.com is not in the group");
+    }
+
+    @Test
+    void updateGroupMember_shouldMapDtosAndCallUpdate() {
+        Trip trip = mock(Trip.class);
+        Group group = new Group();
+        UpdateGroupMemberDTO dto1 = new UpdateGroupMemberDTO("a@x.com", GroupRole.MEMBER, 10.0);
+        UpdateGroupMemberDTO dto2 = new UpdateGroupMemberDTO("b@x.com", null, 5.0);
+        User user1 = mock(User.class);
+        User user2 = mock(User.class);
+        when(userService.getUserByEmail("a@x.com")).thenReturn(user1);
+        when(userService.getUserByEmail("b@x.com")).thenReturn(user2);
+        when(groupUserService.findByGroupAndUser(group, user1)).thenReturn(mock(GroupUser.class));
+        when(groupUserService.findByGroupAndUser(group, user2)).thenReturn(mock(GroupUser.class));
+
+        groupService.updateGroupMember(trip, group, Arrays.asList(dto1, dto2));
+
+        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+        verify(groupUserService).update(eq(trip), captor.capture());
+        List<UpdateGroupUserDTO> captured = captor.getValue();
+        assertThat(captured).hasSize(2);
+        assertThat(captured.get(0).user()).isEqualTo(user1);
+        assertThat(captured.get(0).role()).isEqualTo(GroupRole.MEMBER);
+        assertThat(captured.get(0).balance()).isEqualTo(10.0);
+        assertThat(captured.get(1).user()).isEqualTo(user2);
+        assertThat(captured.get(1).role()).isNull();
+        assertThat(captured.get(1).balance()).isEqualTo(5.0);
     }
 }
