@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper; // Użyj com.fasterxml.jackson.databind.ObjectMapper jeśli zmienisz wersję
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -121,6 +123,163 @@ public class FriendshipControllerIntegrationTest extends AbstractIntegrationTest
                 .andExpect(jsonPath("$.data[0].name").value("Anna"))
                 .andExpect(jsonPath("$.data[0].surname").value("Nowak"))
                 .andExpect(jsonPath("$.createdAt").exists());
+    }
+
+    @Test
+    void getFriendships_shouldReturnFilteredFriendships_whenStatusParameterIsProvided() throws Exception {
+        // Given
+        String senderEmail = "sender@example.com";
+        String receiverEmail = "receiver@example.com";
+
+        registerUser("Jan", "Kowalski", senderEmail);
+        registerUser("Anna", "Nowak", receiverEmail);
+
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
+
+        Friendship friendship = new Friendship();
+        friendship.setUserSender(sender);
+        friendship.setUserReceiver(receiver);
+        friendship.setStatus(FriendshipStatus.ACCEPTED);
+        friendshipRepository.saveAndFlush(friendship);
+
+        when(jwtService.extractEmail(any(HttpServletRequest.class))).thenReturn(senderEmail);
+
+        // When & Then
+        mockMvc.perform(get("/api/friendships")
+                        .with(user(senderEmail).roles("USER"))
+                        .param("status", "ACCEPTED")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.url").value("/api/friendships?status=ACCEPTED"))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].email").value(receiverEmail));
+    }
+
+    @Test
+    void getMyFriendshipRequests_shouldReturnPendingRequests_whenRequested() throws Exception {
+        // Given
+        String senderEmail = "sender@example.com";
+        String receiverEmail = "receiver@example.com";
+
+        registerUser("Jan", "Kowalski", senderEmail);
+        registerUser("Anna", "Nowak", receiverEmail);
+
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
+
+        Friendship friendship = new Friendship();
+        friendship.setUserSender(sender);
+        friendship.setUserReceiver(receiver);
+        friendship.setStatus(FriendshipStatus.PENDING);
+        friendshipRepository.saveAndFlush(friendship);
+
+        when(jwtService.extractEmail(any(HttpServletRequest.class))).thenReturn(receiverEmail);
+
+        // When & Then
+        mockMvc.perform(get("/api/friendships/my-requests")
+                        .with(user(receiverEmail).roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Friendship requests retrieved successfully"))
+                .andExpect(jsonPath("$.url").value("/api/friendships/my-requests"))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].email").value(senderEmail));
+    }
+
+    @Test
+    void updateFriendship_shouldAcceptFriendship_whenIdIsValid() throws Exception {
+        // Given
+        String senderEmail = "sender@example.com";
+        String receiverEmail = "receiver@example.com";
+
+        registerUser("Jan", "Kowalski", senderEmail);
+        registerUser("Anna", "Nowak", receiverEmail);
+
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
+
+        Friendship friendship = new Friendship();
+        friendship.setUserSender(sender);
+        friendship.setUserReceiver(receiver);
+        friendship.setStatus(FriendshipStatus.PENDING);
+        friendship = friendshipRepository.saveAndFlush(friendship);
+
+        UUID id = friendship.getId();
+
+        // When & Then
+        mockMvc.perform(patch("/api/friendships/{id}/accept", id)
+                        .with(user(receiverEmail).roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Friendship accepted successfully"))
+                .andExpect(jsonPath("$.url").value("/api/friendships/" + id + "/accept"))
+                .andExpect(jsonPath("$.data.status").value("ACCEPTED"));
+    }
+
+    @Test
+    void rejectFriendship_shouldRejectFriendship_whenIdIsValid() throws Exception {
+        // Given
+        String senderEmail = "sender@example.com";
+        String receiverEmail = "receiver@example.com";
+
+        registerUser("Jan", "Kowalski", senderEmail);
+        registerUser("Anna", "Nowak", receiverEmail);
+
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
+
+        Friendship friendship = new Friendship();
+        friendship.setUserSender(sender);
+        friendship.setUserReceiver(receiver);
+        friendship.setStatus(FriendshipStatus.PENDING);
+        friendship = friendshipRepository.saveAndFlush(friendship);
+
+        UUID id = friendship.getId();
+
+        // When & Then
+        mockMvc.perform(patch("/api/friendships/{id}/reject", id)
+                        .with(user(receiverEmail).roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Friendship rejected successfully"))
+                .andExpect(jsonPath("$.url").value("/api/friendships/" + id + "/reject"))
+                .andExpect(jsonPath("$.data.status").value("REJECTED"));
+    }
+
+    @Test
+    void blockFriendship_shouldBlockFriendship_whenIdIsValid() throws Exception {
+        // Given
+        String senderEmail = "sender@example.com";
+        String receiverEmail = "receiver@example.com";
+
+        registerUser("Jan", "Kowalski", senderEmail);
+        registerUser("Anna", "Nowak", receiverEmail);
+
+        User sender = userService.getUserByEmail(senderEmail);
+        User receiver = userService.getUserByEmail(receiverEmail);
+
+        Friendship friendship = new Friendship();
+        friendship.setUserSender(sender);
+        friendship.setUserReceiver(receiver);
+        friendship.setStatus(FriendshipStatus.PENDING);
+        friendship = friendshipRepository.saveAndFlush(friendship);
+
+        UUID id = friendship.getId();
+
+        // When & Then
+        mockMvc.perform(patch("/api/friendships/{id}/block", id)
+                        .with(user(receiverEmail).roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("Friendship rejected successfully"))
+                .andExpect(jsonPath("$.url").value("/api/friendships/" + id + "/reject"))
+                .andExpect(jsonPath("$.data.status").value("BLOCKED"));
     }
 
     @Test
