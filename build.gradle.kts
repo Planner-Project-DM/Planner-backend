@@ -31,6 +31,10 @@ dependencies {
     implementation("org.springframework.retry:spring-retry:2.0.6")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
 
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.apache.poi:poi:4.1.2")
+    implementation("org.apache.poi:poi-ooxml:4.1.2")
+
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
