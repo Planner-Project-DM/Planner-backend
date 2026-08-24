@@ -27,6 +27,14 @@ public class Styles {
         return font;
     }
 
+    public static Font textBold(Workbook wb) {
+        var font = wb.createFont();
+        font.setFontName("Arial");
+        font.setBold(true);
+        font.setColor(IndexedColors.BLACK.getIndex());
+        return font;
+    }
+
     public static Font blueHeaderFont(Workbook wb) {
         var font = wb.createFont();
         font.setFontName("Arial");
@@ -41,9 +49,10 @@ public class Styles {
         return style;
     }
 
-    public static CellStyle rightAlignedCellStyle(Workbook wb) {
+    public static CellStyle rightAlignedCellStyle(Workbook wb, Font font) {
         var style = wb.createCellStyle();
         style.setAlignment(HorizontalAlignment.RIGHT);
+        style.setFont(font);
         return style;
     }
 
