@@ -3,6 +3,7 @@ package net.dysky.planner.report;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -48,7 +49,7 @@ public class ReportService {
 
     private void createHeaderRow(Sheet sheet, Map<CustomCellStyle, CellStyle> styles) {
         createRow(sheet, 1, 1, "NAME - PODSUMOWANIE FUNDUSZY", styles.get(CustomCellStyle.MAIN_HEADER));
-        groupColumn(sheet, 1, 3);
+        groupColumn(sheet, 1, 1, 3);
 
         createRow(sheet, 2, 1, "Podsumowanie funduszy", styles.get(CustomCellStyle.TEXT));
     }
@@ -74,7 +75,7 @@ public class ReportService {
         cell.setCellStyle(style);
     }
 
-    private void groupColumn(Sheet sheet, int startRowIndex, int endRowIndex) {
-        sheet.groupColumn(startRowIndex, endRowIndex);
+    private void groupColumn(Sheet sheet, int rowIndex, int startColumnIndex, int endColumnIndex) {
+        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, startColumnIndex, endColumnIndex));
     }
 }
