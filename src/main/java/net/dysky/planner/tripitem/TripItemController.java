@@ -19,8 +19,8 @@ class TripItemController {
 
     private final CityVisitedService cityVisitedService;
 
-    @GetMapping("/city")
-    public ResponseEntity<ResponseDTO> getTripItemsByCity(@RequestParam String city) {
+    @GetMapping("/city/{city}")
+    public ResponseEntity<ResponseDTO> getTripItemsByCity(@PathVariable String city) {
         List<TripItem> tripItems;
 
         if(cityVisitedService.isCityVisited(city)) {
