@@ -38,6 +38,7 @@ public class Styles {
     public static Font blueHeaderFont(Workbook wb) {
         var font = wb.createFont();
         font.setFontName("Arial");
+        font.setBold(true);
         font.setColor(IndexedColors.WHITE.getIndex());
         font.setFontHeightInPoints((short) 12);
         return font;
