@@ -52,8 +52,11 @@ public class TripItemService {
     )
     public OverpassApiDTO getDataFromOverpassApi(String city) {
         String query = String.format("""
-                [out:json][timeout:25];
-                    area["name"="%s"]["admin_level"="8"]->.searchArea;
+                [out:json][timeout:60];
+                    (
+                        area["name"="%s"]["place"~"city|town|village|municipality"];
+                        area["name:en"="%s"]["place"~"city|town|village|municipality"];
+                    )->.searchArea;
                     (
                       node["tourism"~"hotel|hostel|guest_house|apartment|museum|viewpoint|attraction"](area.searchArea);
                       node["historic"~"castle|monument|ruins"](area.searchArea);
@@ -61,7 +64,7 @@ public class TripItemService {
                       way["historic"~"castle|monument|ruins"](area.searchArea);
                     );
                     out center body;
-            """, city);
+            """, city, city);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("data", query);

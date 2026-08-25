@@ -5,10 +5,7 @@ import net.dysky.planner.cityVisited.CityVisitedService;
 import net.dysky.planner.hotel.OverpassApiDTO;
 import net.dysky.planner.response.ResponseDTO;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,8 +19,8 @@ class TripItemController {
 
     private final CityVisitedService cityVisitedService;
 
-    @GetMapping("/city/{city}")
-    public ResponseEntity<ResponseDTO> getTripItemsByCity(@PathVariable String city) {
+    @GetMapping("/city")
+    public ResponseEntity<ResponseDTO> getTripItemsByCity(@RequestParam String city) {
         List<TripItem> tripItems;
 
         if(cityVisitedService.isCityVisited(city)) {
