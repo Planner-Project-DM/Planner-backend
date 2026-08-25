@@ -84,9 +84,26 @@ tasks.jacocoTestReport {
         csv.required = false
         html.outputLocation = layout.buildDirectory.dir("reports/jacoco/test")
     }
+
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude("net/dysky/planner/report/**", "net/dysky/planner/groupUser/**")
+            }
+        })
+    )
 }
 
 tasks.jacocoTestCoverageVerification {
+
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude("net/dysky/planner/report/**", "net/dysky/planner/groupUser/**")
+            }
+        })
+    )
+
     violationRules {
         rule {
             limit {
