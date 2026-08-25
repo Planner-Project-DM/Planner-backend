@@ -19,15 +19,17 @@ class StyleGenerator {
         var mainHeaderStyle = Styles.cellStyle(wb, mainHeaderFont);
         var subHeaderStyle = Styles.cellStyle(wb, subHeaderFont);
         var textStyle = Styles.cellStyle(wb, textFont);
+        var textBoldStyle = Styles.cellStyle(wb, textBoldFont);
         var blueHeaderStyle = Styles.blueHeader(wb, blueHeaderFont);
-        var textBoldStyle = Styles.rightAlignedCellStyle(wb, textBoldFont);
+        var rightAlignedTextBoldStyle = Styles.rightAlignedCellStyle(wb, textBoldFont);
         var rightAlignedTextStyle = Styles.rightAlignedCellStyle(wb, textFont);
 
         return Map.of(
                 CustomCellStyle.MAIN_HEADER, mainHeaderStyle,
                 CustomCellStyle.SUB_HEADER, subHeaderStyle,
                 CustomCellStyle.TEXT, textStyle,
-                CustomCellStyle.RIGHT_ALIGNED_TEXT_BOLD, textBoldStyle,
+                CustomCellStyle.TEXT_BOLD, textBoldStyle,
+                CustomCellStyle.RIGHT_ALIGNED_TEXT_BOLD, rightAlignedTextBoldStyle,
                 CustomCellStyle.RIGHT_ALIGNED_TEXT, rightAlignedTextStyle,
                 CustomCellStyle.BLUE_HEADER, blueHeaderStyle
         );

@@ -36,6 +36,9 @@ public class ReportService {
         sheet.setColumnWidth(6, 20 * 256);
         createTop3(sheet, styles);
 
+        sheet.setColumnWidth(3, 20 * 256);
+        createExpenseByCategory(sheet, styles);
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         wb.write(out);
@@ -90,6 +93,33 @@ public class ReportService {
         createRow(sheet, 6, 6, "1 000,00 PLN", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
         createRow(sheet, 7, 6, "800,00 PLN", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
         createRow(sheet, 8, 6, "600,00 PLN", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
+    }
+
+    private void createExpenseByCategory(Sheet sheet, Map<CustomCellStyle, CellStyle> styles) {
+        createRow(sheet, 10, 1, "Wydatki wg Kategorii", styles.get(CustomCellStyle.SUB_HEADER));
+
+        createRow(sheet, 11, 1, "Kategoria", styles.get(CustomCellStyle.BLUE_HEADER));
+        createRow(sheet, 11, 2, "Kwota (PLN)", styles.get(CustomCellStyle.BLUE_HEADER));
+        createRow(sheet, 11, 3, "Udział (%)", styles.get(CustomCellStyle.BLUE_HEADER));
+
+        createRow(sheet, 12, 1, "Nocleg", styles.get(CustomCellStyle.TEXT));
+        createRow(sheet, 13, 1, "Rozrywka", styles.get(CustomCellStyle.TEXT));
+        createRow(sheet, 14, 1, "Jedzenie", styles.get(CustomCellStyle.TEXT));
+        createRow(sheet, 15, 1, "Inne", styles.get(CustomCellStyle.TEXT));
+
+        createRow(sheet, 12, 2, "1 500,00 PLN", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
+        createRow(sheet, 13, 2, "1 000,00 PLN", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
+        createRow(sheet, 14, 2, "800,00 PLN", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
+        createRow(sheet, 15, 2, "300,00 PLN", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
+
+        createRow(sheet, 12, 3, "41,67%", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
+        createRow(sheet, 13, 3, "27,78%", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
+        createRow(sheet, 14, 3, "22,22%", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
+        createRow(sheet, 15, 3, "8,33%", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT));
+
+        createRow(sheet, 16, 1, "Suma", styles.get(CustomCellStyle.TEXT_BOLD));
+        createRow(sheet, 16, 2, "3 600,00 PLN", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT_BOLD));
+        createRow(sheet, 16, 3, "100%", styles.get(CustomCellStyle.RIGHT_ALIGNED_TEXT_BOLD));
     }
 
     private void createRow(Sheet sheet, int rowIndex, int cellIndex, String value, CellStyle style) {
