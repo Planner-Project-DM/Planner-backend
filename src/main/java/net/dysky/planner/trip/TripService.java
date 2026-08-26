@@ -6,6 +6,7 @@ import net.dysky.planner.exception.BudgetNotPositiveException;
 import net.dysky.planner.exception.TripFoundException;
 import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.group.CreateGroupDTO;
+import net.dysky.planner.group.Group;
 import net.dysky.planner.group.GroupService;
 import net.dysky.planner.tripitem.TripItem;
 import net.dysky.planner.tripitem.TripItemService;
@@ -50,6 +51,15 @@ public class TripService {
 
     public List<Trip> getAllTripsByEmailAndStatus(String email, TripStatus tripStatus) {
         return tripRepository.findAllByTripCreatorEmailAndStatus(email, tripStatus);
+    }
+
+    public List<Trip> getAllTripWithPrivileges(String email) {
+        List<Trip> trips = tripRepository.findAllByTripCreatorEmail(email);
+
+        List<Group> groups = groupService.getAllGroupsForUser(email);
+
+        trips.addAll(groups.stream().flatMap(group -> tripRepository.findAllByTripGroup(group).stream()).toList());
+        return trips;
     }
 
     @Transactional

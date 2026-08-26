@@ -73,4 +73,11 @@ public class GroupService {
 
         groupUserService.remove(groupUser);
     }
+
+    public List<Group> getAllGroupsForUser(String email) {
+        List<GroupUser> groupUsers = groupUserService.findALlByUserEmail(email, GroupRole.OWNER);
+
+        return groupUsers.stream().map(GroupUser::getGroup).toList();
+    }
+
 }

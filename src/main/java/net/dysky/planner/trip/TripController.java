@@ -31,7 +31,7 @@ class TripController {
             return ResponseEntity.ok(responseDTO);
         }
 
-        List<Trip> trips = tripService.getAllTripsByEmail(email);
+        List<Trip> trips = tripService.getAllTripWithPrivileges(email);
         ResponseDTO responseDTO = new ResponseDTO(LocalDateTime.now(), 200, "Trips retrieved successfully", "/api/trips", trips);
         return ResponseEntity.ok(responseDTO);
     }

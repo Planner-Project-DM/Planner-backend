@@ -20,6 +20,10 @@ public class GroupUserService {
                 .orElseThrow(() -> new RuntimeException("GroupUser not found"));
     }
 
+    public List<GroupUser> findALlByUserEmail(String userEmail, GroupRole role) {
+        return groupUserRepository.findAllByUser_EmailAndRoleNot(userEmail, role);
+    }
+
     public GroupUser add(CreateGroupUserDTO createGroupUserDTO) {
         GroupUser groupUser = new GroupUser();
 

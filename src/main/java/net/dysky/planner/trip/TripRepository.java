@@ -1,5 +1,6 @@
 package net.dysky.planner.trip;
 
+import net.dysky.planner.group.Group;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,4 +14,6 @@ interface TripRepository extends JpaRepository<Trip, UUID> {
     List<Trip> findAllByTripCreatorEmailAndStatus(String tripCreatorEmail, TripStatus status);
 
     boolean existsByNameAndTripCreator_Email(String name, String tripCreatorEmail);
+
+    List<Trip> findAllByTripGroup(Group tripGroup);
 }
