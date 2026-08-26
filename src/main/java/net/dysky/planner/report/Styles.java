@@ -73,4 +73,11 @@ public class Styles {
         return style;
     }
 
+    public static CellStyle rightAlignedCurrencyCellStyle(Workbook wb, Font font) {
+        var style = rightAlignedCellStyle(wb, font);
+        DataFormat format = wb.createDataFormat();
+        style.setDataFormat(format.getFormat("#,##0.00\" PLN\""));
+        return style;
+    }
+
 }

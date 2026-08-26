@@ -1,11 +1,14 @@
 package net.dysky.planner.report;
 
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.trip.Trip;
+import net.dysky.planner.trip.TripService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,11 +19,15 @@ class ReportController {
 
     private final ReportService reportService;
 
+    private final TripService tripService;
+
     @GetMapping("/funds-summary")
-    public ResponseEntity<byte[]> generateFundsSummaryReport() {
+    public ResponseEntity<byte[]> generateFundsSummaryReport(@RequestBody ReportRequestDTO reportRequestDTO) {
+        Trip trip = tripService.getTripById(reportRequestDTO.tripId());
+
         byte[] reportFundsSummary;
         try {
-            reportFundsSummary = reportService.generateReport();
+            reportFundsSummary = reportService.generateReport(trip);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

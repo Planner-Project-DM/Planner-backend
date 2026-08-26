@@ -8,4 +8,5 @@ public enum CustomCellStyle {
     RIGHT_ALIGNED_TEXT_BOLD,
     RIGHT_ALIGNED_TEXT,
     BLUE_HEADER,
+    TEXT_CURRENCY
 }

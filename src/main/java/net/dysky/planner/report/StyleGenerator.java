@@ -23,6 +23,7 @@ class StyleGenerator {
         var blueHeaderStyle = Styles.blueHeader(wb, blueHeaderFont);
         var rightAlignedTextBoldStyle = Styles.rightAlignedCellStyle(wb, textBoldFont);
         var rightAlignedTextStyle = Styles.rightAlignedCellStyle(wb, textFont);
+        var rightAlignedCurrencyStyle = Styles.rightAlignedCurrencyCellStyle(wb, textBoldFont);
 
         return Map.of(
                 CustomCellStyle.MAIN_HEADER, mainHeaderStyle,
@@ -31,10 +32,8 @@ class StyleGenerator {
                 CustomCellStyle.TEXT_BOLD, textBoldStyle,
                 CustomCellStyle.RIGHT_ALIGNED_TEXT_BOLD, rightAlignedTextBoldStyle,
                 CustomCellStyle.RIGHT_ALIGNED_TEXT, rightAlignedTextStyle,
-                CustomCellStyle.BLUE_HEADER, blueHeaderStyle
+                CustomCellStyle.BLUE_HEADER, blueHeaderStyle,
+                CustomCellStyle.TEXT_CURRENCY, rightAlignedCurrencyStyle
         );
-
     }
-
-
 }
