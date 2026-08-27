@@ -132,7 +132,7 @@ class GroupServiceTest {
         when(user.getEmail()).thenReturn("removeme@domain.com");
         group.setGroupUsers(List.of(groupUser));
 
-        RemoveFromGroupDTO dto = new RemoveFromGroupDTO("Adventure Team", "removeme@domain.com");
+        RemoveFromGroupDTO dto = new RemoveFromGroupDTO("removeme@domain.com");
 
         when(userService.getUserByEmail("removeme@domain.com")).thenReturn(user);
         when(groupUserService.findByGroupAndUser(group, user)).thenReturn(groupUser);
@@ -147,7 +147,7 @@ class GroupServiceTest {
         Group group = new Group();
         group.setGroupUsers(new ArrayList<>());
 
-        RemoveFromGroupDTO dto = new RemoveFromGroupDTO("Adventure Team", "notingroup@domain.com");
+        RemoveFromGroupDTO dto = new RemoveFromGroupDTO("notingroup@domain.com");
         User user = mock(User.class);
 
         when(userService.getUserByEmail("notingroup@domain.com")).thenReturn(user);

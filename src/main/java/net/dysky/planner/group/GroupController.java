@@ -25,7 +25,7 @@ class GroupController {
 
         groupService.addToGroup(group, addToGroupDTO);
 
-        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User added to group successfully", "/api/groups/add", null));
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User added to group successfully", "/api/trips/" + id + "/group/members", null));
     }
 
     @PutMapping
@@ -34,7 +34,7 @@ class GroupController {
 
         groupService.updateGroupMember(trip, trip.getTripGroup(), updateGroupMemberDTO);
 
-        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Group information updated successfully", "/api/groups/update", null));
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Group information updated successfully", "/api/trips/" + id + "/group/members", null));
     }
 
     @DeleteMapping
@@ -43,7 +43,7 @@ class GroupController {
 
         groupService.deleteFromGroup(group, removeFromGroupDTO);
 
-        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User removed from group successfully", "/api/groups/remove", null));
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User removed from group successfully", "/api/trips/" + id + "/group/members", null));
     }
 
 }
