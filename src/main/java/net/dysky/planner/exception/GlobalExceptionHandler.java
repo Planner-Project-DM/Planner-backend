@@ -153,6 +153,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(HasNoPermissionException.class)
+    public ResponseEntity<ResponseDTO> handleHasNoPermission(HasNoPermissionException ex, HttpServletRequest request) {
+        ResponseDTO error = new ResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ResponseDTO> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
         ResponseDTO error = new ResponseDTO(

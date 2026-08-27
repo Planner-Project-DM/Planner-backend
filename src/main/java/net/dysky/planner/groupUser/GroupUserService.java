@@ -2,6 +2,7 @@ package net.dysky.planner.groupUser;
 
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.exception.BalanceOverBudgetException;
+import net.dysky.planner.exception.HasNoPermissionException;
 import net.dysky.planner.group.Group;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.user.User;
@@ -62,8 +63,11 @@ public class GroupUserService {
     }
 
     public void remove(GroupUser groupUser) {
+        if(!groupUser.getRole().equals(GroupRole.OWNER)) {
+            throw new HasNoPermissionException("Only the owner of the group can remove a user from the group");
+        }
+
         groupUserRepository.delete(groupUser);
     }
-
 
 }

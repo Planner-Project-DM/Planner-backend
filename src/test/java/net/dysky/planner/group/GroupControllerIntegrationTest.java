@@ -104,7 +104,7 @@ public class GroupControllerIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("User added to group successfully"))
-                .andExpect(jsonPath("$.url").value("/api/groups/add"))
+                .andExpect(jsonPath("$.url").value("/api/trips/" + tripId + "/group/members"))
                 .andExpect(jsonPath("$.createdAt").exists());
     }
 
@@ -152,16 +152,16 @@ public class GroupControllerIntegrationTest extends AbstractIntegrationTest {
         when(tripService.getTripById(tripId)).thenReturn(mockTrip);
         when(mockTrip.getTripGroup()).thenReturn(group);
 
-        RemoveFromGroupDTO dto = new RemoveFromGroupDTO("Adam", "secondary@example.com");
+        RemoveFromGroupDTO dto = new RemoveFromGroupDTO("secondary@example.com");
 
         mockMvc.perform(delete("/api/trips/{id}/group/members", tripId)
                         .with(user("user@example.com").roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value(200))
-                .andExpect(jsonPath("$.message").value("User removed from group successfully"))
-                .andExpect(jsonPath("$.url").value("/api/groups/remove"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.message").value("Only the owner of the group can remove a user from the group"))
+                .andExpect(jsonPath("$.url").value("/api/trips/" + tripId + "/group/members"))
                 .andExpect(jsonPath("$.createdAt").exists());
     }
 
@@ -175,7 +175,7 @@ public class GroupControllerIntegrationTest extends AbstractIntegrationTest {
         when(tripService.getTripById(tripId)).thenReturn(mockTrip);
         when(mockTrip.getTripGroup()).thenReturn(group);
 
-        RemoveFromGroupDTO dto = new RemoveFromGroupDTO("Adam", "secondary@example.com");
+        RemoveFromGroupDTO dto = new RemoveFromGroupDTO("secondary@example.com");
 
         mockMvc.perform(delete("/api/trips/{id}/group/members", tripId)
                         .with(user("user@example.com").roles("USER"))
