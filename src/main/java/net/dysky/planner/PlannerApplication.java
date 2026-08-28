@@ -8,9 +8,11 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableRetry
+@EnableScheduling
 @OpenAPIDefinition(
         info = @Info(title = "Planner API", version = "1.0"),
         security = @SecurityRequirement(name = "bearerAuth")
