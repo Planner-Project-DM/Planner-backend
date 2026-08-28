@@ -40,6 +40,7 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-kafka")
     testImplementation("org.springframework.kafka:spring-kafka-test")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
 
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
