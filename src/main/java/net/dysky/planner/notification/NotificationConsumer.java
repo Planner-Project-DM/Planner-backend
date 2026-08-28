@@ -13,8 +13,8 @@ public class NotificationConsumer {
 
     @KafkaListener(topics = "planner-notification", groupId = "notification-group")
     public void consume(NotificationDTO dto) {
-        String userId = dto.receiverId().toString();
+        String personalTopic = "/topic/notifications/" + dto.receiverId();
 
-        messagingTemplate.convertAndSendToUser(userId, "/queue/notifications", dto);
+        messagingTemplate.convertAndSend(personalTopic, dto);
     }
 }
