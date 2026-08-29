@@ -37,11 +37,7 @@ public class ScheduleService {
 
         isDateValid(dto.startTime(), dto.endTime(), trip.getStartDate().atStartOfDay(), trip.getEndDate().atTime(23, 59));
 
-        if(dto.tripItem() == null) {
-            throw new IllegalArgumentException("Trip item cannot be null");
-        } else if(schedule.getTripItem().getId().equals(dto.tripItem())) {
-            throw new IllegalArgumentException("Trip item is the same as the current one");
-        } else {
+        if(dto.tripItem() != null) {
             schedule.setTripItem(schedule.getTripItem());
         }
 
