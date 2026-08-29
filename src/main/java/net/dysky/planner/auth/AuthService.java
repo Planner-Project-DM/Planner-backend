@@ -1,5 +1,6 @@
 package net.dysky.planner.auth;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.response.ResponseDTO;
 import net.dysky.planner.user.User;
@@ -21,7 +22,7 @@ public class AuthService {
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public ResponseEntity<ResponseDTO> login(LoginDTO loginDTO) {
+    public ResponseEntity<ResponseDTO> login(@Valid LoginDTO loginDTO) {
         User user = userService.getUserByEmail(loginDTO.email());
 
         if (!user.getIsActive()) {
@@ -58,7 +59,7 @@ public class AuthService {
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Login successful", "auth/login", response));
     }
 
-    public ResponseEntity<ResponseDTO> register(RegisterDTO registerDTO) {
+    public ResponseEntity<ResponseDTO> register(@Valid RegisterDTO registerDTO) {
         RegisterDTO registerDTOWithEncodedPassword = new RegisterDTO(
                 registerDTO.firstName(),
                 registerDTO.lastName(),

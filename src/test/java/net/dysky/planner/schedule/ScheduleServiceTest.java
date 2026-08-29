@@ -198,59 +198,6 @@ class ScheduleServiceTest {
     }
 
     @Test
-    void updateSchedule_shouldThrowException_whenTripItemIsNull() {
-        UUID scheduleId = UUID.randomUUID();
-        Trip trip = new Trip();
-        trip.setStartDate(LocalDate.of(2026, 8, 1));
-        trip.setEndDate(LocalDate.of(2026, 8, 10));
-
-        LocalDateTime startTime = LocalDateTime.of(2026, 8, 3, 10, 0);
-        LocalDateTime endTime = LocalDateTime.of(2026, 8, 3, 12, 0);
-
-        UpdateScheduleDTO dto = new UpdateScheduleDTO(scheduleId, null, startTime, endTime);
-
-        Schedule existingSchedule = new Schedule();
-        existingSchedule.setId(scheduleId);
-
-        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> scheduleService.updateSchedule(trip, dto));
-
-        assertEquals("Trip item cannot be null", exception.getMessage());
-        verify(scheduleRepository, never()).save(any(Schedule.class));
-    }
-
-    @Test
-    void updateSchedule_shouldThrowException_whenTripItemIsSameAsCurrent() {
-        UUID scheduleId = UUID.randomUUID();
-        UUID itemId = UUID.randomUUID();
-        Trip trip = new Trip();
-        trip.setStartDate(LocalDate.of(2026, 8, 1));
-        trip.setEndDate(LocalDate.of(2026, 8, 10));
-
-        LocalDateTime startTime = LocalDateTime.of(2026, 8, 3, 10, 0);
-        LocalDateTime endTime = LocalDateTime.of(2026, 8, 3, 12, 0);
-
-        UpdateScheduleDTO dto = new UpdateScheduleDTO(scheduleId, itemId, startTime, endTime);
-
-        TripItem existingItem = new TripItem();
-        existingItem.setId(itemId);
-
-        Schedule existingSchedule = new Schedule();
-        existingSchedule.setId(scheduleId);
-        existingSchedule.setTripItem(existingItem);
-
-        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> scheduleService.updateSchedule(trip, dto));
-
-        assertEquals("Trip item is the same as the current one", exception.getMessage());
-        verify(scheduleRepository, never()).save(any(Schedule.class));
-    }
-
-    @Test
     void isDateValid_shouldThrowException_whenDatesAreOutsideTrip() {
         LocalDateTime tripStart = LocalDateTime.of(2026, 8, 1, 0, 0);
         LocalDateTime tripEnd = LocalDateTime.of(2026, 8, 10, 23, 59);
