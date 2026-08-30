@@ -24,7 +24,7 @@ public class ScheduleService {
 
         schedule.setTripItem(createScheduleDTO.tripItem());
 
-        isDateValid(createScheduleDTO.startTime(), createScheduleDTO.endTime(), trip.getStartDate().atStartOfDay(), trip.getEndDate().atTime(23, 59));
+        isDateValid(trip.getId(), createScheduleDTO.startTime(), createScheduleDTO.endTime(), trip.getStartDate().atStartOfDay(), trip.getEndDate().atTime(23, 59));
 
         schedule.setStartTime(createScheduleDTO.startTime());
         schedule.setEndTime(createScheduleDTO.endTime());
@@ -35,7 +35,7 @@ public class ScheduleService {
     public Schedule updateSchedule(Trip trip, UpdateScheduleDTO dto) {
         Schedule schedule = getScheduleById(dto.scheduleId());
 
-        isDateValid(dto.startTime(), dto.endTime(), trip.getStartDate().atStartOfDay(), trip.getEndDate().atTime(23, 59), dto.scheduleId());
+        isDateValid(trip.getId(), dto.startTime(), dto.endTime(), trip.getStartDate().atStartOfDay(), trip.getEndDate().atTime(23, 59), dto.scheduleId());
 
         if(dto.tripItem() != null) {
             schedule.setTripItem(schedule.getTripItem());
@@ -48,17 +48,25 @@ public class ScheduleService {
     }
 
     public void isDateValid(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime tripStartDate, LocalDateTime tripEndDate) {
-        checkDate(startTime, endTime, tripStartDate, tripEndDate);
+        isDateValid(null, startTime, endTime, tripStartDate, tripEndDate, null);
+    }
 
-        if(scheduleRepository.existsOverlapping(startTime, endTime)) {
-            throw new IllegalArgumentException("Schedule overlaps with an existing schedule");
-        }
+    public void isDateValid(UUID tripId, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime tripStartDate, LocalDateTime tripEndDate) {
+        isDateValid(tripId, startTime, endTime, tripStartDate, tripEndDate, null);
     }
 
     public void isDateValid(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime tripStartDate, LocalDateTime tripEndDate, UUID scheduleId) {
+        isDateValid(null, startTime, endTime, tripStartDate, tripEndDate, scheduleId);
+    }
+
+    public void isDateValid(UUID tripId, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime tripStartDate, LocalDateTime tripEndDate, UUID scheduleId) {
         checkDate(startTime, endTime, tripStartDate, tripEndDate);
 
-        if(scheduleRepository.existsOverlapping(startTime, endTime, scheduleId)) {
+        boolean overlaps = tripId == null
+                ? scheduleRepository.existsOverlapping(startTime, endTime)
+                : scheduleRepository.existsOverlapping(tripId, startTime, endTime, scheduleId);
+
+        if(overlaps) {
             throw new IllegalArgumentException("Schedule overlaps with an existing schedule");
         }
     }
