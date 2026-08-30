@@ -187,7 +187,7 @@ class ScheduleServiceTest {
         existingSchedule.setTripItem(existingItem);
 
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
-        when(scheduleRepository.existsOverlapping(startTime, endTime)).thenReturn(false);
+        when(scheduleRepository.existsOverlapping(startTime, endTime, scheduleId)).thenReturn(false);
         when(scheduleRepository.save(any(Schedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         scheduleService.updateSchedule(trip, dto);
