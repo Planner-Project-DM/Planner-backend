@@ -35,7 +35,7 @@ public class ScheduleService {
     public Schedule updateSchedule(Trip trip, UpdateScheduleDTO dto) {
         Schedule schedule = getScheduleById(dto.scheduleId());
 
-        isDateValid(dto.startTime(), dto.endTime(), trip.getStartDate().atStartOfDay(), trip.getEndDate().atTime(23, 59));
+        isDateValid(dto.startTime(), dto.endTime(), trip.getStartDate().atStartOfDay(), trip.getEndDate().atTime(23, 59), dto.scheduleId());
 
         if(dto.tripItem() != null) {
             schedule.setTripItem(schedule.getTripItem());
@@ -48,6 +48,22 @@ public class ScheduleService {
     }
 
     public void isDateValid(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime tripStartDate, LocalDateTime tripEndDate) {
+        checkDate(startTime, endTime, tripStartDate, tripEndDate);
+
+        if(scheduleRepository.existsOverlapping(startTime, endTime)) {
+            throw new IllegalArgumentException("Schedule overlaps with an existing schedule");
+        }
+    }
+
+    public void isDateValid(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime tripStartDate, LocalDateTime tripEndDate, UUID scheduleId) {
+        checkDate(startTime, endTime, tripStartDate, tripEndDate);
+
+        if(scheduleRepository.existsOverlapping(startTime, endTime, scheduleId)) {
+            throw new IllegalArgumentException("Schedule overlaps with an existing schedule");
+        }
+    }
+
+    public void checkDate(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime tripStartDate, LocalDateTime tripEndDate) {
         if(startTime.isBefore(tripStartDate) && endTime.isBefore(tripEndDate)) {
             throw new IllegalArgumentException("Schedule must be within the trip dates");
         }
@@ -58,10 +74,6 @@ public class ScheduleService {
 
         if(startTime.isEqual(endTime)) {
             throw new IllegalArgumentException("Start time and end time cannot be the same");
-        }
-
-        if(scheduleRepository.existsOverlapping(startTime, endTime)) {
-            throw new IllegalArgumentException("Schedule overlaps with an existing schedule");
         }
     }
 

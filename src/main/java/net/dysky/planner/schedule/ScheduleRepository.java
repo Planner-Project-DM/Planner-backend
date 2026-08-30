@@ -11,4 +11,7 @@ interface ScheduleRepository extends JpaRepository<Schedule, UUID> {
 
     @Query("SELECT COUNT(s) > 0 FROM Schedule s WHERE s.startTime < :endTime AND s.endTime > :startTime")
     boolean existsOverlapping(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+
+    @Query("SELECT COUNT(s) > 0 FROM Schedule s WHERE s.startTime < :endTime AND s.endTime > :startTime AND s.id <> :scheduleId")
+    boolean existsOverlapping(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime, @Param("scheduleId") UUID scheduleId);
 }
