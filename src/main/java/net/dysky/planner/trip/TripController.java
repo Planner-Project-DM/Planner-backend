@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.response.ResponseDTO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -59,6 +60,7 @@ class TripController {
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Trip updated successfully", "/api/trips/" + id, updatedTrip));
     }
 
+    @PreAuthorize("@tripSecurity.hasRoleInTrip(#id, authentication)")
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseDTO> deleteTrip(@PathVariable UUID id) {
         tripService.deleteTrip(id);

@@ -25,6 +25,10 @@ public class GroupUserService {
         return groupUserRepository.findAllByUser_EmailAndRoleNot(userEmail, role);
     }
 
+    public boolean isUserOwnerOrAdminOfGroup(Group group, String email) {
+        return groupUserRepository.existsByGroupAndUser_EmailAndRoleNot(group, email, GroupRole.MEMBER);
+    }
+
     public GroupUser add(CreateGroupUserDTO createGroupUserDTO) {
         GroupUser groupUser = new GroupUser();
 
