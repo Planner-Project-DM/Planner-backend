@@ -11,4 +11,6 @@ interface GroupUserRepository extends JpaRepository<GroupUser, GroupUserId> {
     List<GroupUser> findByGroup(Group group);
 
     List<GroupUser> findAllByUser_EmailAndRoleNot(String userEmail, GroupRole role);
+
+    boolean existsByGroupAndUser_EmailAndRoleNot(Group group, String userEmail, GroupRole role);
 }
