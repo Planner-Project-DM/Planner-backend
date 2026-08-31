@@ -1,12 +1,12 @@
 package net.dysky.planner.tripitem;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import net.dysky.planner.address.Address;
 import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.hotel.ElementDTO;
 import net.dysky.planner.hotel.Location;
 import net.dysky.planner.hotel.OverpassApiDTO;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
@@ -19,13 +19,16 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
 public class TripItemService {
 
     private final RestClient restClient;
-
     private final TripItemRepository tripItemRepository;
+
+    public TripItemService(@Qualifier("overpassRestClient") RestClient restClient, TripItemRepository tripItemRepository) {
+        this.restClient = restClient;
+        this.tripItemRepository = tripItemRepository;
+    }
 
     public TripItem findById(UUID id) {
         return tripItemRepository.findById(id).orElseThrow(
