@@ -29,4 +29,11 @@ class RestClientConfig {
                 .build();
     }
 
+    @Bean
+    public RestClient geocodingRestClient(@Value("${weather.geocoding.api.url:https://geocoding-api.open-meteo.com/v1/search}") String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
+
 }
