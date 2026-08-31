@@ -20,11 +20,12 @@ public class WeatherService {
     }
 
     public ArchiveWeatherDTO getArchiveData(double latitude, double longitude, LocalDate startDate, LocalDate endDate) {
+
         return archiveRestClient.get().uri(uriBuilder -> uriBuilder
                         .queryParam("latitude", latitude)
                         .queryParam("longitude", longitude)
-                        .queryParam("startDate", startDate)
-                        .queryParam("endDate", endDate)
+                        .queryParam("start_date", startDate)
+                        .queryParam("end_date", endDate)
                         .queryParam("daily", "temperature_2m_max,temperature_2m_min,rain_sum")
                         .build()
                 )
@@ -33,7 +34,6 @@ public class WeatherService {
     }
 
     public WeatherDTO getWeatherData(double latitude, double longitude, LocalDate startDate, LocalDate endDate) {
-
         if (startDate.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("Start date cannot be in the past.");
         }

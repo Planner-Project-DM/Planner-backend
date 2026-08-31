@@ -9,6 +9,6 @@ public record ArchiveWeatherDTO(
     String timezone_abbreviation,
     String elevation,
     DailyUnits daily_units,
-    ArchiveDaily archiveDaily
+    Daily daily
 ) {
 }
