@@ -2,6 +2,8 @@ package net.dysky.planner.schedule;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import net.dysky.planner.trip.Trip;
+import net.dysky.planner.tripSchedule.TripSchedule;
 import net.dysky.planner.tripitem.TripItem;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +59,33 @@ class ScheduleRepositoryTest {
     }
 
     @Test
+    void existsOverlapping_shouldBeScopedToTrip() {
+        Trip tripOne = new Trip();
+        tripOne.setName("Trip A");
+        entityManager.persist(tripOne);
+
+        Trip tripTwo = new Trip();
+        tripTwo.setName("Trip B");
+        entityManager.persist(tripTwo);
+
+        Schedule schedule = persistSchedule(
+                LocalDateTime.of(2026, 8, 2, 10, 0),
+                LocalDateTime.of(2026, 8, 2, 12, 0)
+        );
+        persistTripSchedule(tripOne, schedule);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(scheduleRepository.existsOverlapping(
+                tripTwo.getId(),
+                LocalDateTime.of(2026, 8, 2, 11, 0),
+                LocalDateTime.of(2026, 8, 2, 13, 0),
+                null
+        )).isFalse();
+    }
+
+    @Test
     void existsOverlapping_shouldReturnFalse_whenScheduleIntervalsDoNotOverlap() {
         persistSchedule(
                 LocalDateTime.of(2026, 8, 2, 10, 0),
@@ -84,5 +113,12 @@ class ScheduleRepositoryTest {
         entityManager.persist(schedule);
 
         return schedule;
+    }
+
+    private void persistTripSchedule(Trip trip, Schedule schedule) {
+        TripSchedule tripSchedule = new TripSchedule();
+        tripSchedule.setTrip(trip);
+        tripSchedule.setSchedule(schedule);
+        entityManager.persist(tripSchedule);
     }
 }

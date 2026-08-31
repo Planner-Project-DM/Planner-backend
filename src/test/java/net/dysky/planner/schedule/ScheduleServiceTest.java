@@ -58,6 +58,7 @@ class ScheduleServiceTest {
     void addSchedule_shouldSaveAndReturnSchedule_whenDataIsValid() {
         // Given
         Trip trip = new Trip();
+        trip.setId(UUID.randomUUID());
         trip.setStartDate(LocalDate.of(2026, 8, 1));
         trip.setEndDate(LocalDate.of(2026, 8, 10));
 
@@ -66,7 +67,7 @@ class ScheduleServiceTest {
         LocalDateTime endTime = LocalDateTime.of(2026, 8, 2, 12, 0);
         CreateScheduleDTO dto = new CreateScheduleDTO(tripItem, startTime, endTime);
 
-        when(scheduleRepository.existsOverlapping(startTime, endTime)).thenReturn(false);
+        when(scheduleRepository.existsOverlapping(trip.getId(), startTime, endTime, null)).thenReturn(false);
         when(scheduleRepository.save(any(Schedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
@@ -78,7 +79,7 @@ class ScheduleServiceTest {
         assertEquals(startTime, result.getStartTime());
         assertEquals(endTime, result.getEndTime());
 
-        verify(scheduleRepository, times(1)).existsOverlapping(startTime, endTime);
+        verify(scheduleRepository, times(1)).existsOverlapping(trip.getId(), startTime, endTime, null);
         verify(scheduleRepository, times(1)).save(any(Schedule.class));
     }
 
@@ -146,6 +147,7 @@ class ScheduleServiceTest {
     void addSchedule_shouldThrowException_whenScheduleOverlapsWithExisting() {
         // Given
         Trip trip = new Trip();
+        trip.setId(UUID.randomUUID());
         trip.setStartDate(LocalDate.of(2026, 8, 1));
         trip.setEndDate(LocalDate.of(2026, 8, 10));
 
@@ -154,14 +156,14 @@ class ScheduleServiceTest {
         LocalDateTime endTime = LocalDateTime.of(2026, 8, 2, 12, 0);
         CreateScheduleDTO dto = new CreateScheduleDTO(tripItem, startTime, endTime);
 
-        when(scheduleRepository.existsOverlapping(startTime, endTime)).thenReturn(true);
+        when(scheduleRepository.existsOverlapping(trip.getId(), startTime, endTime, null)).thenReturn(true);
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
                 () -> scheduleService.addSchedule(trip, dto));
 
         assertEquals("Schedule overlaps with an existing schedule", exception.getMessage());
-        verify(scheduleRepository, times(1)).existsOverlapping(startTime, endTime);
+        verify(scheduleRepository, times(1)).existsOverlapping(trip.getId(), startTime, endTime, null);
         verify(scheduleRepository, never()).save(any(Schedule.class));
     }
 
@@ -172,6 +174,7 @@ class ScheduleServiceTest {
         UUID newItemId = UUID.randomUUID();
 
         Trip trip = new Trip();
+        trip.setId(UUID.randomUUID());
         trip.setStartDate(LocalDate.of(2026, 8, 1));
         trip.setEndDate(LocalDate.of(2026, 8, 10));
 
@@ -187,7 +190,7 @@ class ScheduleServiceTest {
         existingSchedule.setTripItem(existingItem);
 
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
-        when(scheduleRepository.existsOverlapping(startTime, endTime, scheduleId)).thenReturn(false);
+        when(scheduleRepository.existsOverlapping(trip.getId(), startTime, endTime, scheduleId)).thenReturn(false);
         when(scheduleRepository.save(any(Schedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         scheduleService.updateSchedule(trip, dto);
