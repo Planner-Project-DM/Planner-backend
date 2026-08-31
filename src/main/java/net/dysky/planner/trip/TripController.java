@@ -38,7 +38,7 @@ class TripController {
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<ResponseDTO> getTripById(@PathVariable UUID id) {
+    public ResponseEntity<ResponseDTO> getTripById(@PathVariable UUID id) {
         Trip trip = tripService.getTripById(id);
 
         ResponseDTO responseDTO = new ResponseDTO(LocalDateTime.now(), 200, "Trip retrieved successfully", "/api/trips/" + id, trip);

@@ -5,6 +5,8 @@ import jakarta.transaction.Transactional;
 import net.dysky.planner.AbstractIntegrationTest;
 import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.auth.RegisterDTO;
+import net.dysky.planner.group.CreateGroupDTO;
+import net.dysky.planner.group.GroupService;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +34,9 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private GroupService groupService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -65,6 +70,19 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
         trip.setStartDate(LocalDate.now());
         trip.setTripCreator(testUser);
         trip.setEndDate(LocalDate.now().plusDays(5));
+        return tripRepository.saveAndFlush(trip);
+    }
+
+    private Trip createAndSaveTrip(String name, String destination, TripStatus status, String groupName) {
+        Trip trip = new Trip();
+        trip.setName(name);
+        trip.setDestination(destination);
+        trip.setStatus(status);
+        trip.setBudget(1500.0);
+        trip.setStartDate(LocalDate.now());
+        trip.setTripCreator(testUser);
+        trip.setEndDate(LocalDate.now().plusDays(5));
+        trip.setTripGroup(groupService.createGroup(new CreateGroupDTO(""), testUser.getEmail()));
         return tripRepository.saveAndFlush(trip);
     }
 
@@ -253,11 +271,11 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void deleteTrip_shouldDeleteSuccessfully_whenTripExists() throws Exception {
-        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED, "");
         UUID id = savedTrip.getId();
 
         mockMvc.perform(delete("/api/trips/{id}", id)
-                        .with(user("user@example.com").roles("USER"))
+                        .with(user(testUser.getEmail()).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
