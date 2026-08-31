@@ -7,6 +7,10 @@ public record UpdateScheduleDTO(
     UUID scheduleId,
     UUID tripItem,
     LocalDateTime startTime,
-    LocalDateTime endTime
+    LocalDateTime endTime,
+    Boolean allDay
 ) {
+    public UpdateScheduleDTO(UUID scheduleId, UUID tripItem, LocalDateTime startTime, LocalDateTime endTime) {
+        this(scheduleId, tripItem, startTime, endTime, null);
+    }
 }

@@ -32,7 +32,7 @@ public class TripScheduleService {
     public TripSchedule addScheduleToTrip(Trip trip, CreateTripScheduleDTO dto) {
         TripItem tripItem = tripItemService.findById(dto.tripItemId());
 
-        Schedule schedule = scheduleService.addSchedule(trip, new CreateScheduleDTO(tripItem, dto.startTime(), dto.endTime()));
+        Schedule schedule = scheduleService.addSchedule(trip, new CreateScheduleDTO(tripItem, dto.startTime(), dto.endTime(), dto.allDay()));
 
         TripSchedule tripSchedule = new TripSchedule();
 
@@ -64,8 +64,8 @@ public class TripScheduleService {
         return new ScheduleResponseDTO(
                 tripSchedule.schedule.getId(),
                 tripItemSummaryDTO,
-                tripSchedule.schedule.getStartTime().toString(),
-                tripSchedule.schedule.getEndTime().toString()
+                tripSchedule.schedule.getStartTime() == null ? null : tripSchedule.schedule.getStartTime().toString(),
+                tripSchedule.schedule.getEndTime() == null ? null : tripSchedule.schedule.getEndTime().toString()
         );
     }
 

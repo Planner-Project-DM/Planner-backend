@@ -7,6 +7,10 @@ import java.time.LocalDateTime;
 public record CreateScheduleDTO(
     TripItem tripItem,
     LocalDateTime startTime,
-    LocalDateTime endTime
+    LocalDateTime endTime,
+    boolean allDay
 ) {
+    public CreateScheduleDTO(TripItem tripItem, LocalDateTime startTime, LocalDateTime endTime) {
+        this(tripItem, startTime, endTime, false);
+    }
 }

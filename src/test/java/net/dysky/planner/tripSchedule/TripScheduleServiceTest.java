@@ -161,4 +161,30 @@ class TripScheduleServiceTest {
         assertEquals("2026-08-02T10:00", result.startTime());
         assertEquals("2026-08-02T12:00", result.endTime());
     }
+
+    @Test
+    void mapToDTO_shouldReturnNullDates_whenScheduleIsAllDay() {
+        UUID scheduleId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        TripItem tripItem = mock(TripItem.class);
+        when(tripItem.getId()).thenReturn(itemId);
+        when(tripItem.getName()).thenReturn("Cały dzień");
+
+        Schedule schedule = mock(Schedule.class);
+        when(schedule.getTripItem()).thenReturn(tripItem);
+        when(schedule.getId()).thenReturn(scheduleId);
+        when(schedule.getStartTime()).thenReturn(null);
+        when(schedule.getEndTime()).thenReturn(null);
+
+        TripSchedule tripSchedule = new TripSchedule();
+        tripSchedule.setSchedule(schedule);
+
+        ScheduleResponseDTO result = tripScheduleService.mapToDTO(tripSchedule);
+
+        assertNotNull(result);
+        assertNull(result.startTime());
+        assertNull(result.endTime());
+        assertEquals("Cały dzień", result.tripItem().name());
+    }
 }

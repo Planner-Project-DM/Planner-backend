@@ -29,5 +29,7 @@ public class Schedule {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
+    private boolean allDay = false;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 }
