@@ -2,6 +2,7 @@ package net.dysky.planner.schedule;
 
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripitem.TripItem;
+import net.dysky.planner.tripitem.TripItemService;
 import net.dysky.planner.tripSchedule.UpdateScheduleDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,9 @@ class ScheduleServiceTest {
 
     @Mock
     private ScheduleRepository scheduleRepository;
+
+    @Mock
+    private TripItemService tripItemService;
 
     @InjectMocks
     private ScheduleService scheduleService;
@@ -80,6 +84,30 @@ class ScheduleServiceTest {
         assertEquals(endTime, result.getEndTime());
 
         verify(scheduleRepository, times(1)).existsOverlapping(trip.getId(), startTime, endTime, null);
+        verify(scheduleRepository, times(1)).save(any(Schedule.class));
+    }
+
+    @Test
+    void addSchedule_shouldSetDatesToNull_whenAllDayIsTrue() {
+        Trip trip = new Trip();
+        trip.setId(UUID.randomUUID());
+        trip.setStartDate(LocalDate.of(2026, 8, 1));
+        trip.setEndDate(LocalDate.of(2026, 8, 10));
+
+        TripItem tripItem = new TripItem();
+        LocalDateTime startTime = LocalDateTime.of(2026, 8, 2, 10, 0);
+        LocalDateTime endTime = LocalDateTime.of(2026, 8, 2, 12, 0);
+        CreateScheduleDTO dto = new CreateScheduleDTO(tripItem, startTime, endTime, true);
+
+        when(scheduleRepository.save(any(Schedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Schedule result = scheduleService.addSchedule(trip, dto);
+
+        assertNotNull(result);
+        assertTrue(result.isAllDay());
+        assertNull(result.getStartTime());
+        assertNull(result.getEndTime());
+        verify(scheduleRepository, never()).existsOverlapping(any(), any(), any(), any());
         verify(scheduleRepository, times(1)).save(any(Schedule.class));
     }
 
@@ -168,6 +196,34 @@ class ScheduleServiceTest {
     }
 
     @Test
+    void updateSchedule_shouldSetDatesToNull_whenAllDayIsEnabled() {
+        UUID scheduleId = UUID.randomUUID();
+        Trip trip = new Trip();
+        trip.setId(UUID.randomUUID());
+        trip.setStartDate(LocalDate.of(2026, 8, 1));
+        trip.setEndDate(LocalDate.of(2026, 8, 10));
+
+        Schedule existingSchedule = new Schedule();
+        existingSchedule.setId(scheduleId);
+        existingSchedule.setAllDay(false);
+        existingSchedule.setStartTime(LocalDateTime.of(2026, 8, 3, 10, 0));
+        existingSchedule.setEndTime(LocalDateTime.of(2026, 8, 3, 12, 0));
+
+        UpdateScheduleDTO dto = new UpdateScheduleDTO(scheduleId, null, null, null, true);
+
+        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
+        when(scheduleRepository.save(any(Schedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Schedule result = scheduleService.updateSchedule(trip, dto);
+
+        assertNotNull(result);
+        assertTrue(result.isAllDay());
+        assertNull(result.getStartTime());
+        assertNull(result.getEndTime());
+        verify(scheduleRepository, times(1)).save(existingSchedule);
+    }
+
+    @Test
     void updateSchedule_shouldUpdateAndSave_whenDataIsValidAndTripItemIsDifferent() {
         UUID scheduleId = UUID.randomUUID();
         UUID existingItemId = UUID.randomUUID();
@@ -185,11 +241,15 @@ class ScheduleServiceTest {
         TripItem existingItem = new TripItem();
         existingItem.setId(existingItemId);
 
+        TripItem newItem = new TripItem();
+        newItem.setId(newItemId);
+
         Schedule existingSchedule = new Schedule();
         existingSchedule.setId(scheduleId);
         existingSchedule.setTripItem(existingItem);
 
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
+        when(tripItemService.findById(newItemId)).thenReturn(newItem);
         when(scheduleRepository.existsOverlapping(trip.getId(), startTime, endTime, scheduleId)).thenReturn(false);
         when(scheduleRepository.save(any(Schedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -197,6 +257,8 @@ class ScheduleServiceTest {
 
         assertEquals(startTime, existingSchedule.getStartTime());
         assertEquals(endTime, existingSchedule.getEndTime());
+        assertEquals(newItem, existingSchedule.getTripItem());
+        verify(tripItemService, times(1)).findById(newItemId);
         verify(scheduleRepository, times(1)).save(existingSchedule);
     }
 

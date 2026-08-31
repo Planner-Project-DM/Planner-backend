@@ -6,6 +6,10 @@ import java.util.UUID;
 public record CreateTripScheduleDTO(
         UUID tripItemId,
         LocalDateTime startTime,
-        LocalDateTime endTime
+        LocalDateTime endTime,
+        boolean allDay
 ) {
+    public CreateTripScheduleDTO(UUID tripItemId, LocalDateTime startTime, LocalDateTime endTime) {
+        this(tripItemId, startTime, endTime, false);
+    }
 }
