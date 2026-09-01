@@ -25,12 +25,13 @@ class WeatherController {
         CoordinatesDTO coordinates = geocodingService.getCoordinates(city);
 
         if(LocalDate.now().plusDays(14).isBefore(weatherSearchDTO.startDate())) {
-            LocalDate startArchiveDate = weatherSearchDTO.startDate().minusYears(7);
-            LocalDate endArchiveDate = weatherSearchDTO.endDate().minusYears(1);
+            LocalDate startArchiveDate = weatherSearchDTO.startDate().minusYears(5);
+            LocalDate endArchiveDate = weatherSearchDTO.endDate().minusYears(2);
 
             ArchiveWeatherDTO response = weatherService.getArchiveData(coordinates.latitude(), coordinates.longitude(), startArchiveDate, endArchiveDate);
 
-            return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Weather data retrieved successfully", "api/weather/" + city, response));
+            ArchiveWeatherDTO result = weatherService.calculateAverageParams(response, weatherSearchDTO.startDate(), weatherSearchDTO.endDate());
+            return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Weather data retrieved successfully", "api/weather/" + city, result));
         } else {
             WeatherDTO response = weatherService.getWeatherData(coordinates.latitude(), coordinates.longitude(), weatherSearchDTO.startDate(), weatherSearchDTO.endDate());
 
