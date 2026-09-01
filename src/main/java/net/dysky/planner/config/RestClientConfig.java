@@ -15,4 +15,25 @@ class RestClientConfig {
                 .build();
     }
 
+    @Bean
+    public RestClient archiveRestClient(@Value("${archive.api.url:https://archive-api.open-meteo.com/v1/archive}")  String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
+
+    @Bean
+    public RestClient weatherRestClient(@Value("${weather.api.url:https://api.open-meteo.com/v1/forecast}")  String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
+
+    @Bean
+    public RestClient geocodingRestClient(@Value("${geocoding.api.url:https://geocoding-api.open-meteo.com/v1/search}") String baseUrl) {
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
+
 }
