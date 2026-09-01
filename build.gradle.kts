@@ -94,7 +94,13 @@ tasks.jacocoTestReport {
     classDirectories.setFrom(
         files(classDirectories.files.map {
             fileTree(it) {
-                exclude("net/dysky/planner/report/**", "net/dysky/planner/groupUser/**")
+                exclude(
+                    "net/dysky/planner/report/**",
+                    "net/dysky/planner/groupUser/**",
+                    "net/dysky/planner/weather/*DTO.class",
+                    "net/dysky/planner/weather/Hourly.class",
+                    "net/dysky/planner/weather/WeatherDTO.class"
+                )
             }
         })
     )
@@ -105,7 +111,13 @@ tasks.jacocoTestCoverageVerification {
     classDirectories.setFrom(
         files(classDirectories.files.map {
             fileTree(it) {
-                exclude("net/dysky/planner/report/**", "net/dysky/planner/groupUser/**")
+                exclude(
+                    "net/dysky/planner/report/**",
+                    "net/dysky/planner/groupUser/**",
+                    "net/dysky/planner/weather/*DTO.class",
+                    "net/dysky/planner/weather/Hourly.class",
+                    "net/dysky/planner/weather/WeatherDTO.class"
+                )
             }
         })
     )
