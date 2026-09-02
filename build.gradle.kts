@@ -54,11 +54,8 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    implementation("com.bucket4j:bucket4j-core:8.15.0")
-    implementation("com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter:0.13.0")
-    implementation("org.springframework.boot:spring-boot-starter-cache:3.5.7")
-    implementation("javax.cache:cache-api")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    implementation("com.bucket4j:bucket4j-core:8.10.1")
+    implementation("com.github.ben-manes.caffeine:caffeine")
 
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")

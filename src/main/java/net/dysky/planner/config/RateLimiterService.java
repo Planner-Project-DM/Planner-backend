@@ -20,7 +20,7 @@ public class RateLimiterService {
                 .build();
     }
 
-    public Bucket getBucket(String key) {
+    public Bucket resolveBucket(String key) {
         return cache.get(key, k -> createNewBucker());
     }
 
