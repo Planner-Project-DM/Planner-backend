@@ -42,7 +42,6 @@ public class UserService {
         user.setEmail(registerDTO.email());
         user.setPhoneNumber(registerDTO.phoneNumber());
 
-        // TODO hash
         user.setPassword(registerDTO.password());
 
         return userRepository.save(user);
