@@ -9,6 +9,7 @@ public class SettingsService {
         Settings settings = new Settings();
 
         settings.setCurrency(createSettingsDTO.currency());
+        settings.setBudgetLimit(createSettingsDTO.budgetLimit());
 
         return settings;
     }
@@ -17,6 +18,7 @@ public class SettingsService {
         Settings settings = new Settings();
 
         settings.setCurrency("PLN");
+        settings.setBudgetLimit(0.0);
 
         return settings;
     }

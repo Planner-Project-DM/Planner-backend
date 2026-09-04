@@ -21,4 +21,6 @@ public class Settings {
 
     private String currency;
 
+    private Double budgetLimit;
+
 }
