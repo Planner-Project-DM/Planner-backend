@@ -13,4 +13,12 @@ public class SettingsService {
         return settings;
     }
 
+    public Settings createDefaultSettings() {
+        Settings settings = new Settings();
+
+        settings.setCurrency("PLN");
+
+        return settings;
+    }
+
 }
