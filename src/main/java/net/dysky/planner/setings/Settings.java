@@ -23,4 +23,6 @@ public class Settings {
 
     private Double budgetLimit;
 
+    private String language;
+
 }
