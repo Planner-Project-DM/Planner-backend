@@ -3,6 +3,7 @@ package net.dysky.planner.group;
 import net.dysky.planner.groupUser.CreateGroupUserDTO;
 import net.dysky.planner.groupUser.GroupUser;
 import net.dysky.planner.groupUser.GroupUserService;
+import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -11,9 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,7 +23,6 @@ import net.dysky.planner.groupUser.UpdateGroupUserDTO;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.exception.UserNotFoundException;
 import org.mockito.ArgumentCaptor;
-import java.util.Arrays;
 
 @ExtendWith(MockitoExtension.class)
 class GroupServiceTest {
@@ -37,6 +35,9 @@ class GroupServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private GroupService groupService;
@@ -90,14 +91,18 @@ class GroupServiceTest {
     void addToGroup_shouldAddUserWhenNotAlreadyInGroup() {
         Group group = new Group();
         group.setGroupUsers(new ArrayList<>());
+        User senderUser = mock(User.class);
+
+        when(userService.getUserByEmail("sender@domain.com")).thenReturn(senderUser);
 
         AddToGroupDTO dto = new AddToGroupDTO("newmember@domain.com");
         User userToAdd = mock(User.class);
 
         when(userService.getUserByEmail("newmember@domain.com")).thenReturn(userToAdd);
 
-        groupService.addToGroup(group, dto);
+        groupService.addToGroup(group, dto, "sender@domain.com");
 
+        verify(userService).getUserByEmail("sender@domain.com");
         verify(userService).getUserByEmail("newmember@domain.com");
         verify(groupUserService).add(any(CreateGroupUserDTO.class));
     }
@@ -110,15 +115,15 @@ class GroupServiceTest {
 
         when(existingGroupUser.getUser()).thenReturn(existingUser);
         when(existingUser.getEmail()).thenReturn("member@domain.com");
+
         group.setGroupUsers(List.of(existingGroupUser));
 
         AddToGroupDTO dto = new AddToGroupDTO("member@domain.com");
 
-        assertThatThrownBy(() -> groupService.addToGroup(group, dto))
+        assertThatThrownBy(() -> groupService.addToGroup(group, dto, "sender@domain.com"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("User is already in the group");
 
-        verifyNoInteractions(userService);
         verifyNoInteractions(groupUserService);
     }
 
