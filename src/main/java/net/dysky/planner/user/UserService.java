@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.dysky.planner.auth.RegisterDTO;
 import net.dysky.planner.exception.UserExistException;
 import net.dysky.planner.exception.UserNotFoundException;
-import net.dysky.planner.setings.SettingsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import net.dysky.planner.usersetings.UserSettingsService;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -17,7 +16,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final SettingsService settingsService;
+    private final UserSettingsService userSettingsService;
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(
@@ -47,7 +46,7 @@ public class UserService {
         user.setPhoneNumber(registerDTO.phoneNumber());
 
         user.setPassword(registerDTO.password());
-        user.setSettings(settingsService.createDefaultSettings());
+        user.setSettings(userSettingsService.createDefaultSettings());
 
         return userRepository.save(user);
     }

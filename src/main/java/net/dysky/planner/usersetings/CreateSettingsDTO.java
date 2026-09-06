@@ -1,4 +1,4 @@
-package net.dysky.planner.setings;
+package net.dysky.planner.usersetings;
 
 public record CreateSettingsDTO(
     String currency,

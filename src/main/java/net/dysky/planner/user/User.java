@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 import net.dysky.planner.groupUser.GroupUser;
-import net.dysky.planner.setings.Settings;
+import net.dysky.planner.usersetings.UserSettings;
 
 import java.util.List;
 import java.util.UUID;
@@ -41,6 +41,6 @@ public class User {
 
     private Boolean isActive = true;
 
-    @OneToOne
-    private Settings settings;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private UserSettings settings;
 }
