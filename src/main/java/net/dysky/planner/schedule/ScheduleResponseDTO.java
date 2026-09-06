@@ -6,6 +6,7 @@ public record ScheduleResponseDTO(
     UUID id,
     TripItemSummaryDTO tripItem,
     String startTime,
-    String endTime
+    String endTime,
+    boolean allDay
 ) {
 }

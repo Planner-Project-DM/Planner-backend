@@ -46,7 +46,8 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
                 UUID.randomUUID(),
                 new TripItemSummaryDTO(UUID.randomUUID(), "Hotel Marriott"),
                 "2026-08-02T10:00",
-                "2026-08-02T12:00"
+                "2026-08-02T12:00",
+                false
         );
 
         when(tripService.getTripById(tripId)).thenReturn(mockTrip);

@@ -65,7 +65,8 @@ public class TripScheduleService {
                 tripSchedule.schedule.getId(),
                 tripItemSummaryDTO,
                 tripSchedule.schedule.getStartTime() == null ? null : tripSchedule.schedule.getStartTime().toString(),
-                tripSchedule.schedule.getEndTime() == null ? null : tripSchedule.schedule.getEndTime().toString()
+                tripSchedule.schedule.getEndTime() == null ? null : tripSchedule.schedule.getEndTime().toString(),
+                tripSchedule.schedule.isAllDay()
         );
     }
 
