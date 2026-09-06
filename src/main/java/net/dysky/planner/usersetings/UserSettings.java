@@ -1,5 +1,6 @@
 package net.dysky.planner.usersetings;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +15,12 @@ import java.util.UUID;
 public class UserSettings {
 
     @Id
+    @JsonIgnore
     @GeneratedValue
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
