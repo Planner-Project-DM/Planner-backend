@@ -29,7 +29,7 @@ public class ScheduleService {
         schedule.setAllDay(createScheduleDTO.allDay());
 
         if (createScheduleDTO.allDay()) {
-            schedule.setStartTime(null);
+            schedule.setStartTime(createScheduleDTO.startTime());
             schedule.setEndTime(null);
             return scheduleRepository.save(schedule);
         }
@@ -49,7 +49,7 @@ public class ScheduleService {
         }
 
         if(schedule.isAllDay()) {
-            schedule.setStartTime(null);
+            schedule.setStartTime(dto.startTime());
             schedule.setEndTime(null);
             return scheduleRepository.save(schedule);
         }
