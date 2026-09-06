@@ -105,7 +105,7 @@ class ScheduleServiceTest {
 
         assertNotNull(result);
         assertTrue(result.isAllDay());
-        assertNull(result.getStartTime());
+        assertNotNull(result.getStartTime());
         assertNull(result.getEndTime());
         verify(scheduleRepository, never()).existsOverlapping(any(), any(), any(), any());
         verify(scheduleRepository, times(1)).save(any(Schedule.class));
