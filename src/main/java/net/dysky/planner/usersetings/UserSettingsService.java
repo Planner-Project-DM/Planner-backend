@@ -11,6 +11,7 @@ public class UserSettingsService {
         settings.setCurrency(Currency.valueOf(createSettingsDTO.currency()));
         settings.setBudgetLimit(createSettingsDTO.budgetLimit());
         settings.setLanguage(Language.valueOf(createSettingsDTO.language()));
+        settings.setNotificationEnabled(createSettingsDTO.isNotificationsEnabled());
 
         return settings;
     }
@@ -21,6 +22,7 @@ public class UserSettingsService {
         settings.setCurrency(Currency.PLN);
         settings.setBudgetLimit(0.0);
         settings.setLanguage(Language.PL);
+        settings.setNotificationEnabled(true);
 
         return settings;
     }

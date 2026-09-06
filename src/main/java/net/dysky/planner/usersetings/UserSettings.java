@@ -29,4 +29,6 @@ public class UserSettings {
     @Enumerated(EnumType.STRING)
     private Language language;
 
+    private boolean isNotificationEnabled;
+
 }
