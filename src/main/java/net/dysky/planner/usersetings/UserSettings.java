@@ -21,10 +21,12 @@ public class UserSettings {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    private String currency;
+    @Enumerated(EnumType.STRING)
+    private Currency currency;
 
     private Double budgetLimit;
 
-    private String language;
+    @Enumerated(EnumType.STRING)
+    private Language language;
 
 }

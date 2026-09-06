@@ -8,9 +8,9 @@ public class UserSettingsService {
     public UserSettings createSettings(CreateSettingsDTO createSettingsDTO) {
         UserSettings settings = new UserSettings();
 
-        settings.setCurrency(createSettingsDTO.currency());
+        settings.setCurrency(Currency.valueOf(createSettingsDTO.currency()));
         settings.setBudgetLimit(createSettingsDTO.budgetLimit());
-        settings.setLanguage(createSettingsDTO.language());
+        settings.setLanguage(Language.valueOf(createSettingsDTO.language()));
 
         return settings;
     }
@@ -18,9 +18,9 @@ public class UserSettingsService {
     public UserSettings createDefaultSettings() {
         UserSettings settings = new UserSettings();
 
-        settings.setCurrency("PLN");
+        settings.setCurrency(Currency.PLN);
         settings.setBudgetLimit(0.0);
-        settings.setLanguage("PL");
+        settings.setLanguage(Language.PL);
 
         return settings;
     }
