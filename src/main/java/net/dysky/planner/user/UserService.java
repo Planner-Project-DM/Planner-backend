@@ -1,19 +1,22 @@
 package net.dysky.planner.user;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import net.dysky.planner.auth.RegisterDTO;
 import net.dysky.planner.exception.UserExistException;
 import net.dysky.planner.exception.UserNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import net.dysky.planner.usersetings.UserSettingsService;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    private final UserSettingsService userSettingsService;
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(
@@ -42,8 +45,8 @@ public class UserService {
         user.setEmail(registerDTO.email());
         user.setPhoneNumber(registerDTO.phoneNumber());
 
-        // TODO hash
         user.setPassword(registerDTO.password());
+        user.setSettings(userSettingsService.createDefaultSettings());
 
         return userRepository.save(user);
     }

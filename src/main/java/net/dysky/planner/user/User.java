@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 import net.dysky.planner.groupUser.GroupUser;
+import net.dysky.planner.usersetings.UserSettings;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,4 +40,14 @@ public class User {
     private List<GroupUser> groupUsers;
 
     private Boolean isActive = true;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserSettings settings;
+
+    public void setSettings(UserSettings settings) {
+        this.settings = settings;
+        if (settings != null) {
+            settings.setUser(this);
+        }
+    }
 }
