@@ -8,10 +8,7 @@ import net.dysky.planner.response.ResponseDTO;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -46,6 +43,29 @@ public class UserSettingsController {
                         settings
                 )
         );
+    }
+
+    @PutMapping
+    public ResponseEntity<ResponseDTO> updateUserSettings(@RequestBody UpdateSettingsDTO updateSettingsDTO, HttpServletRequest request) {
+        String email = jwtService.extractEmail(request);
+        User user = userService.getUserByEmail(email);
+
+        if(user == null) {
+            throw new UserNotFoundException("User " + email + " not found");
+        }
+
+        UserSettings updatedSettings = userSettingsService.updateSettings(user.getSettings(), updateSettingsDTO);
+
+        return ResponseEntity.ok(
+                new ResponseDTO(
+                        LocalDateTime.now(),
+                        200,
+                        "User settings updated successfully",
+                        "api/users/settings",
+                        updatedSettings
+                )
+        );
+
     }
 
 }
