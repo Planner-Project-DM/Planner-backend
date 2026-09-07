@@ -3,6 +3,7 @@ package net.dysky.planner.user;
 import net.dysky.planner.auth.RegisterDTO;
 import net.dysky.planner.exception.UserExistException;
 import net.dysky.planner.exception.UserNotFoundException;
+import net.dysky.planner.usersetings.UserSettingsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +23,9 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserSettingsService userSettingsService;
 
     @InjectMocks
     private UserService userService;

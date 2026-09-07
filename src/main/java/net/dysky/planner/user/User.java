@@ -41,6 +41,13 @@ public class User {
 
     private Boolean isActive = true;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserSettings settings;
+
+    public void setSettings(UserSettings settings) {
+        this.settings = settings;
+        if (settings != null) {
+            settings.setUser(this);
+        }
+    }
 }
