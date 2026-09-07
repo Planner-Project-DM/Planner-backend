@@ -3,9 +3,11 @@ package net.dysky.planner.trip;
 import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.group.Group;
 import net.dysky.planner.group.GroupService;
+import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.tripitem.TripItem;
 import net.dysky.planner.tripitem.TripItemService;
 import net.dysky.planner.tripitinerary.TripItineraryService;
+import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,9 @@ class TripServiceTest {
 
     @Mock
     private GroupService groupService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @Mock
     private TripItemService tripItemService;
@@ -151,6 +156,8 @@ class TripServiceTest {
 
     @Test
     void createTrip_shouldSaveAndReturnTrip_whenBudgetIsPositive() {
+        User user = mock(User.class);
+
         String email = "test.test@planner.com";
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = LocalDate.now().plusDays(7);
@@ -158,6 +165,9 @@ class TripServiceTest {
 
         ArgumentCaptor<Trip> tripCaptor = ArgumentCaptor.forClass(Trip.class);
         when(tripRepository.save(any(Trip.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(user.getId()).thenReturn(UUID.randomUUID());
+        when(userService.getUserByEmail("test.test@planner.com")).thenReturn(user);
 
         Trip createdTrip = tripService.createTrip(dto, email);
 
@@ -168,7 +178,7 @@ class TripServiceTest {
         assertEquals("Wycieczka do Rzymu", savedTrip.getName());
         assertEquals("Rzym", savedTrip.getDestination());
         assertEquals(TripStatus.PLANNED, savedTrip.getStatus());
-        assertNull(savedTrip.getTripCreator());
+        assertNotNull(savedTrip.getTripCreator());
         assertEquals(2500.0, savedTrip.getBudget());
         assertEquals(startDate, savedTrip.getStartDate());
         assertEquals(endDate, savedTrip.getEndDate());

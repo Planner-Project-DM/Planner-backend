@@ -1,6 +1,8 @@
 package net.dysky.planner.group;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.response.ResponseDTO;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
@@ -18,12 +20,14 @@ class GroupController {
 
     private final TripService tripService;
     private final GroupService groupService;
+    private final JwtService jwtService;
 
     @PostMapping
-    public ResponseEntity<ResponseDTO> addToGroup(@PathVariable UUID id, @RequestBody AddToGroupDTO addToGroupDTO) {
+    public ResponseEntity<ResponseDTO> addToGroup(@PathVariable UUID id, @RequestBody AddToGroupDTO addToGroupDTO, HttpServletRequest request) {
         Group group = tripService.getTripById(id).getTripGroup();
+        String email = jwtService.extractEmail(request);
 
-        groupService.addToGroup(group, addToGroupDTO);
+        groupService.addToGroup(group, addToGroupDTO, email);
 
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User added to group successfully", "/api/trips/" + id + "/group/members", null));
     }
@@ -38,10 +42,11 @@ class GroupController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseDTO> removeFromGroup(@PathVariable UUID id, @RequestBody RemoveFromGroupDTO removeFromGroupDTO) {
+    public ResponseEntity<ResponseDTO> removeFromGroup(@PathVariable UUID id, @RequestBody RemoveFromGroupDTO removeFromGroupDTO, HttpServletRequest request) {
         Group group = tripService.getTripById(id).getTripGroup();
+        String email = jwtService.extractEmail(request);
 
-        groupService.deleteFromGroup(group, removeFromGroupDTO);
+        groupService.deleteFromGroup(group, removeFromGroupDTO, email);
 
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User removed from group successfully", "/api/trips/" + id + "/group/members", null));
     }
