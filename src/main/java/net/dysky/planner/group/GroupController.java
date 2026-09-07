@@ -42,10 +42,11 @@ class GroupController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseDTO> removeFromGroup(@PathVariable UUID id, @RequestBody RemoveFromGroupDTO removeFromGroupDTO) {
+    public ResponseEntity<ResponseDTO> removeFromGroup(@PathVariable UUID id, @RequestBody RemoveFromGroupDTO removeFromGroupDTO, HttpServletRequest request) {
         Group group = tripService.getTripById(id).getTripGroup();
+        String email = jwtService.extractEmail(request);
 
-        groupService.deleteFromGroup(group, removeFromGroupDTO);
+        groupService.deleteFromGroup(group, removeFromGroupDTO, email);
 
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User removed from group successfully", "/api/trips/" + id + "/group/members", null));
     }

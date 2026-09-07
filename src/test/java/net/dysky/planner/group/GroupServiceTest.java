@@ -132,9 +132,11 @@ class GroupServiceTest {
         Group group = new Group();
         GroupUser groupUser = mock(GroupUser.class);
         User user = mock(User.class);
+        User senderUser = mock(User.class);
 
         when(groupUser.getUser()).thenReturn(user);
         when(user.getEmail()).thenReturn("removeme@domain.com");
+        when(userService.getUserByEmail("sender@domain.com")).thenReturn(senderUser);
         group.setGroupUsers(List.of(groupUser));
 
         RemoveFromGroupDTO dto = new RemoveFromGroupDTO("removeme@domain.com");
@@ -142,7 +144,7 @@ class GroupServiceTest {
         when(userService.getUserByEmail("removeme@domain.com")).thenReturn(user);
         when(groupUserService.findByGroupAndUser(group, user)).thenReturn(groupUser);
 
-        groupService.deleteFromGroup(group, dto);
+        groupService.deleteFromGroup(group, dto, "sender@domain.com");
 
         verify(groupUserService).remove(groupUser);
     }
@@ -155,9 +157,12 @@ class GroupServiceTest {
         RemoveFromGroupDTO dto = new RemoveFromGroupDTO("notingroup@domain.com");
         User user = mock(User.class);
 
-        when(userService.getUserByEmail("notingroup@domain.com")).thenReturn(user);
+        User senderUser = mock(User.class);
 
-        assertThatThrownBy(() -> groupService.deleteFromGroup(group, dto))
+        when(userService.getUserByEmail("notingroup@domain.com")).thenReturn(user);
+        when(userService.getUserByEmail("sender@domain.com")).thenReturn(senderUser);
+
+        assertThatThrownBy(() -> groupService.deleteFromGroup(group, dto, "sender@domain.com"))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("User is not in the group");
 

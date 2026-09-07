@@ -68,8 +68,9 @@ public class GroupService {
         groupUserService.update(trip, list);
     }
 
-    public void deleteFromGroup(Group group, RemoveFromGroupDTO removeFromGroupDTO) {
+    public void deleteFromGroup(Group group, RemoveFromGroupDTO removeFromGroupDTO, String email) {
         User userToRemove = userService.getUserByEmail(removeFromGroupDTO.email());
+        User sender = userService.getUserByEmail(email);
 
         boolean inGroup = group.getGroupUsers().stream()
                 .anyMatch(gu -> gu.getUser().getEmail().equals(removeFromGroupDTO.email()));
@@ -78,6 +79,13 @@ public class GroupService {
         GroupUser groupUser = groupUserService.findByGroupAndUser(group, userToRemove);
 
         groupUserService.remove(groupUser);
+
+        notificationService.createNotification(
+                "Removed from group" + group.getName(),
+                "You have been removed from the group",
+                userToRemove.getId(),
+                sender.getId()
+        );
     }
 
     public List<Group> getAllGroupsForUser(String email) {
