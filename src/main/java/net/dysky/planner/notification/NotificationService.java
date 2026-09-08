@@ -50,6 +50,24 @@ public class NotificationService {
         repository.save(notification);
     }
 
+    @Transactional
+    public void createNotification(String title, String message, UUID receiverId) {
+        User sender = userService.getUserByEmail("SYSTEM");
+        User receiver = userService.getUserById(receiverId);
+
+        Notification notification = new Notification();
+
+        notification.setSender(sender);
+        notification.setReceiver(receiver);
+
+        notification.setTitle(title);
+        notification.setMessage(message);
+
+        notification.setStatus(NotificationStatus.PENDING);
+
+        repository.save(notification);
+    }
+
     @Scheduled(fixedDelay = 7000)
     public void sendToKafka() {
         List<Notification> notifications = repository.findAllByStatus(NotificationStatus.PENDING);
