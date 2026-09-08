@@ -3,6 +3,9 @@ package net.dysky.planner.tripitinerary;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.exception.TripFoundException;
+import net.dysky.planner.groupUser.GroupRole;
+import net.dysky.planner.groupUser.GroupUser;
+import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripitem.TripItem;
 import net.dysky.planner.tripitem.TripItemService;
@@ -16,8 +19,8 @@ import java.util.UUID;
 public class TripItineraryService {
 
     private final TripItineraryRepository tripItineraryRepository;
-
     private final TripItemService tripItemService;
+    private final NotificationService notificationService;
 
     public TripItinerary findById(UUID tripId, UUID tripItemId) {
         TripTripItemsId tripTripItemsId = new TripTripItemsId(tripId, tripItemId);
@@ -54,7 +57,18 @@ public class TripItineraryService {
     @Transactional
     public TripItinerary updateTripItinerary(Trip trip, UpdateTripItineraryDTO updateTripItineraryDTO) {
         TripItinerary tripItinerary = findById(trip.getId(), updateTripItineraryDTO.tripItemId());
+
         tripItinerary.setPrice(updateTripItineraryDTO.price());
+
+        for(GroupUser user : trip.getTripGroup().getGroupUsers()) {
+            if(user.getRole() != GroupRole.OWNER) {
+                notificationService.createNotification(
+                        "Cost of item updated",
+                        "The cost of item " + tripItinerary.getTripItem().getName() + " has been updated to " + updateTripItineraryDTO.price(),
+                        user.getUser().getId()
+                );
+            }
+        }
 
         return tripItineraryRepository.save(tripItinerary);
     }

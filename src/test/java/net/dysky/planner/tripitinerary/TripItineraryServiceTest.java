@@ -1,5 +1,6 @@
 package net.dysky.planner.tripitinerary;
 
+import net.dysky.planner.group.Group;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripitem.TripItem;
 import net.dysky.planner.tripitem.TripItemService;
@@ -113,6 +114,7 @@ class TripItineraryServiceTest {
         UUID tripItemId = UUID.randomUUID();
         Trip trip = new Trip();
         trip.setId(tripId);
+        trip.setTripGroup(new Group());
 
         UpdateTripItineraryDTO dto = new UpdateTripItineraryDTO(tripItemId, 350.0);
 
