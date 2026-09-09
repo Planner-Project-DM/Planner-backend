@@ -3,7 +3,7 @@ package net.dysky.planner.user;
 import net.dysky.planner.auth.RegisterDTO;
 import net.dysky.planner.exception.UserExistException;
 import net.dysky.planner.exception.UserNotFoundException;
-import net.dysky.planner.usersetings.UserSettingsService;
+import net.dysky.planner.usersettings.UserSettingsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

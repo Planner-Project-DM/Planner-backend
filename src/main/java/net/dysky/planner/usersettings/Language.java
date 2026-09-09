@@ -1,4 +1,4 @@
-package net.dysky.planner.usersetings;
+package net.dysky.planner.usersettings;
 
 public enum Language {
     PL,
