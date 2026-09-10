@@ -1,4 +1,4 @@
-package net.dysky.planner.usersetings;
+package net.dysky.planner.usersettings;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

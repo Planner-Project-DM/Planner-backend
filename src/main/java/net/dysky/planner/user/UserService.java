@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.dysky.planner.auth.RegisterDTO;
 import net.dysky.planner.exception.UserExistException;
 import net.dysky.planner.exception.UserNotFoundException;
-import net.dysky.planner.usersetings.UserSettingsService;
+import net.dysky.planner.usersettings.UserSettingsService;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

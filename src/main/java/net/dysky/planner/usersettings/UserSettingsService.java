@@ -1,4 +1,4 @@
-package net.dysky.planner.usersetings;
+package net.dysky.planner.usersettings;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
