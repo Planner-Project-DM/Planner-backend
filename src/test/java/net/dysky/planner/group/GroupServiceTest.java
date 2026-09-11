@@ -131,17 +131,22 @@ class GroupServiceTest {
     void deleteFromGroup_shouldRemoveUserWhenInGroup() {
         Group group = new Group();
         GroupUser groupUser = mock(GroupUser.class);
+        GroupUser senderGroupUser = mock(GroupUser.class);
         User user = mock(User.class);
         User senderUser = mock(User.class);
 
         when(groupUser.getUser()).thenReturn(user);
+        when(senderGroupUser.getUser()).thenReturn(senderUser);
+        when(senderGroupUser.getRole()).thenReturn(GroupRole.OWNER);
         when(user.getEmail()).thenReturn("removeme@domain.com");
+        when(senderUser.getEmail()).thenReturn("sender@domain.com");
         when(userService.getUserByEmail("sender@domain.com")).thenReturn(senderUser);
-        group.setGroupUsers(List.of(groupUser));
+        group.setGroupUsers(List.of(senderGroupUser, groupUser));
 
         RemoveFromGroupDTO dto = new RemoveFromGroupDTO("removeme@domain.com");
 
         when(userService.getUserByEmail("removeme@domain.com")).thenReturn(user);
+        when(groupUserService.findByGroupAndUser(group, senderUser)).thenReturn(senderGroupUser);
         when(groupUserService.findByGroupAndUser(group, user)).thenReturn(groupUser);
 
         groupService.deleteFromGroup(group, dto, "sender@domain.com");
