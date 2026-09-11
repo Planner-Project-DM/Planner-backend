@@ -2,6 +2,7 @@ package net.dysky.planner.group;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.exception.HasNoPermissionException;
 import net.dysky.planner.exception.UserInGroupException;
 import net.dysky.planner.exception.UserNotFoundException;
 import net.dysky.planner.groupUser.*;
@@ -76,7 +77,12 @@ public class GroupService {
                 .anyMatch(gu -> gu.getUser().getEmail().equals(removeFromGroupDTO.email()));
         if (!inGroup) throw new UserNotFoundException("User is not in the group");
 
+        GroupUser senderGroupUser = groupUserService.findByGroupAndUser(group, sender);
         GroupUser groupUser = groupUserService.findByGroupAndUser(group, userToRemove);
+
+        if(!senderGroupUser.getRole().equals(GroupRole.OWNER)) {
+            throw new HasNoPermissionException("Only the owner of the group can remove a user from the group");
+        }
 
         groupUserService.remove(groupUser);
 

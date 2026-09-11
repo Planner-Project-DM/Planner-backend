@@ -67,10 +67,6 @@ public class GroupUserService {
     }
 
     public void remove(GroupUser groupUser) {
-        if(!groupUser.getRole().equals(GroupRole.OWNER)) {
-            throw new HasNoPermissionException("Only the owner of the group can remove a user from the group");
-        }
-
         groupUserRepository.delete(groupUser);
     }
 
