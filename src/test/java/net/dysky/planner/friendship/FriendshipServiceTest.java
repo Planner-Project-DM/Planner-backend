@@ -3,6 +3,7 @@ package net.dysky.planner.friendship;
 import net.dysky.planner.exception.FriendshipExistsException;
 import net.dysky.planner.exception.FriendshipNotFoundException;
 import net.dysky.planner.exception.UserNotFoundException;
+import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ class FriendshipServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private FriendshipService friendshipService;

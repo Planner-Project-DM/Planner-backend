@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.dysky.planner.exception.FriendshipExistsException;
 import net.dysky.planner.exception.FriendshipNotFoundException;
 import net.dysky.planner.exception.UserNotFoundException;
+import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
 
     private final UserService userService;
+
+    private final NotificationService notificationService;
 
     public List<FriendshipDTO> getFriendships(String email) {
         User user = userService.getUserByEmail(email);
@@ -76,6 +79,13 @@ public class FriendshipService {
 
         friendship.setStatus(FriendshipStatus.PENDING);
 
+        notificationService.createNotification(
+                "Friendship request from " + sender.getFirstName() + " " + sender.getLastName(),
+                " You have a new friendship request from " + sender.getFirstName() + " " + sender.getLastName(),
+                receiver.getId(),
+                sender.getId()
+        );
+
         return friendshipRepository.save(friendship);
     }
 
@@ -94,6 +104,19 @@ public class FriendshipService {
 
         Friendship friendship =  getFriendship(user, friend);
         friendshipRepository.delete(friendship);
+
+        notificationService.createNotification(
+                "Friendship removed",
+                "You have removed " + friend.getFirstName() + " " + friend.getLastName() + " from your friends list",
+                user.getId()
+        );
+
+        notificationService.createNotification(
+                "Friendship removed",
+                "You are no longer friends with " + user.getFirstName() + " " + user.getLastName(),
+                friend.getId(),
+                user.getId()
+        );
     }
 
     FriendshipDTO mapToFriendshipDTO(Friendship friendship, String email) {
@@ -106,6 +129,5 @@ public class FriendshipService {
                 user.getLastName()
         );
     }
-
 
 }

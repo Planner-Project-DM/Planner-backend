@@ -52,7 +52,7 @@ public class NotificationService {
 
     @Transactional
     public void createNotification(String title, String message, UUID receiverId) {
-        User sender = userService.getUserByEmail("SYSTEM");
+        User sender = userService.getUserByEmail("system@planner.net");
         User receiver = userService.getUserById(receiverId);
 
         Notification notification = new Notification();

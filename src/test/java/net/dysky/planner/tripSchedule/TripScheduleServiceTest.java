@@ -1,9 +1,13 @@
 package net.dysky.planner.tripSchedule;
 
+import net.dysky.planner.group.Group;
+import net.dysky.planner.groupUser.GroupUser;
+import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.schedule.*;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripitem.TripItem;
 import net.dysky.planner.tripitem.TripItemService;
+import net.dysky.planner.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,6 +34,9 @@ class TripScheduleServiceTest {
 
     @Mock
     private ScheduleService scheduleService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private TripScheduleService tripScheduleService;
@@ -85,12 +92,22 @@ class TripScheduleServiceTest {
     void addScheduleToTrip_shouldSaveAndReturnTripSchedule() {
         // Given
         Trip trip = new Trip();
+        Group group = new Group();
+        User user = new User();
+        user.setEmail("other@example.com");
+        GroupUser groupUser = new GroupUser();
+        groupUser.setGroup(group);
+        groupUser.setUser(user);
+        group.getGroupUsers().add(groupUser);
+        trip.setTripGroup(group);
+
         UUID tripItemId = UUID.randomUUID();
         LocalDateTime startTime = LocalDateTime.of(2026, 8, 2, 10, 0);
         LocalDateTime endTime = LocalDateTime.of(2026, 8, 2, 12, 0);
         CreateTripScheduleDTO dto = new CreateTripScheduleDTO(tripItemId, startTime, endTime);
 
         TripItem tripItem = new TripItem();
+        tripItem.setName("Hotel Marriott");
         Schedule schedule = new Schedule();
 
         when(tripItemService.findById(tripItemId)).thenReturn(tripItem);
@@ -98,7 +115,7 @@ class TripScheduleServiceTest {
         when(tripScheduleRepository.save(any(TripSchedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        TripSchedule result = tripScheduleService.addScheduleToTrip(trip, dto);
+        TripSchedule result = tripScheduleService.addScheduleToTrip(trip, dto, "SYSTEM");
 
         // Then
         assertNotNull(result);
@@ -108,6 +125,11 @@ class TripScheduleServiceTest {
         verify(tripItemService, times(1)).findById(tripItemId);
         verify(scheduleService, times(1)).addSchedule(eq(trip), any(CreateScheduleDTO.class));
         verify(tripScheduleRepository, times(1)).save(any(TripSchedule.class));
+        verify(notificationService, times(1)).createNotification(
+                eq("New schedule added to trip"),
+                contains("Hotel Marriott"),
+                eq(user.getId())
+        );
     }
 
     @Test
@@ -115,18 +137,43 @@ class TripScheduleServiceTest {
         // Given
         UUID tripId = UUID.randomUUID();
         UUID scheduleId = UUID.randomUUID();
+        Trip trip = new Trip();
+        trip.setId(tripId);
+        Group group = new Group();
+        User user = new User();
+        user.setEmail("other@example.com");
+        user.setId(UUID.randomUUID());
+        GroupUser groupUser = new GroupUser();
+        groupUser.setGroup(group);
+        groupUser.setUser(user);
+        group.getGroupUsers().add(groupUser);
+        trip.setTripGroup(group);
+
+        TripItem tripItem = new TripItem();
+        tripItem.setName("Hotel Marriott");
+        Schedule schedule = new Schedule();
+        schedule.setTripItem(tripItem);
+        schedule.setId(scheduleId);
+
         TripSchedule tripSchedule = new TripSchedule();
+        tripSchedule.setTrip(trip);
+        tripSchedule.setSchedule(schedule);
 
         when(tripScheduleRepository.findByTrip_IdAndSchedule_Id(tripId, scheduleId))
                 .thenReturn(Optional.of(tripSchedule));
 
         // When
-        tripScheduleService.deleteScheduleFromTrip(tripId, scheduleId);
+        tripScheduleService.deleteScheduleFromTrip(trip, scheduleId, "SYSTEM");
 
         // Then
         verify(tripScheduleRepository, times(1)).findByTrip_IdAndSchedule_Id(tripId, scheduleId);
         verify(tripScheduleRepository, times(1)).delete(tripSchedule);
         verify(scheduleService, times(1)).deleteSchedule(scheduleId);
+        verify(notificationService, times(1)).createNotification(
+                eq("Trip schedule deleted"),
+                contains("Hotel Marriott"),
+                eq(user.getId())
+        );
     }
 
     @Test

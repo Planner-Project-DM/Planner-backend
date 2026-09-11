@@ -1,6 +1,7 @@
 package net.dysky.planner.tripSchedule;
 
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.schedule.*;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripitem.TripItem;
@@ -20,6 +21,8 @@ public class TripScheduleService {
 
     private final ScheduleService scheduleService;
 
+    private final NotificationService notificationService;
+
     public TripSchedule findByTripAndSchedule(UUID tripId, UUID scheduleId) {
         return tripScheduleRepository.findByTrip_IdAndSchedule_Id(tripId, scheduleId).orElseThrow(
                 () -> new IllegalArgumentException("Schedule not found for the given trip"));
@@ -29,7 +32,7 @@ public class TripScheduleService {
         return tripScheduleRepository.findAllByTripId(trip.getId());
     }
 
-    public TripSchedule addScheduleToTrip(Trip trip, CreateTripScheduleDTO dto) {
+    public TripSchedule addScheduleToTrip(Trip trip, CreateTripScheduleDTO dto, String email) {
         TripItem tripItem = tripItemService.findById(dto.tripItemId());
 
         Schedule schedule = scheduleService.addSchedule(trip, new CreateScheduleDTO(tripItem, dto.startTime(), dto.endTime(), dto.allDay()));
@@ -38,21 +41,52 @@ public class TripScheduleService {
 
         tripSchedule.setTrip(trip);
         tripSchedule.setSchedule(schedule);
+
+        trip.getTripGroup().getGroupUsers().forEach(groupUser -> {
+            if(!groupUser.getUser().getEmail().equals(email)) {
+                notificationService.createNotification(
+                        "New schedule added to trip",
+                        "Schedule for " + tripItem.getName() + " has been added to your trip. Created by: " + email,
+                        groupUser.getUser().getId()
+                );
+            }
+        });
+
         return tripScheduleRepository.save(tripSchedule);
     }
 
-    public TripSchedule updateScheduleInTrip(Trip trip, UpdateScheduleDTO dto) {
-        Schedule schedule =  scheduleService.updateSchedule(trip, dto);
+    public TripSchedule updateScheduleInTrip(Trip trip, UpdateScheduleDTO dto, String email) {
+        Schedule schedule = scheduleService.updateSchedule(trip, dto);
+
+        trip.getTripGroup().getGroupUsers().forEach(groupUser -> {
+            if(!groupUser.getUser().getEmail().equals(email)) {
+                notificationService.createNotification(
+                        "Schedule updated in trip",
+                        "Schedule for " + schedule.getTripItem().getName() + " has been updated in your trip. Updated by: " + email,
+                        groupUser.getUser().getId()
+                );
+            }
+        });
 
         return findByTripAndSchedule(trip.getId(), schedule.getId());
     }
 
-    public void deleteScheduleFromTrip(UUID tripId, UUID scheduleId) {
-        TripSchedule tripSchedule = findByTripAndSchedule(tripId, scheduleId);
+    public void deleteScheduleFromTrip(Trip trip, UUID scheduleId, String email) {
+        TripSchedule tripSchedule = findByTripAndSchedule(trip.getId(), scheduleId);
 
         tripScheduleRepository.delete(tripSchedule);
 
         scheduleService.deleteSchedule(scheduleId);
+
+        trip.getTripGroup().getGroupUsers().forEach(groupUser -> {
+            if(!groupUser.getUser().getEmail().equals(email)) {
+                notificationService.createNotification(
+                        "Trip schedule deleted",
+                        "Schedule for " + tripSchedule.getSchedule().getTripItem().getName() + " has been deleted from your trip. Deleted by: " + email,
+                        groupUser.getUser().getId()
+                );
+            }
+        });
     }
 
     public ScheduleResponseDTO mapToDTO(TripSchedule tripSchedule) {
