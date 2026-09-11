@@ -142,11 +142,15 @@ public class GroupControllerIntegrationTest extends AbstractIntegrationTest {
         Group group = createAndSaveGroup("Paryż Group");
         User secondaryUser = createAndSaveSecondaryUser("secondary@example.com");
 
+        groupUserService.add(new CreateGroupUserDTO(group, testUser, GroupRole.OWNER));
         groupUserService.add(new CreateGroupUserDTO(group, secondaryUser, GroupRole.MEMBER));
 
-        GroupUser mockGroupUser = mock(GroupUser.class);
-        when(mockGroupUser.getUser()).thenReturn(secondaryUser);
-        group.getGroupUsers().add(mockGroupUser);
+        GroupUser senderGroupUser = mock(GroupUser.class);
+        GroupUser memberGroupUser = mock(GroupUser.class);
+        when(senderGroupUser.getUser()).thenReturn(testUser);
+        when(memberGroupUser.getUser()).thenReturn(secondaryUser);
+        group.getGroupUsers().add(senderGroupUser);
+        group.getGroupUsers().add(memberGroupUser);
 
         Trip mockTrip = mock(Trip.class);
         when(tripService.getTripById(tripId)).thenReturn(mockTrip);
@@ -158,9 +162,9 @@ public class GroupControllerIntegrationTest extends AbstractIntegrationTest {
                         .with(user("user@example.com").roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.status").value(401))
-                .andExpect(jsonPath("$.message").value("Only the owner of the group can remove a user from the group"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.message").value("User removed from group successfully"))
                 .andExpect(jsonPath("$.url").value("/api/trips/" + tripId + "/group/members"))
                 .andExpect(jsonPath("$.createdAt").exists());
     }
