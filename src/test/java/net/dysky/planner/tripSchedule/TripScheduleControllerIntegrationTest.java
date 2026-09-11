@@ -1,11 +1,14 @@
 package net.dysky.planner.tripSchedule;
 
+import jakarta.servlet.http.HttpServletRequest;
 import net.dysky.planner.AbstractIntegrationTest;
+import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.schedule.ScheduleResponseDTO;
 import net.dysky.planner.schedule.TripItemSummaryDTO;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,6 +36,14 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
 
     @MockitoBean
     private TripScheduleService tripScheduleService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @BeforeEach
+    void setUp() {
+        when(jwtService.extractEmail(any(HttpServletRequest.class))).thenReturn("user@example.com");
+    }
 
     @Test
     void getAllSchedulesForTrip_shouldReturnSchedules_whenTripExists() throws Exception {
@@ -101,7 +112,7 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
         );
 
         when(tripService.getTripById(tripId)).thenReturn(mockTrip);
-        when(tripScheduleService.addScheduleToTrip(eq(mockTrip), any(CreateTripScheduleDTO.class)))
+        when(tripScheduleService.addScheduleToTrip(eq(mockTrip), any(CreateTripScheduleDTO.class), eq("user@example.com")))
                 .thenReturn(new TripSchedule());
 
         // When & Then
@@ -114,7 +125,7 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
                 .andExpect(jsonPath("$.message").value("Schedule added successfully"));
 
         verify(tripService, times(1)).getTripById(tripId);
-        verify(tripScheduleService, times(1)).addScheduleToTrip(eq(mockTrip), any(CreateTripScheduleDTO.class));
+        verify(tripScheduleService, times(1)).addScheduleToTrip(eq(mockTrip), any(CreateTripScheduleDTO.class) , eq("user@example.com"));
     }
 
     @Test
@@ -147,7 +158,7 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
         CreateTripScheduleDTO dto = new CreateTripScheduleDTO(UUID.randomUUID(), LocalDateTime.now(), LocalDateTime.now());
 
         when(tripService.getTripById(tripId)).thenReturn(mockTrip);
-        when(tripScheduleService.addScheduleToTrip(eq(mockTrip), any(CreateTripScheduleDTO.class)))
+        when(tripScheduleService.addScheduleToTrip(eq(mockTrip), any(CreateTripScheduleDTO.class),eq("user@example.com")))
                 .thenThrow(new IllegalArgumentException("Schedule overlaps with an existing schedule"));
 
         // When & Then
@@ -160,7 +171,7 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
                 .andExpect(jsonPath("$.message").value("Schedule overlaps with an existing schedule"));
 
         verify(tripService, times(1)).getTripById(tripId);
-        verify(tripScheduleService, times(1)).addScheduleToTrip(eq(mockTrip), any(CreateTripScheduleDTO.class));
+        verify(tripScheduleService, times(1)).addScheduleToTrip(eq(mockTrip), any(CreateTripScheduleDTO.class),eq("user@example.com"));
     }
 
     @Test

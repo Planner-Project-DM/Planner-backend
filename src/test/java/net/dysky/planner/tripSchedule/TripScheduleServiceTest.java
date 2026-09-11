@@ -1,5 +1,6 @@
 package net.dysky.planner.tripSchedule;
 
+import net.dysky.planner.group.Group;
 import net.dysky.planner.schedule.*;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripitem.TripItem;
@@ -85,6 +86,7 @@ class TripScheduleServiceTest {
     void addScheduleToTrip_shouldSaveAndReturnTripSchedule() {
         // Given
         Trip trip = new Trip();
+        trip.setTripGroup(new Group());
         UUID tripItemId = UUID.randomUUID();
         LocalDateTime startTime = LocalDateTime.of(2026, 8, 2, 10, 0);
         LocalDateTime endTime = LocalDateTime.of(2026, 8, 2, 12, 0);
@@ -98,7 +100,7 @@ class TripScheduleServiceTest {
         when(tripScheduleRepository.save(any(TripSchedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
-        TripSchedule result = tripScheduleService.addScheduleToTrip(trip, dto);
+        TripSchedule result = tripScheduleService.addScheduleToTrip(trip, dto,"SYSTEM");
 
         // Then
         assertNotNull(result);

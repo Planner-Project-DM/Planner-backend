@@ -1,10 +1,13 @@
 package net.dysky.planner.tripSchedule;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.response.ResponseDTO;
 import net.dysky.planner.schedule.ScheduleResponseDTO;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
+import net.dysky.planner.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +21,8 @@ import java.util.UUID;
 class TripScheduleController {
 
     private final TripScheduleService tripScheduleService;
-
     private final TripService tripService;
+    private final JwtService jwtService;
 
     @GetMapping
     public ResponseEntity<ResponseDTO> getAllSchedulesForTrip(@PathVariable("id") UUID id) {
@@ -40,10 +43,11 @@ class TripScheduleController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDTO> addScheduleToTrip(@PathVariable("id") UUID id, @RequestBody CreateTripScheduleDTO dto) {
+    public ResponseEntity<ResponseDTO> addScheduleToTrip(@PathVariable("id") UUID id, @RequestBody CreateTripScheduleDTO dto, HttpServletRequest request) {
         Trip trip = tripService.getTripById(id);
+        String email = jwtService.extractEmail(request);
 
-        TripSchedule tripSchedule = tripScheduleService.addScheduleToTrip(trip, dto);
+        TripSchedule tripSchedule = tripScheduleService.addScheduleToTrip(trip, dto, email);
         ScheduleResponseDTO response = tripScheduleService.mapToDTO(tripSchedule);
 
         return ResponseEntity.ok(
@@ -58,10 +62,11 @@ class TripScheduleController {
     }
 
     @PutMapping
-    public ResponseEntity<ResponseDTO> updateScheduleInTrip(@PathVariable("id") UUID id, @RequestBody UpdateScheduleDTO dto) {
+    public ResponseEntity<ResponseDTO> updateScheduleInTrip(@PathVariable("id") UUID id, @RequestBody UpdateScheduleDTO dto, HttpServletRequest request) {
         Trip trip = tripService.getTripById(id);
+        String email = jwtService.extractEmail(request);
 
-        TripSchedule updated = tripScheduleService.updateScheduleInTrip(trip, dto);
+        TripSchedule updated = tripScheduleService.updateScheduleInTrip(trip, dto, email);
 
         ScheduleResponseDTO response = tripScheduleService.mapToDTO(updated);
 

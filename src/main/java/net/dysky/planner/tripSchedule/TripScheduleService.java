@@ -32,7 +32,7 @@ public class TripScheduleService {
         return tripScheduleRepository.findAllByTripId(trip.getId());
     }
 
-    public TripSchedule addScheduleToTrip(Trip trip, CreateTripScheduleDTO dto) {
+    public TripSchedule addScheduleToTrip(Trip trip, CreateTripScheduleDTO dto, String email) {
         TripItem tripItem = tripItemService.findById(dto.tripItemId());
 
         Schedule schedule = scheduleService.addSchedule(trip, new CreateScheduleDTO(tripItem, dto.startTime(), dto.endTime(), dto.allDay()));
@@ -43,14 +43,22 @@ public class TripScheduleService {
         tripSchedule.setSchedule(schedule);
 
         trip.getTripGroup().getGroupUsers().forEach(groupUser ->
-            notificationService.createNotification("New schedule added to trip", "Schedule for " + tripItem.getName() + " has been added to your trip.", groupUser.getUser().getId())
+            notificationService.createNotification("New schedule added to trip", "Schedule for " + tripItem.getName() + " has been added to your trip. Created by: " + email, groupUser.getUser().getId())
         );
 
         return tripScheduleRepository.save(tripSchedule);
     }
 
-    public TripSchedule updateScheduleInTrip(Trip trip, UpdateScheduleDTO dto) {
-        Schedule schedule =  scheduleService.updateSchedule(trip, dto);
+    public TripSchedule updateScheduleInTrip(Trip trip, UpdateScheduleDTO dto, String email) {
+        Schedule schedule = scheduleService.updateSchedule(trip, dto);
+
+        trip.getTripGroup().getGroupUsers().forEach(groupUser ->
+                notificationService.createNotification(
+                        "Schedule updated in trip",
+                        "Schedule for " + schedule.getTripItem().getName() + " has been updated in your trip. Updated by: " + email,
+                        groupUser.getUser().getId()
+                )
+        );
 
         return findByTripAndSchedule(trip.getId(), schedule.getId());
     }
