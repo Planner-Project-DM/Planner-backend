@@ -42,9 +42,15 @@ public class TripScheduleService {
         tripSchedule.setTrip(trip);
         tripSchedule.setSchedule(schedule);
 
-        trip.getTripGroup().getGroupUsers().forEach(groupUser ->
-            notificationService.createNotification("New schedule added to trip", "Schedule for " + tripItem.getName() + " has been added to your trip. Created by: " + email, groupUser.getUser().getId())
-        );
+        trip.getTripGroup().getGroupUsers().forEach(groupUser -> {
+            if(!groupUser.getUser().getEmail().equals(email)) {
+                notificationService.createNotification(
+                        "New schedule added to trip",
+                        "Schedule for " + tripItem.getName() + " has been added to your trip. Created by: " + email,
+                        groupUser.getUser().getId()
+                );
+            }
+        });
 
         return tripScheduleRepository.save(tripSchedule);
     }
@@ -52,23 +58,35 @@ public class TripScheduleService {
     public TripSchedule updateScheduleInTrip(Trip trip, UpdateScheduleDTO dto, String email) {
         Schedule schedule = scheduleService.updateSchedule(trip, dto);
 
-        trip.getTripGroup().getGroupUsers().forEach(groupUser ->
+        trip.getTripGroup().getGroupUsers().forEach(groupUser -> {
+            if(!groupUser.getUser().getEmail().equals(email)) {
                 notificationService.createNotification(
                         "Schedule updated in trip",
                         "Schedule for " + schedule.getTripItem().getName() + " has been updated in your trip. Updated by: " + email,
                         groupUser.getUser().getId()
-                )
-        );
+                );
+            }
+        });
 
         return findByTripAndSchedule(trip.getId(), schedule.getId());
     }
 
-    public void deleteScheduleFromTrip(UUID tripId, UUID scheduleId) {
-        TripSchedule tripSchedule = findByTripAndSchedule(tripId, scheduleId);
+    public void deleteScheduleFromTrip(Trip trip, UUID scheduleId, String email) {
+        TripSchedule tripSchedule = findByTripAndSchedule(trip.getId(), scheduleId);
 
         tripScheduleRepository.delete(tripSchedule);
 
         scheduleService.deleteSchedule(scheduleId);
+
+        trip.getTripGroup().getGroupUsers().forEach(groupUser -> {
+            if(!groupUser.getUser().getEmail().equals(email)) {
+                notificationService.createNotification(
+                        "Trip schedule deleted",
+                        "Schedule for " + tripSchedule.getSchedule().getTripItem().getName() + " has been deleted from your trip. Deleted by: " + email,
+                        groupUser.getUser().getId()
+                );
+            }
+        });
     }
 
     public ScheduleResponseDTO mapToDTO(TripSchedule tripSchedule) {

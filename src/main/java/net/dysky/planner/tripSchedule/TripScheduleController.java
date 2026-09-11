@@ -82,9 +82,11 @@ class TripScheduleController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseDTO> deleteScheduleFromTrip(@PathVariable("id") UUID id, @RequestParam("scheduleId") UUID scheduleId) {
+    public ResponseEntity<ResponseDTO> deleteScheduleFromTrip(@PathVariable("id") UUID id, @RequestParam("scheduleId") UUID scheduleId, HttpServletRequest request) {
+        Trip trip = tripService.getTripById(id);
+        String email = jwtService.extractEmail(request);
 
-        tripScheduleService.deleteScheduleFromTrip(id, scheduleId);
+        tripScheduleService.deleteScheduleFromTrip(trip, scheduleId, email);
 
         return ResponseEntity.ok(
                 new ResponseDTO(

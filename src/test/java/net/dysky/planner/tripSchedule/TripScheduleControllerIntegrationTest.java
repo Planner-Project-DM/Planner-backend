@@ -179,6 +179,10 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
         // Given
         UUID tripId = UUID.randomUUID();
         UUID scheduleId = UUID.randomUUID();
+        Trip mockTrip = new Trip();
+        mockTrip.setId(tripId);
+
+        when(tripService.getTripById(tripId)).thenReturn(mockTrip);
 
         // When & Then
         mockMvc.perform(delete("/api/trips/{id}/schedules", tripId)
@@ -189,7 +193,8 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("Schedule deleted successfully"));
 
-        verify(tripScheduleService, times(1)).deleteScheduleFromTrip(tripId, scheduleId);
+        verify(tripService, times(1)).getTripById(tripId);
+        verify(tripScheduleService, times(1)).deleteScheduleFromTrip(mockTrip, scheduleId, "user@example.com");
     }
 
     @Test
@@ -197,9 +202,12 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
         // Given
         UUID tripId = UUID.randomUUID();
         UUID scheduleId = UUID.randomUUID();
+        Trip mockTrip = new Trip();
+        mockTrip.setId(tripId);
 
+        when(tripService.getTripById(tripId)).thenReturn(mockTrip);
         doThrow(new IllegalArgumentException("Schedule not found for the given trip"))
-                .when(tripScheduleService).deleteScheduleFromTrip(tripId, scheduleId);
+                .when(tripScheduleService).deleteScheduleFromTrip(mockTrip, scheduleId, "user@example.com");
 
         // When & Then
         mockMvc.perform(delete("/api/trips/{id}/schedules", tripId)
@@ -210,6 +218,7 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message").value("Schedule not found for the given trip"));
 
-        verify(tripScheduleService, times(1)).deleteScheduleFromTrip(tripId, scheduleId);
+        verify(tripService, times(1)).getTripById(tripId);
+        verify(tripScheduleService, times(1)).deleteScheduleFromTrip(mockTrip, scheduleId, "user@example.com");
     }
 }
