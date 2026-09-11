@@ -1,6 +1,7 @@
 package net.dysky.planner.tripSchedule;
 
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.schedule.*;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripitem.TripItem;
@@ -20,6 +21,8 @@ public class TripScheduleService {
 
     private final ScheduleService scheduleService;
 
+    private final NotificationService notificationService;
+
     public TripSchedule findByTripAndSchedule(UUID tripId, UUID scheduleId) {
         return tripScheduleRepository.findByTrip_IdAndSchedule_Id(tripId, scheduleId).orElseThrow(
                 () -> new IllegalArgumentException("Schedule not found for the given trip"));
@@ -38,6 +41,11 @@ public class TripScheduleService {
 
         tripSchedule.setTrip(trip);
         tripSchedule.setSchedule(schedule);
+
+        trip.getTripGroup().getGroupUsers().forEach(groupUser ->
+            notificationService.createNotification("New schedule added to trip", "Schedule for " + tripItem.getName() + " has been added to your trip.", groupUser.getUser().getId())
+        );
+
         return tripScheduleRepository.save(tripSchedule);
     }
 
