@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import net.dysky.planner.AbstractIntegrationTest;
 import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.auth.RegisterDTO;
+import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,9 @@ public class FriendshipControllerIntegrationTest extends AbstractIntegrationTest
 
     @MockitoBean
     private JwtService jwtService;
+
+    @MockitoBean
+    private NotificationService notificationService;
 
     @Autowired
     private FriendshipService friendshipService;
@@ -285,6 +289,8 @@ public class FriendshipControllerIntegrationTest extends AbstractIntegrationTest
     @Test
     void deleteFriendship_shouldReturnOk_whenFriendshipIsDeletedSuccessfully() throws Exception {
         // Given
+        registerUser("SYSTEM", "SYSTEM", "system@planner.net");
+
         String userEmail = "user@example.com";
         String friendEmail = "friend@example.com";
 
