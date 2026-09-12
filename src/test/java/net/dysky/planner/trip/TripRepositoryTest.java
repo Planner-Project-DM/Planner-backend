@@ -2,12 +2,10 @@ package net.dysky.planner.trip;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import net.dysky.planner.group.Group;
+import net.dysky.planner.AbstractIntegrationTest;
 import net.dysky.planner.user.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -15,10 +13,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@ActiveProfiles("test")
 @Transactional
-class TripRepositoryTest {
+class TripRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private TripRepository tripRepository;
