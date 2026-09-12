@@ -2,12 +2,11 @@ package net.dysky.planner.tripitem;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import net.dysky.planner.AbstractIntegrationTest;
 import net.dysky.planner.address.Address;
 import net.dysky.planner.hotel.Location;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -17,10 +16,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@ActiveProfiles("test")
 @Transactional
-class TripItemRepositoryTest {
+class TripItemRepositoryTest extends AbstractIntegrationTest {
 
     @Autowired
     private TripItemRepository tripItemRepository;
