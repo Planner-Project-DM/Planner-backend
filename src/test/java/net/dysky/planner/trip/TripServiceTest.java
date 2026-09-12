@@ -3,6 +3,7 @@ package net.dysky.planner.trip;
 import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.group.Group;
 import net.dysky.planner.group.GroupService;
+import net.dysky.planner.metrics.AppMetrics;
 import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.tripitem.TripItem;
 import net.dysky.planner.tripitem.TripItemService;
@@ -45,6 +46,9 @@ class TripServiceTest {
 
     @Mock
     private TripItineraryService tripItineraryService;
+
+    @Mock
+    private AppMetrics appMetrics;
 
     @InjectMocks
     private TripService tripService;

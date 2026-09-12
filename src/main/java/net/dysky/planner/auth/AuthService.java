@@ -2,6 +2,7 @@ package net.dysky.planner.auth;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.dysky.planner.metrics.AppMetrics;
 import net.dysky.planner.response.ResponseDTO;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
@@ -21,8 +22,13 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final AppMetrics appMetrics;
 
     public ResponseEntity<ResponseDTO> login(@Valid LoginDTO loginDTO) {
+        return appMetrics.getAuthLoginTimer().record(() -> performLogin(loginDTO));
+    };
+
+    public ResponseEntity<ResponseDTO> performLogin(LoginDTO loginDTO) {
         User user = userService.getUserByEmail(loginDTO.email());
 
         if (!user.getIsActive()) {

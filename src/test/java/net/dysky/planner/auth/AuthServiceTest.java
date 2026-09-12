@@ -1,5 +1,8 @@
 package net.dysky.planner.auth;
 
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import net.dysky.planner.metrics.AppMetrics;
 import net.dysky.planner.response.ResponseDTO;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
@@ -31,6 +34,9 @@ public class AuthServiceTest {
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Mock
+    private AppMetrics appMetrics;
+
     @InjectMocks
     private AuthService authService;
 
@@ -39,6 +45,9 @@ public class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
+        Timer simpleTimer = new SimpleMeterRegistry().timer("auth.login");
+        lenient().when(appMetrics.getAuthLoginTimer()).thenReturn(simpleTimer);
+
         activeUser = new User();
         activeUser.setEmail("test@dysky.net");
         activeUser.setPassword("encoded_password");

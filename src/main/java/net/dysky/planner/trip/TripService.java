@@ -8,6 +8,7 @@ import net.dysky.planner.exception.TripNotFoundException;
 import net.dysky.planner.group.CreateGroupDTO;
 import net.dysky.planner.group.Group;
 import net.dysky.planner.group.GroupService;
+import net.dysky.planner.metrics.AppMetrics;
 import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.tripitem.TripItem;
 import net.dysky.planner.tripitem.TripItemService;
@@ -34,6 +35,8 @@ public class TripService {
     private final GroupService groupService;
 
     private final NotificationService notificationService;
+
+    private final AppMetrics appMetrics;
 
     public Trip getTripById(UUID id) {
         return tripRepository.findById(id).orElseThrow(
@@ -105,9 +108,12 @@ public class TripService {
         trip.setStartDate(createTripDTO.startDate());
         trip.setEndDate(createTripDTO.endDate());
 
+        Trip savedTrip = tripRepository.save(trip);
+
+        appMetrics.incrementTripCreated();
         notificationService.createNotification("Trip Created", "Your trip " + trip.getName() + " has been created.", user.getId(), user.getId());
 
-        return tripRepository.save(trip);
+        return savedTrip;
     }
 
     @Transactional
