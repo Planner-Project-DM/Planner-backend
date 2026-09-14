@@ -68,7 +68,7 @@ public class NotificationService {
         repository.save(notification);
     }
 
-    @Scheduled(fixedDelay = 7000)
+    @Scheduled(fixedDelay = 20000)
     public void sendToKafka() {
         List<Notification> notifications = repository.findAllByStatus(NotificationStatus.PENDING);
 
