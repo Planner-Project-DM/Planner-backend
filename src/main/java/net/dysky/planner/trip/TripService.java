@@ -61,10 +61,12 @@ public class TripService {
 
     public List<Trip> getAllTripWithPrivileges(String email) {
         List<Trip> trips = tripRepository.findAllByTripCreatorEmail(email);
-
         List<Group> groups = groupService.getAllGroupsForUser(email);
 
-        trips.addAll(groups.stream().flatMap(group -> tripRepository.findAllByTripGroup(group).stream()).toList());
+        if (!groups.isEmpty()) {
+            trips.addAll(tripRepository.findAllByTripGroupIn(groups));
+        }
+
         return trips;
     }
 
