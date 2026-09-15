@@ -1,10 +1,14 @@
 package net.dysky.planner.usersettings;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserSettingsService {
+
+    private final UserSettingsRepository userSettingsRepository;
 
     public UserSettings createSettings(CreateSettingsDTO createSettingsDTO) {
         UserSettings settings = new UserSettings();
