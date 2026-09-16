@@ -3,6 +3,8 @@ package net.dysky.planner.trip;
 import net.dysky.planner.group.Group;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +15,12 @@ interface TripRepository extends JpaRepository<Trip, UUID> {
 
     @EntityGraph(attributePaths = {"tripGroup", "tripCreator", "tripItineraries"})
     Optional<Trip> findById(UUID id);
+
+    @Query("SELECT t FROM Trip t " +
+            "LEFT JOIN FETCH t.tripGroup " +
+            "LEFT JOIN FETCH t.tripItineraries " +
+            "WHERE t.id = :id")
+    Optional<Trip> findByIdWithDetails(@Param("id") UUID id);
 
     List<Trip> findByStatus(TripStatus status);
 

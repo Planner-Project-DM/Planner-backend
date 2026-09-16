@@ -15,6 +15,8 @@ import net.dysky.planner.tripitem.TripItemService;
 import net.dysky.planner.tripitinerary.TripItineraryService;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,6 +43,15 @@ public class TripService {
     public Trip getTripById(UUID id) {
         return tripRepository.findById(id).orElseThrow(
                 () -> new TripNotFoundException("Trip not found"));
+    }
+
+    @Transactional
+    @Cacheable(value = "trips_view", key = "#id")
+    public TripDetailsDTO getTripDetailsForApi(UUID id) {
+        Trip trip = tripRepository.findByIdWithDetails(id).orElseThrow(
+                () -> new TripNotFoundException("Trip not found"));
+
+        return TripDetailsDTO.fromEntity(trip);
     }
 
     public List<Trip> getAllTrips() {
@@ -71,6 +82,7 @@ public class TripService {
     }
 
     @Transactional
+    @CacheEvict(value = "trips", key = "#tripId")
     public Trip updateTripCosts(UUID tripId) {
         Trip trip = getTripById(tripId);
         Double totalCost = tripItineraryService.getTotalCostByTripId(tripId);
@@ -119,6 +131,7 @@ public class TripService {
     }
 
     @Transactional
+    @CacheEvict(value = "trips", key = "#id")
     public Trip updateTrip(UUID id, UpdateTripDTO updateTripDTO) {
         Trip trip = getTripById(id);
 
@@ -148,6 +161,7 @@ public class TripService {
     }
 
     @Transactional
+    @CacheEvict(value = "trips", key = "#id")
     public void deleteTrip(UUID id) {
         Trip trip = getTripById(id);
         tripRepository.delete(trip);
