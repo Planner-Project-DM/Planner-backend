@@ -3,18 +3,18 @@ package net.dysky.planner.usersettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+@ExtendWith(MockitoExtension.class)
 class UserSettingsServiceTest {
 
+    @InjectMocks
     private UserSettingsService userSettingsService;
-
-    @BeforeEach
-    void setUp() {
-        userSettingsService = new UserSettingsService();
-    }
 
     @Test
     @DisplayName("createSettings: shouldMapAllFields_whenDtoIsValid")
