@@ -1,5 +1,6 @@
 package net.dysky.planner;
 
+import com.redis.testcontainers.RedisContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -26,9 +27,8 @@ public abstract class AbstractIntegrationTest {
     private static final KafkaContainer kafka =
             new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.0"));
 
-    private static final GenericContainer<?> redis =
-            new GenericContainer<>("redis:7.2-alpine")
-                    .withExposedPorts(6379);
+    private static final RedisContainer redis =
+            new RedisContainer(DockerImageName.parse("redis:7.2.0-alpine"));
 
     static {
         postgres.start();

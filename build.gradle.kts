@@ -69,6 +69,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:kafka")
+    testImplementation("com.redis:testcontainers-redis:2.2.2")
     testImplementation("org.awaitility:awaitility:4.2.2")
 
     runtimeOnly("com.h2database:h2")
