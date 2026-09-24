@@ -110,9 +110,8 @@ tasks.jacocoTestReport {
                 exclude(
                     "net/dysky/planner/report/**",
                     "net/dysky/planner/groupUser/**",
-                    "net/dysky/planner/weather/*DTO.class",
-                    "net/dysky/planner/weather/Hourly.class",
-                    "net/dysky/planner/weather/WeatherDTO.class"
+                    "net/dysky/planner/weather/**",
+                    "net/dysky/planner/geocoding/**"
                 )
             }
         })
@@ -127,9 +126,8 @@ tasks.jacocoTestCoverageVerification {
                 exclude(
                     "net/dysky/planner/report/**",
                     "net/dysky/planner/groupUser/**",
-                    "net/dysky/planner/weather/*DTO.class",
-                    "net/dysky/planner/weather/Hourly.class",
-                    "net/dysky/planner/weather/WeatherDTO.class"
+                    "net/dysky/planner/geocoding/**",
+                    "net/dysky/planner/weather/**"
                 )
             }
         })

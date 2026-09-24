@@ -10,9 +10,11 @@ import net.dysky.planner.notification.NotificationService;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -41,7 +43,8 @@ public class GroupService {
         return createdGroup;
     }
 
-    public void addToGroup(Group group, AddToGroupDTO addToGroupDTO, String email) {
+    @CacheEvict(value = "trips_view", key = "#tripId")
+    public void addToGroup(Group group, AddToGroupDTO addToGroupDTO, String email, UUID tripId) {
         boolean alreadyInGroup = group.getGroupUsers().stream()
                 .anyMatch(gu -> gu.getUser().getEmail().equals(addToGroupDTO.email()));
         if (alreadyInGroup) throw new UserInGroupException("User is already in the group");
@@ -53,6 +56,7 @@ public class GroupService {
         notificationService.createNotification("Added to group", "You have been added to the group", userToAdd.getId(), sender.getId());
     }
 
+    @CacheEvict(value = "trips_view", key = "#trip.id")
     public void updateGroupMember(Trip trip, Group group, List<UpdateGroupMemberDTO> dtos) {
         if(dtos.isEmpty()) return;
 
@@ -69,7 +73,8 @@ public class GroupService {
         groupUserService.update(trip, list);
     }
 
-    public void deleteFromGroup(Group group, RemoveFromGroupDTO removeFromGroupDTO, String email) {
+    @CacheEvict(value = "trips_view", key = "#tripId")
+    public void deleteFromGroup(Group group, RemoveFromGroupDTO removeFromGroupDTO, String email, UUID tripId) {
         User userToRemove = userService.getUserByEmail(removeFromGroupDTO.email());
         User sender = userService.getUserByEmail(email);
 
