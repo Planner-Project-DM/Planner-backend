@@ -100,7 +100,7 @@ class GroupServiceTest {
 
         when(userService.getUserByEmail("newmember@domain.com")).thenReturn(userToAdd);
 
-        groupService.addToGroup(group, dto, "sender@domain.com");
+        groupService.addToGroup(group, dto, "sender@domain.com", UUID.randomUUID());
 
         verify(userService).getUserByEmail("sender@domain.com");
         verify(userService).getUserByEmail("newmember@domain.com");
@@ -120,7 +120,7 @@ class GroupServiceTest {
 
         AddToGroupDTO dto = new AddToGroupDTO("member@domain.com");
 
-        assertThatThrownBy(() -> groupService.addToGroup(group, dto, "sender@domain.com"))
+        assertThatThrownBy(() -> groupService.addToGroup(group, dto, "sender@domain.com", UUID.randomUUID()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("User is already in the group");
 
@@ -149,7 +149,7 @@ class GroupServiceTest {
         when(groupUserService.findByGroupAndUser(group, senderUser)).thenReturn(senderGroupUser);
         when(groupUserService.findByGroupAndUser(group, user)).thenReturn(groupUser);
 
-        groupService.deleteFromGroup(group, dto, "sender@domain.com");
+        groupService.deleteFromGroup(group, dto, "sender@domain.com", UUID.randomUUID());
 
         verify(groupUserService).remove(groupUser);
     }
@@ -167,7 +167,7 @@ class GroupServiceTest {
         when(userService.getUserByEmail("notingroup@domain.com")).thenReturn(user);
         when(userService.getUserByEmail("sender@domain.com")).thenReturn(senderUser);
 
-        assertThatThrownBy(() -> groupService.deleteFromGroup(group, dto, "sender@domain.com"))
+        assertThatThrownBy(() -> groupService.deleteFromGroup(group, dto, "sender@domain.com", UUID.randomUUID()))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("User is not in the group");
 
