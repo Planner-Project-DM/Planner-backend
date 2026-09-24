@@ -13,16 +13,16 @@
 
 ## 📋 Table of contents
 
-- [About](#about)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Features](#features)
-- [Local setup](#local-setup)
-- [API documentation](#api-documentation)
-- [Tests](#tests)
-- [CI/CD](#cicd)
-- [Monitoring](#monitoring)
-- [Project structure](#project-structure)
+- [About](#-about)
+- [Tech Stack](#-tech-stack)
+- [Architecture](#-architecture)
+- [Features](#-features)
+- [Local setup](#-local-setup)
+- [API documentation](#-api-documentation)
+- [Tests](#-tests)
+- [CI/CD](#-cicd)
+- [Monitoring](#-monitoring)
+- [Project structure](#-project-structure)
 
 ---
 
