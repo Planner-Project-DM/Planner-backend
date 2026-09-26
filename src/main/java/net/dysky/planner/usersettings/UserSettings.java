@@ -25,12 +25,12 @@ public class UserSettings {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    private Currency currency;
+    private Currency currency = Currency.PLN;
 
     private Double budgetLimit;
 
     @Enumerated(EnumType.STRING)
-    private Language language;
+    private Language language = Language.PL;
 
     private boolean isNotificationEnabled;
 
