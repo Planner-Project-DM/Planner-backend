@@ -32,6 +32,7 @@ public class UserSettings {
     @Enumerated(EnumType.STRING)
     private Language language = Language.PL;
 
-    private boolean isNotificationEnabled;
+    @Column(nullable = false)
+    private boolean isNotificationEnabled = true;
 
 }
