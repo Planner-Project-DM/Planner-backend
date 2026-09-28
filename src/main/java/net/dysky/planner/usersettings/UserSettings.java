@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import net.dysky.planner.notification.NotificationChannel;
 import net.dysky.planner.user.User;
 
 import java.util.UUID;
@@ -34,5 +35,9 @@ public class UserSettings {
 
     @Column(nullable = false)
     private boolean isNotificationEnabled = true;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NotificationChannel notificationChannel = NotificationChannel.PUSH;
 
 }
