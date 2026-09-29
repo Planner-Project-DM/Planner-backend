@@ -28,7 +28,7 @@ public class UserSettings {
     @Enumerated(EnumType.STRING)
     private Currency currency = Currency.PLN;
 
-    private Double budgetLimit;
+    private Double budgetLimit = 0.0;
 
     @Enumerated(EnumType.STRING)
     private Language language = Language.PL;
