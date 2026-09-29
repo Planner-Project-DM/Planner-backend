@@ -33,11 +33,32 @@ public class UserSettings {
     @Enumerated(EnumType.STRING)
     private Language language = Language.PL;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "notifications_enabled")
     private boolean isNotificationEnabled = true;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "notification_channel")
     private NotificationChannel notificationChannel = NotificationChannel.PUSH;
+
+    @Column(nullable = false)
+    private boolean notifyFriendshipRequest = true;
+
+    @Column(nullable = false)
+    private boolean notifyFriendshipRemoved = true;
+
+    @Column(nullable = false)
+    private boolean notifyScheduleItemAdded = true;
+    @Column(nullable = false)
+    private boolean notifyScheduleItemUpdated = true;
+    @Column(nullable = false)
+    private boolean notifyScheduleItemDeleted = true;
+
+    @Column(nullable = false)
+    private boolean notifyGroupMemberAdded = true;
+    @Column(nullable = false)
+    private boolean notifyGroupMemberRemoved = true;
+
+    @Column(nullable = false)
+    private boolean notifyFundItemCostUpdated = true;
 
 }

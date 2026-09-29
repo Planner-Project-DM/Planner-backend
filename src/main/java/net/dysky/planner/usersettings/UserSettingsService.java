@@ -4,11 +4,18 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserSettingsService {
 
     private final UserSettingsRepository userSettingsRepository;
+
+    public UserSettings findByUserId(UUID id) {
+        return userSettingsRepository.findByUser_Id(id).orElseThrow(
+                () -> new IllegalArgumentException("User settings not found"));
+    }
 
     public UserSettings createSettings(CreateSettingsDTO createSettingsDTO) {
         UserSettings settings = new UserSettings();
@@ -23,11 +30,6 @@ public class UserSettingsService {
 
     public UserSettings createDefaultSettings() {
         UserSettings settings = new UserSettings();
-
-        settings.setCurrency(Currency.PLN);
-        settings.setBudgetLimit(0.0);
-        settings.setLanguage(Language.PL);
-        settings.setNotificationEnabled(true);
 
         return settings;
     }

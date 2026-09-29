@@ -4,6 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
+import net.dysky.planner.usersettings.UserSettings;
+import net.dysky.planner.usersettings.UserSettingsService;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ public class NotificationService {
     private final NotificationRepository repository;
 
     private final UserService userService;
+
+    private final UserSettingsService userSettingsService;
 
     public Notification findById(UUID notificationId) {
         return repository.findById(notificationId).orElseThrow(
@@ -107,6 +111,21 @@ public class NotificationService {
         }
     }
 
+    public boolean shouldNotify(UUID userId, NotificationType type) {
+        UserSettings s = userSettingsService.findByUserId(userId);
 
+        if (!s.isNotificationEnabled()) return false;
+
+        return switch (type) {
+            case FRIENDSHIP_REQUEST -> s.isNotifyFriendshipRequest();
+            case FRIENDSHIP_REMOVED -> s.isNotifyFriendshipRemoved();
+            case SCHEDULE_ITEM_ADDED -> s.isNotifyScheduleItemAdded();
+            case SCHEDULE_ITEM_UPDATED -> s.isNotifyScheduleItemUpdated();
+            case SCHEDULE_ITEM_DELETED -> s.isNotifyScheduleItemDeleted();
+            case GROUP_MEMBER_ADDED -> s.isNotifyGroupMemberAdded();
+            case GROUP_MEMBER_REMOVED  -> s.isNotifyGroupMemberRemoved();
+            case FUND_ITEM_COST_UPDATED  -> s.isNotifyFundItemCostUpdated();
+        };
+    }
 
 }
