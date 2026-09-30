@@ -2,6 +2,7 @@ package net.dysky.planner.tripSchedule;
 
 import lombok.RequiredArgsConstructor;
 import net.dysky.planner.notification.NotificationService;
+import net.dysky.planner.notification.NotificationType;
 import net.dysky.planner.schedule.*;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.tripitem.TripItem;
@@ -43,7 +44,7 @@ public class TripScheduleService {
         tripSchedule.setSchedule(schedule);
 
         trip.getTripGroup().getGroupUsers().forEach(groupUser -> {
-            if(!groupUser.getUser().getEmail().equals(email)) {
+            if(!groupUser.getUser().getEmail().equals(email) && notificationService.shouldNotify(groupUser.getUser().getId(), NotificationType.SCHEDULE_ITEM_ADDED)) {
                 notificationService.createNotification(
                         "New schedule added to trip",
                         "Schedule for " + tripItem.getName() + " has been added to your trip. Created by: " + email,
@@ -59,7 +60,7 @@ public class TripScheduleService {
         Schedule schedule = scheduleService.updateSchedule(trip, dto);
 
         trip.getTripGroup().getGroupUsers().forEach(groupUser -> {
-            if(!groupUser.getUser().getEmail().equals(email)) {
+            if(!groupUser.getUser().getEmail().equals(email) && notificationService.shouldNotify(groupUser.getUser().getId(), NotificationType.SCHEDULE_ITEM_UPDATED)) {
                 notificationService.createNotification(
                         "Schedule updated in trip",
                         "Schedule for " + schedule.getTripItem().getName() + " has been updated in your trip. Updated by: " + email,
@@ -79,7 +80,7 @@ public class TripScheduleService {
         scheduleService.deleteSchedule(scheduleId);
 
         trip.getTripGroup().getGroupUsers().forEach(groupUser -> {
-            if(!groupUser.getUser().getEmail().equals(email)) {
+            if(!groupUser.getUser().getEmail().equals(email) && notificationService.shouldNotify(groupUser.getUser().getId(), NotificationType.SCHEDULE_ITEM_DELETED)) {
                 notificationService.createNotification(
                         "Trip schedule deleted",
                         "Schedule for " + tripSchedule.getSchedule().getTripItem().getName() + " has been deleted from your trip. Deleted by: " + email,
