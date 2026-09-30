@@ -6,6 +6,7 @@ import net.dysky.planner.exception.FriendshipExistsException;
 import net.dysky.planner.exception.FriendshipNotFoundException;
 import net.dysky.planner.exception.UserNotFoundException;
 import net.dysky.planner.notification.NotificationService;
+import net.dysky.planner.notification.NotificationType;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.springframework.stereotype.Service;
@@ -79,12 +80,14 @@ public class FriendshipService {
 
         friendship.setStatus(FriendshipStatus.PENDING);
 
-        notificationService.createNotification(
-                "Friendship request from " + sender.getFirstName() + " " + sender.getLastName(),
-                " You have a new friendship request from " + sender.getFirstName() + " " + sender.getLastName(),
-                receiver.getId(),
-                sender.getId()
-        );
+        if (notificationService.shouldNotify(receiver.getId(), NotificationType.FRIENDSHIP_REQUEST))  {
+            notificationService.createNotification(
+                    "Friendship request from " + sender.getFirstName() + " " + sender.getLastName(),
+                    " You have a new friendship request from " + sender.getFirstName() + " " + sender.getLastName(),
+                    receiver.getId(),
+                    sender.getId()
+            );
+        }
 
         return friendshipRepository.save(friendship);
     }
@@ -105,18 +108,22 @@ public class FriendshipService {
         Friendship friendship =  getFriendship(user, friend);
         friendshipRepository.delete(friendship);
 
-        notificationService.createNotification(
-                "Friendship removed",
-                "You have removed " + friend.getFirstName() + " " + friend.getLastName() + " from your friends list",
-                user.getId()
-        );
+        if(notificationService.shouldNotify(user.getId(), NotificationType.FRIENDSHIP_REMOVED)) {
+            notificationService.createNotification(
+                    "Friendship removed",
+                    "You have removed " + friend.getFirstName() + " " + friend.getLastName() + " from your friends list",
+                    user.getId()
+            );
+        }
 
-        notificationService.createNotification(
-                "Friendship removed",
-                "You are no longer friends with " + user.getFirstName() + " " + user.getLastName(),
-                friend.getId(),
-                user.getId()
-        );
+        if(notificationService.shouldNotify(friend.getId(), NotificationType.FRIENDSHIP_REMOVED)) {
+            notificationService.createNotification(
+                    "Friendship removed",
+                    "You are no longer friends with " + user.getFirstName() + " " + user.getLastName(),
+                    friend.getId(),
+                    user.getId()
+            );
+        }
     }
 
     FriendshipDTO mapToFriendshipDTO(Friendship friendship, String email) {

@@ -22,7 +22,10 @@ public abstract class AbstractIntegrationTest {
     protected MockMvc mockMvc;
 
     private static final PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:16-alpine");
+            new PostgreSQLContainer<>("postgres:16-alpine")
+                    .withDatabaseName("testplanner")
+                    .withUsername("postgres")
+                    .withPassword("password");
 
     private static final KafkaContainer kafka =
             new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.0"));

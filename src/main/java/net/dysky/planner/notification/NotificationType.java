@@ -1,0 +1,15 @@
+package net.dysky.planner.notification;
+
+public enum NotificationType {
+    FRIENDSHIP_REQUEST,
+    FRIENDSHIP_REMOVED,
+
+    SCHEDULE_ITEM_ADDED,
+    SCHEDULE_ITEM_UPDATED,
+    SCHEDULE_ITEM_DELETED,
+
+    GROUP_MEMBER_ADDED,
+    GROUP_MEMBER_REMOVED,
+
+    FUND_ITEM_COST_UPDATED
+}

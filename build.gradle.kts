@@ -31,7 +31,9 @@ dependencies {
     implementation("org.springframework.retry:spring-retry:2.0.6")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
 
-    implementation("org.flywaydb:flyway-core:9.21.0")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-flyway:4.0.1")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.poi:poi:4.1.2")

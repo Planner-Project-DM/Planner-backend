@@ -19,11 +19,11 @@ public class JwtService {
     @Value("${jwt.secret.key}")
     private String secretKey;
 
-    public String generateToken(User user, int time) {
+    public String generateToken(User user, long time) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + time))
+                .setExpiration(new Date(System.currentTimeMillis() + time ))
                 .signWith(getSignInKey())
                 .compact();
     }

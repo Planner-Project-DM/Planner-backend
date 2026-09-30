@@ -50,11 +50,11 @@ public class AuthService {
         String token;
 
         if(loginDTO.rememberMe()) {
-            int time = 1000 * 60 * 60 * 24 * 7;
+            long time = 1000L * 60 * 60 * 24 * 31;
 
             token = jwtService.generateToken(user, time);
         } else {
-            int time = 1000 * 60 * 60 * 24;
+            long time = 1000L * 60 * 60 * 24;
 
             token = jwtService.generateToken(user, time);
         }
