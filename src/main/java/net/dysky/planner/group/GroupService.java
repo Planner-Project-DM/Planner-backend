@@ -7,6 +7,7 @@ import net.dysky.planner.exception.UserInGroupException;
 import net.dysky.planner.exception.UserNotFoundException;
 import net.dysky.planner.groupUser.*;
 import net.dysky.planner.notification.NotificationService;
+import net.dysky.planner.notification.NotificationType;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
@@ -53,7 +54,14 @@ public class GroupService {
         User sender = userService.getUserByEmail(email);
         groupUserService.add(new CreateGroupUserDTO(group, userToAdd, GroupRole.MEMBER));
 
-        notificationService.createNotification("Added to group", "You have been added to the group", userToAdd.getId(), sender.getId());
+        if (notificationService.shouldNotify(userToAdd.getId(), NotificationType.GROUP_MEMBER_ADDED)) {
+            notificationService.createNotification(
+                    "Added to group " + group.getName(),
+                    "You have been added to the group",
+                    userToAdd.getId(),
+                    sender.getId()
+            );
+        }
     }
 
     @CacheEvict(value = "trips_view", key = "#trip.id")
@@ -91,12 +99,15 @@ public class GroupService {
 
         groupUserService.remove(groupUser);
 
-        notificationService.createNotification(
-                "Removed from group" + group.getName(),
-                "You have been removed from the group",
-                userToRemove.getId(),
-                sender.getId()
-        );
+        if (notificationService.shouldNotify(userToRemove.getId(), NotificationType.GROUP_MEMBER_REMOVED)) {
+            notificationService.createNotification(
+                    "Removed from group" + group.getName(),
+                    "You have been removed from the group",
+                    userToRemove.getId(),
+                    sender.getId()
+            );
+        }
+
     }
 
     public List<Group> getAllGroupsForUser(String email) {
