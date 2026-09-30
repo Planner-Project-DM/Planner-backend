@@ -113,6 +113,7 @@ class TripScheduleServiceTest {
         when(tripItemService.findById(tripItemId)).thenReturn(tripItem);
         when(scheduleService.addSchedule(eq(trip), any(CreateScheduleDTO.class))).thenReturn(schedule);
         when(tripScheduleRepository.save(any(TripSchedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(notificationService.shouldNotify(any(), any())).thenReturn(true);
 
         // When
         TripSchedule result = tripScheduleService.addScheduleToTrip(trip, dto, "SYSTEM");
@@ -161,6 +162,7 @@ class TripScheduleServiceTest {
 
         when(tripScheduleRepository.findByTrip_IdAndSchedule_Id(tripId, scheduleId))
                 .thenReturn(Optional.of(tripSchedule));
+        when(notificationService.shouldNotify(any(), any())).thenReturn(true);
 
         // When
         tripScheduleService.deleteScheduleFromTrip(trip, scheduleId, "SYSTEM");

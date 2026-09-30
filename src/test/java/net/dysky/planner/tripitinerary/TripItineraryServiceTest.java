@@ -191,6 +191,7 @@ class TripItineraryServiceTest {
 
         when(tripItineraryRepository.findById(any(TripTripItemsId.class))).thenReturn(Optional.of(existingItinerary));
         when(tripItineraryRepository.save(any(TripItinerary.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(notificationService.shouldNotify(any(), any())).thenReturn(true);
 
         TripItinerary result = tripItineraryService.updateTripItinerary(trip, dto);
 

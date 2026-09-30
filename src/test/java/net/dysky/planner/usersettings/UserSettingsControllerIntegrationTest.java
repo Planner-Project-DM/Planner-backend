@@ -63,7 +63,16 @@ public class UserSettingsControllerIntegrationTest extends AbstractIntegrationTe
                 .andExpect(jsonPath("$.data.currency").value("PLN"))
                 .andExpect(jsonPath("$.data.language").value("PL"))
                 .andExpect(jsonPath("$.data.budgetLimit").value(0.0))
-                .andExpect(jsonPath("$.data.notificationEnabled").value(true));
+                .andExpect(jsonPath("$.data.notificationEnabled").value(true))
+                .andExpect(jsonPath("$.data.notificationChannel").value("PUSH"))
+                .andExpect(jsonPath("$.data.notifyFriendshipRequest").value(true))
+                .andExpect(jsonPath("$.data.notifyFriendshipRemoved").value(true))
+                .andExpect(jsonPath("$.data.notifyScheduleItemAdded").value(true))
+                .andExpect(jsonPath("$.data.notifyScheduleItemUpdated").value(true))
+                .andExpect(jsonPath("$.data.notifyScheduleItemDeleted").value(true))
+                .andExpect(jsonPath("$.data.notifyGroupMemberAdded").value(true))
+                .andExpect(jsonPath("$.data.notifyGroupMemberRemoved").value(true))
+                .andExpect(jsonPath("$.data.notifyFundItemCostUpdated").value(true));
     }
 
     @Test
@@ -85,6 +94,15 @@ public class UserSettingsControllerIntegrationTest extends AbstractIntegrationTe
                 "EUR",
                 4500.0,
                 "EN",
+                false,
+                "PUSH",
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false
         );
 
@@ -99,13 +117,24 @@ public class UserSettingsControllerIntegrationTest extends AbstractIntegrationTe
                 .andExpect(jsonPath("$.data.currency").value("EUR"))
                 .andExpect(jsonPath("$.data.budgetLimit").value(4500.0))
                 .andExpect(jsonPath("$.data.language").value("EN"))
-                .andExpect(jsonPath("$.data.notificationEnabled").value(false));
+                .andExpect(jsonPath("$.data.notificationEnabled").value(false))
+                .andExpect(jsonPath("$.data.notificationChannel").value("PUSH"))
+                .andExpect(jsonPath("$.data.notifyFriendshipRequest").value(false))
+                .andExpect(jsonPath("$.data.notifyFriendshipRemoved").value(false))
+                .andExpect(jsonPath("$.data.notifyScheduleItemAdded").value(false))
+                .andExpect(jsonPath("$.data.notifyScheduleItemUpdated").value(false))
+                .andExpect(jsonPath("$.data.notifyScheduleItemDeleted").value(false))
+                .andExpect(jsonPath("$.data.notifyGroupMemberAdded").value(false))
+                .andExpect(jsonPath("$.data.notifyGroupMemberRemoved").value(false))
+                .andExpect(jsonPath("$.data.notifyFundItemCostUpdated").value(false));
     }
 
     @Test
     @DisplayName("PUT: shouldNotChangeFields_whenAllFieldsInDtoAreNull")
     void updateUserSettings_shouldNotChangeFields_whenAllFieldsInDtoAreNull() throws Exception {
-        UpdateSettingsDTO emptyDto = new UpdateSettingsDTO(null, null, null, null);
+        UpdateSettingsDTO emptyDto = new UpdateSettingsDTO(
+                null, null, null, null, null, null, null, null, null, null, null, null, null
+        );
 
         mockMvc.perform(put("/api/users/settings")
                         .with(user(userEmail).roles("USER"))
@@ -118,7 +147,16 @@ public class UserSettingsControllerIntegrationTest extends AbstractIntegrationTe
                 .andExpect(jsonPath("$.data.currency").value("PLN"))
                 .andExpect(jsonPath("$.data.budgetLimit").value(0.0))
                 .andExpect(jsonPath("$.data.language").value("PL"))
-                .andExpect(jsonPath("$.data.notificationEnabled").value(true));
+                .andExpect(jsonPath("$.data.notificationEnabled").value(true))
+                .andExpect(jsonPath("$.data.notificationChannel").value("PUSH"))
+                .andExpect(jsonPath("$.data.notifyFriendshipRequest").value(true))
+                .andExpect(jsonPath("$.data.notifyFriendshipRemoved").value(true))
+                .andExpect(jsonPath("$.data.notifyScheduleItemAdded").value(true))
+                .andExpect(jsonPath("$.data.notifyScheduleItemUpdated").value(true))
+                .andExpect(jsonPath("$.data.notifyScheduleItemDeleted").value(true))
+                .andExpect(jsonPath("$.data.notifyGroupMemberAdded").value(true))
+                .andExpect(jsonPath("$.data.notifyGroupMemberRemoved").value(true))
+                .andExpect(jsonPath("$.data.notifyFundItemCostUpdated").value(true));
     }
 
     @Test
@@ -127,7 +165,9 @@ public class UserSettingsControllerIntegrationTest extends AbstractIntegrationTe
         String nonExistingEmail = "ghost@example.com";
         when(jwtService.extractEmail(any(HttpServletRequest.class))).thenReturn(nonExistingEmail);
 
-        UpdateSettingsDTO updateDto = new UpdateSettingsDTO("USD", 1000.0, "EN", true);
+        UpdateSettingsDTO updateDto = new UpdateSettingsDTO(
+                "USD", 1000.0, "EN", true, null, null, null, null, null, null, null, null, null
+        );
 
         mockMvc.perform(put("/api/users/settings")
                         .with(user(nonExistingEmail).roles("USER"))
