@@ -113,7 +113,8 @@ tasks.jacocoTestReport {
                     "net/dysky/planner/report/**",
                     "net/dysky/planner/groupUser/**",
                     "net/dysky/planner/weather/**",
-                    "net/dysky/planner/geocoding/**"
+                    "net/dysky/planner/geocoding/**",
+                    "net/dysky/planner/trip/*DTO*"
                 )
             }
         })
@@ -129,7 +130,8 @@ tasks.jacocoTestCoverageVerification {
                     "net/dysky/planner/report/**",
                     "net/dysky/planner/groupUser/**",
                     "net/dysky/planner/geocoding/**",
-                    "net/dysky/planner/weather/**"
+                    "net/dysky/planner/weather/**",
+                    "net/dysky/planner/trip/*DTO*"
                 )
             }
         })
