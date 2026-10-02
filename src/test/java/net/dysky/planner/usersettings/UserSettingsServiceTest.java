@@ -7,8 +7,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserSettingsServiceTest {
@@ -331,5 +337,127 @@ class UserSettingsServiceTest {
                 () -> assertThat(updated.getNotificationChannel()).isEqualTo(NotificationChannel.PUSH),
                 () -> assertThat(updated.getCurrency()).isEqualTo(Currency.PLN)
         );
+    }
+
+    @Test
+    void createSettings_shouldMapAllFieldsProperly() {
+        // given
+        CreateSettingsDTO dto = mock(CreateSettingsDTO.class);
+        when(dto.currency()).thenReturn("EUR");
+        when(dto.budgetLimit()).thenReturn(1500.50);
+        when(dto.language()).thenReturn("EN");
+        when(dto.isNotificationsEnabled()).thenReturn(false);
+
+        // when
+        UserSettings result = userSettingsService.createSettings(dto);
+
+        // then
+        assertThat(result.getCurrency()).isEqualTo(Currency.EUR);
+        assertThat(result.getBudgetLimit()).isEqualTo(1500.50);
+        assertThat(result.getLanguage()).isEqualTo(Language.EN);
+        assertThat(result.isNotificationEnabled()).isFalse();
+    }
+
+    @Test
+    void createSettings_shouldThrowException_whenCurrencyIsInvalid() {
+        // given
+        CreateSettingsDTO dto = mock(CreateSettingsDTO.class);
+        when(dto.currency()).thenReturn("NIEPRAWIDLOWA_WALUTA");
+
+        // when & then
+        assertThatThrownBy(() -> userSettingsService.createSettings(dto))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void createDefaultSettings_shouldReturnSettingsWithDefaultValues() {
+        // when
+        UserSettings result = userSettingsService.createDefaultSettings();
+
+        // then
+        assertThat(result.getCurrency()).isEqualTo(Currency.PLN);
+        assertThat(result.getBudgetLimit()).isEqualTo(0.0);
+        assertThat(result.getLanguage()).isEqualTo(Language.PL);
+        assertThat(result.isNotificationEnabled()).isTrue();
+        assertThat(result.getNotificationChannel()).isEqualTo(NotificationChannel.PUSH);
+        assertThat(result.isNotifyFriendshipRequest()).isTrue();
+        assertThat(result.isNotifyScheduleItemAdded()).isTrue();
+    }
+
+    @Test
+    void updateSettings_shouldUpdateAllFields_whenAllDtoFieldsArePresent() {
+        // given
+        UserSettings settings = new UserSettings();
+
+        UpdateSettingsDTO dto = mock(UpdateSettingsDTO.class);
+        when(dto.currency()).thenReturn("EUR");
+        when(dto.budgetLimit()).thenReturn(2500.0);
+        when(dto.language()).thenReturn("EN");
+        when(dto.isNotificationsEnabled()).thenReturn(false);
+        when(dto.notificationChannel()).thenReturn(NotificationChannel.EMAIL.name());
+        when(dto.notifyFriendshipRequest()).thenReturn(false);
+        when(dto.notifyFriendshipRemoved()).thenReturn(false);
+        when(dto.notifyScheduleItemAdded()).thenReturn(false);
+        when(dto.notifyScheduleItemUpdated()).thenReturn(false);
+        when(dto.notifyScheduleItemDeleted()).thenReturn(false);
+        when(dto.notifyGroupMemberAdded()).thenReturn(false);
+        when(dto.notifyGroupMemberRemoved()).thenReturn(false);
+        when(dto.notifyFundItemCostUpdated()).thenReturn(false);
+
+        // when
+        UserSettings updated = userSettingsService.updateSettings(settings, dto);
+
+        // then
+        assertThat(updated.getCurrency()).isEqualTo(Currency.EUR);
+        assertThat(updated.getBudgetLimit()).isEqualTo(2500.0);
+        assertThat(updated.getLanguage()).isEqualTo(Language.EN);
+        assertThat(updated.isNotificationEnabled()).isFalse();
+        assertThat(updated.getNotificationChannel()).isEqualTo(NotificationChannel.EMAIL);
+        assertThat(updated.isNotifyFriendshipRequest()).isFalse();
+        assertThat(updated.isNotifyFriendshipRemoved()).isFalse();
+        assertThat(updated.isNotifyScheduleItemAdded()).isFalse();
+        assertThat(updated.isNotifyScheduleItemUpdated()).isFalse();
+        assertThat(updated.isNotifyScheduleItemDeleted()).isFalse();
+        assertThat(updated.isNotifyGroupMemberAdded()).isFalse();
+        assertThat(updated.isNotifyGroupMemberRemoved()).isFalse();
+        assertThat(updated.isNotifyFundItemCostUpdated()).isFalse();
+    }
+
+    @Test
+    void updateSettings_shouldNotUpdateFields_whenAllDtoFieldsAreNull() {
+        // given
+        UserSettings settings = new UserSettings();
+        settings.setCurrency(Currency.PLN);
+        settings.setBudgetLimit(100.0);
+        settings.setLanguage(Language.PL);
+
+        UpdateSettingsDTO emptyDto = mock(UpdateSettingsDTO.class);
+        when(emptyDto.budgetLimit()).thenReturn(null);
+
+        // when
+        UserSettings updated = userSettingsService.updateSettings(settings, emptyDto);
+
+        // then
+        assertThat(updated.getCurrency()).isEqualTo(Currency.PLN);
+        assertThat(updated.getBudgetLimit()).isEqualTo(100.0);
+        assertThat(updated.getLanguage()).isEqualTo(Language.PL);
+    }
+
+    @Test
+    void updateSettings_shouldUpdateOnlySelectedFields() {
+        // given
+        UserSettings settings = new UserSettings();
+        settings.setBudgetLimit(100.0);
+        settings.setCurrency(Currency.PLN);
+
+        UpdateSettingsDTO partialDto = mock(UpdateSettingsDTO.class);
+        when(partialDto.budgetLimit()).thenReturn(500.0);
+
+        // when
+        UserSettings updated = userSettingsService.updateSettings(settings, partialDto);
+
+        // then
+        assertThat(updated.getBudgetLimit()).isEqualTo(500.0);
+        assertThat(updated.getCurrency()).isEqualTo(Currency.PLN);
     }
 }
