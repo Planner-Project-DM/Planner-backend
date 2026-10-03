@@ -51,4 +51,23 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
+    public User updateUser(UUID id, UserUpdateDTO dto) {
+        User user = getUserById(id);
+
+        if(dto.firstName() != null) {
+            user.setFirstName(dto.firstName());
+        }
+
+        if(dto.lastName() != null) {
+            user.setLastName(dto.lastName());
+        }
+
+        if(dto.phoneNumber() != null) {
+            user.setPhoneNumber(dto.phoneNumber());
+        }
+
+        return user;
+    }
+
 }
