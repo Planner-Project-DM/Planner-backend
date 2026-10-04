@@ -63,6 +63,14 @@ public class UserService {
             user.setLastName(dto.lastName());
         }
 
+        if(dto.email() != null) {
+            if(existsByEmail(dto.email()) && !user.getEmail().equals(dto.email())) {
+                throw new UserExistException("Email already exists");
+            }
+
+            user.setEmail(dto.email());
+        }
+
         if(dto.phoneNumber() != null) {
             user.setPhoneNumber(dto.phoneNumber());
         }
