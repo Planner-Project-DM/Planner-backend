@@ -1,20 +1,24 @@
 package net.dysky.planner.user;
 
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.dysky.planner.auth.RegisterDTO;
 import net.dysky.planner.exception.UserExistException;
 import net.dysky.planner.exception.UserNotFoundException;
 import net.dysky.planner.usersettings.UserSettingsService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -29,6 +33,19 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
+
+    private User activeUser;
+
+    @BeforeEach
+    void setUp() {
+        activeUser = new User();
+        activeUser.setEmail("test@dysky.net");
+        activeUser.setPassword("encoded_password");
+        activeUser.setIsActive(true);
+    }
 
     @Test
     void shouldReturnUserWhenUserExists() {
@@ -149,5 +166,34 @@ public class UserServiceTest {
 
         verify(userRepository, never()).save(any(User.class));
     }
+
+    @Test
+    void encodePassword_ShouldCallPasswordEncoder() {
+        // Given
+        String raw = "my_password";
+        when(passwordEncoder.encode(raw)).thenReturn("encoded");
+
+        // When
+        String result = userService.encodePassword(raw);
+
+        // Then
+        assertEquals("encoded", result);
+        verify(passwordEncoder).encode(raw);
+    }
+
+    @Test
+    void verifyPassword_ShouldReturnTrue_WhenPasswordsMatch() {
+        // Given
+        String raw = "my_password";
+        when(passwordEncoder.matches(raw, activeUser.getPassword())).thenReturn(true);
+
+        // When
+        boolean result = userService.verifyPassword(raw, activeUser);
+
+        // Then
+        assertTrue(result);
+        verify(passwordEncoder).matches(raw, activeUser.getPassword());
+    }
+
 
 }

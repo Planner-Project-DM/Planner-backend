@@ -21,7 +21,6 @@ public class AuthService {
 
     private final JwtService jwtService;
     private final UserService userService;
-    private final BCryptPasswordEncoder passwordEncoder;
     private final AppMetrics appMetrics;
 
     public ResponseEntity<ResponseDTO> login(@Valid LoginDTO loginDTO) {
@@ -43,7 +42,7 @@ public class AuthService {
                     );
         }
 
-        if(!verifyPassword(loginDTO.password(), user)) {
+        if(!userService.verifyPassword(loginDTO.password(), user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseDTO(LocalDateTime.now(), 403, "Invalid credentials", "auth/login", null));
         }
 
@@ -70,7 +69,7 @@ public class AuthService {
                 registerDTO.firstName(),
                 registerDTO.lastName(),
                 registerDTO.email(),
-                encodePassword(registerDTO.password()),
+                userService.encodePassword(registerDTO.password()),
                 registerDTO.phoneNumber()
         );
 
@@ -85,11 +84,5 @@ public class AuthService {
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Register successful", "auth/register", response));
     }
 
-    public String encodePassword(String rawPassword) {
-        return passwordEncoder.encode(rawPassword);
-    }
 
-    public boolean verifyPassword(String password, User user) {
-        return passwordEncoder.matches(password, user.getPassword());
-    }
 }

@@ -4,6 +4,7 @@ public record UserUpdateDTO(
         String firstName,
         String lastName,
         String email,
-        String phoneNumber
+        String phoneNumber,
+        boolean isActive
 ) {
 }
