@@ -9,12 +9,10 @@ import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,12 +30,8 @@ public class AuthServiceTest {
     private UserService userService;
 
     @Mock
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Mock
     private AppMetrics appMetrics;
 
-    @InjectMocks
     private AuthService authService;
 
     private User activeUser;
@@ -47,6 +41,8 @@ public class AuthServiceTest {
     void setUp() {
         Timer simpleTimer = new SimpleMeterRegistry().timer("auth.login");
         lenient().when(appMetrics.getAuthLoginTimer()).thenReturn(simpleTimer);
+
+        authService = new AuthService(jwtService, userService, appMetrics);
 
         activeUser = new User();
         activeUser.setEmail("test@dysky.net");
@@ -67,7 +63,7 @@ public class AuthServiceTest {
         int time = 1000 * 60 * 60 * 24;
 
         when(userService.getUserByEmail(loginDTO.email())).thenReturn(activeUser);
-        when(passwordEncoder.matches(loginDTO.password(), activeUser.getPassword())).thenReturn(true);
+        when(userService.verifyPassword(loginDTO.password(), activeUser)).thenReturn(true);
         when(jwtService.generateToken(activeUser, time)).thenReturn(mockToken);
 
         // When
@@ -86,7 +82,7 @@ public class AuthServiceTest {
         assertEquals(mockToken, data.get("token"));
 
         verify(userService).getUserByEmail(loginDTO.email());
-        verify(passwordEncoder).matches(loginDTO.password(), activeUser.getPassword());
+        verify(userService).verifyPassword(loginDTO.password(), activeUser);
         verify(jwtService).generateToken(activeUser, time);
     }
 
@@ -108,7 +104,6 @@ public class AuthServiceTest {
         assertNull(responseEntity.getBody().data());
 
         verify(userService).getUserByEmail(loginDTO.email());
-        verifyNoInteractions(passwordEncoder);
         verifyNoInteractions(jwtService);
     }
 
@@ -118,7 +113,7 @@ public class AuthServiceTest {
         LoginDTO loginDTO = new LoginDTO("test@dysky.net", "wrong_password", false);
 
         when(userService.getUserByEmail(loginDTO.email())).thenReturn(activeUser);
-        when(passwordEncoder.matches(loginDTO.password(), activeUser.getPassword())).thenReturn(false);
+        when(userService.verifyPassword(loginDTO.password(), activeUser)).thenReturn(false);
 
         // When
         ResponseEntity<ResponseDTO> responseEntity = authService.login(loginDTO);
@@ -131,7 +126,7 @@ public class AuthServiceTest {
         assertNull(responseEntity.getBody().data());
 
         verify(userService).getUserByEmail(loginDTO.email());
-        verify(passwordEncoder).matches(loginDTO.password(), activeUser.getPassword());
+        verify(userService).verifyPassword(loginDTO.password(), activeUser);
         verifyNoInteractions(jwtService);
     }
 
@@ -147,7 +142,7 @@ public class AuthServiceTest {
         );
         String encodedPassword = "encoded_password";
 
-        when(passwordEncoder.encode(registerDTO.password())).thenReturn(encodedPassword);
+        when(userService.encodePassword(registerDTO.password())).thenReturn(encodedPassword);
 
         User createdUser = new User();
         createdUser.setEmail(registerDTO.email());
@@ -168,39 +163,11 @@ public class AuthServiceTest {
         assertEquals("auth/register", responseEntity.getBody().url());
         assertEquals(expectedData, responseEntity.getBody().data());
 
-        verify(passwordEncoder).encode(registerDTO.password());
+        verify(userService).encodePassword(registerDTO.password());
         verify(userService).createUser(argThat(dto ->
                 dto.email().equals(registerDTO.email()) &&
                         dto.password().equals(encodedPassword)
         ));
-    }
-
-    @Test
-    void encodePassword_ShouldCallPasswordEncoder() {
-        // Given
-        String raw = "my_password";
-        when(passwordEncoder.encode(raw)).thenReturn("encoded");
-
-        // When
-        String result = authService.encodePassword(raw);
-
-        // Then
-        assertEquals("encoded", result);
-        verify(passwordEncoder).encode(raw);
-    }
-
-    @Test
-    void verifyPassword_ShouldReturnTrue_WhenPasswordsMatch() {
-        // Given
-        String raw = "my_password";
-        when(passwordEncoder.matches(raw, activeUser.getPassword())).thenReturn(true);
-
-        // When
-        boolean result = authService.verifyPassword(raw, activeUser);
-
-        // Then
-        assertTrue(result);
-        verify(passwordEncoder).matches(raw, activeUser.getPassword());
     }
 
 }
