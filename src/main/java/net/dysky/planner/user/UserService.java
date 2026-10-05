@@ -91,7 +91,7 @@ public class UserService {
         User user = getUserByEmail(email);
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new BadCredentialsException("Invalid current password");
+            throw new BadCredentialsException("Invalid password");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
