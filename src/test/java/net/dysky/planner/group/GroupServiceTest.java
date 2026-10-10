@@ -222,4 +222,20 @@ class GroupServiceTest {
         assertThat(captured.get(1).role()).isNull();
         assertThat(captured.get(1).balance()).isEqualTo(5.0);
     }
+
+    @Test
+    void updateGroupName_shouldUpdateAndSaveGroup() {
+        Trip trip = mock(Trip.class);
+        Group group = new Group();
+        group.setName("Old Name");
+
+        when(trip.getTripGroup()).thenReturn(group);
+
+        CreateGroupDTO dto = new CreateGroupDTO("New Name");
+
+        groupService.updateGroupName(trip, dto);
+
+        assertThat(group.getName()).isEqualTo("New Name");
+        verify(groupRepository).save(group);
+    }
 }
