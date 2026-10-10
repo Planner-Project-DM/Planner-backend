@@ -15,14 +15,14 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/trips/{id}/group/members")
+@RequestMapping("/api/trips/{id}/group")
 class GroupController {
 
     private final TripService tripService;
     private final GroupService groupService;
     private final JwtService jwtService;
 
-    @PostMapping
+    @PostMapping("/members")
     public ResponseEntity<ResponseDTO> addToGroup(@PathVariable UUID id, @RequestBody AddToGroupDTO addToGroupDTO, HttpServletRequest request) {
         Group group = tripService.getTripById(id).getTripGroup();
         String email = jwtService.extractEmail(request);
@@ -40,7 +40,7 @@ class GroupController {
         );
     }
 
-    @PutMapping
+    @PutMapping("/members")
     public ResponseEntity<ResponseDTO> updateGroupMember(@PathVariable UUID id, @RequestBody List<UpdateGroupMemberDTO> updateGroupMemberDTO) {
         Trip trip = tripService.getTripById(id);
 
@@ -57,7 +57,24 @@ class GroupController {
         );
     }
 
-    @DeleteMapping
+    @PutMapping
+    public ResponseEntity<ResponseDTO> updateGroupName(@PathVariable UUID id, @RequestBody CreateGroupDTO createGroupDTO) {
+        Trip trip = tripService.getTripById(id);
+
+        groupService.updateGroupName(trip,createGroupDTO);
+
+        return ResponseEntity.ok(
+                new ResponseDTO(
+                        LocalDateTime.now(),
+                        200,
+                        "Group name updated successfully",
+                        "/api/trips/" + id + "/group",
+                        null
+                )
+        );
+    }
+
+    @DeleteMapping("/members")
     public ResponseEntity<ResponseDTO> removeFromGroup(@PathVariable UUID id, @RequestBody RemoveFromGroupDTO removeFromGroupDTO, HttpServletRequest request) {
         Group group = tripService.getTripById(id).getTripGroup();
         String email = jwtService.extractEmail(request);

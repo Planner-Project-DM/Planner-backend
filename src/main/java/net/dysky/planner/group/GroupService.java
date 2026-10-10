@@ -81,6 +81,15 @@ public class GroupService {
         groupUserService.update(trip, list);
     }
 
+    @Transactional
+    @CacheEvict(value = "trips_view", key = "#trip.id")
+    public void updateGroupName(Trip trip, CreateGroupDTO createGroupDTO) {
+        Group group =  trip.getTripGroup();
+
+        group.setName(createGroupDTO.name());
+        groupRepository.save(group);
+    }
+
     @CacheEvict(value = "trips_view", key = "#tripId")
     public void deleteFromGroup(Group group, RemoveFromGroupDTO removeFromGroupDTO, String email, UUID tripId) {
         User userToRemove = userService.getUserByEmail(removeFromGroupDTO.email());
