@@ -82,7 +82,7 @@ public class TripService {
     }
 
     @Transactional
-    @CacheEvict(value = "trips", key = "#tripId")
+    @CacheEvict(value = "trips_view", key = "#tripId")
     public Trip updateTripCosts(UUID tripId) {
         Trip trip = getTripById(tripId);
         Double totalCost = tripItineraryService.getTotalCostByTripId(tripId);
@@ -131,7 +131,7 @@ public class TripService {
     }
 
     @Transactional
-    @CacheEvict(value = "trips", key = "#id")
+    @CacheEvict(value = "trips_view", key = "#id")
     public Trip updateTrip(UUID id, UpdateTripDTO updateTripDTO) {
         Trip trip = getTripById(id);
 
@@ -161,7 +161,7 @@ public class TripService {
     }
 
     @Transactional
-    @CacheEvict(value = "trips", key = "#id")
+    @CacheEvict(value = "trips_view", key = "#id")
     public void deleteTrip(UUID id) {
         Trip trip = getTripById(id);
         tripRepository.delete(trip);
