@@ -37,11 +37,13 @@ public class User {
     private UserRole role = UserRole.USER;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<GroupUser> groupUsers;
 
     private Boolean isActive = true;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private UserSettings settings;
 
     public void setSettings(UserSettings settings) {

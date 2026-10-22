@@ -20,6 +20,15 @@ class UserController {
 
     private final JwtService jwtService;
 
+    @GetMapping("/me")
+    public ResponseEntity<ResponseDTO> getUserInformation(HttpServletRequest request) {
+        String email = jwtService.extractEmail(request);
+
+        User user = userService.getUserByEmail(email);
+
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User information get successfully", "/api/users/me", user));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ResponseDTO> updateUser(@PathVariable UUID id, @RequestBody UserUpdateDTO dto) {
         User updatedUser = userService.updateUser(id, dto);
