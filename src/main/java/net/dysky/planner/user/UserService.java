@@ -56,8 +56,8 @@ public class UserService {
     }
 
     @Transactional
-    public User updateUser(UUID id, UserUpdateDTO dto) {
-        User user = getUserById(id);
+    public User updateUser(String email, UserUpdateDTO dto) {
+        User user = getUserByEmail(email);
 
         if(dto.firstName() != null) {
             user.setFirstName(dto.firstName());
