@@ -14,8 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.UUID;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -66,14 +64,14 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTest {
                 true
         );
 
-        mockMvc.perform(put("/api/users/{id}", testUser.getId())
+        mockMvc.perform(put("/api/users/{email}", userEmail)
                         .with(user(userEmail).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.message").value("User updated successfully"))
-                .andExpect(jsonPath("$.url").value("api/users/" + testUser.getId()))
+                .andExpect(jsonPath("$.url").value("api/users/" + userEmail))
                 .andExpect(jsonPath("$.data.firstName").value("Johnny"))
                 .andExpect(jsonPath("$.data.lastName").value("Smith"))
                 .andExpect(jsonPath("$.data.email").value("updated_email@example.com"))
@@ -84,7 +82,7 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTest {
     @Test
     @DisplayName("PUT: updateUser_shouldReturnNotFound_whenUserDoesNotExist")
     void updateUser_shouldReturnNotFound_whenUserDoesNotExist() throws Exception {
-        UUID nonExistingId = UUID.randomUUID();
+        String nonExistingEmail = "non_existing_user@example.com";
         UserUpdateDTO updateDTO = new UserUpdateDTO(
                 "Ghost",
                 "User",
@@ -93,7 +91,7 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTest {
                 true
         );
 
-        mockMvc.perform(put("/api/users/{id}", nonExistingId)
+        mockMvc.perform(put("/api/users/{email}", nonExistingEmail)
                         .with(user(userEmail).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
@@ -121,7 +119,7 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTest {
                 true
         );
 
-        mockMvc.perform(put("/api/users/{id}", testUser.getId())
+        mockMvc.perform(put("/api/users/{email}", userEmail)
                         .with(user(userEmail).roles("USER"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))

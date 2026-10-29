@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,11 +28,11 @@ class UserController {
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User information get successfully", "/api/users/me", user));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseDTO> updateUser(@PathVariable UUID id, @RequestBody UserUpdateDTO dto) {
-        User updatedUser = userService.updateUser(id, dto);
+    @PutMapping("/{email}")
+    public ResponseEntity<ResponseDTO> updateUser(@PathVariable String email, @RequestBody UserUpdateDTO dto) {
+        User updatedUser = userService.updateUser(email, dto);
 
-        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User updated successfully", "api/users/" + id, updatedUser));
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "User updated successfully", "api/users/" + email, updatedUser));
     }
 
     @PutMapping("/password")
