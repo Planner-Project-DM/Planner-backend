@@ -1,0 +1,25 @@
+# VCS and IDE
+.git
+.gitignore
+.gitattributes
+.idea
+.vscode
+.claude
+
+# Build output and caches (the image is built from sources)
+build
+.gradle
+out
+bin
+
+# Secrets and local config - never part of the build context
+.env
+*.env
+ssl
+
+# Not needed for the image
+.github
+docs
+*.md
+docker-compose.yml
+HELP.md
