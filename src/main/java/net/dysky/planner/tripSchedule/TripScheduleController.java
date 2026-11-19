@@ -9,6 +9,7 @@ import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
 import net.dysky.planner.user.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ class TripScheduleController {
     private final TripService tripService;
     private final JwtService jwtService;
 
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
     @GetMapping
     public ResponseEntity<ResponseDTO> getAllSchedulesForTrip(@PathVariable("id") UUID id) {
         Trip trip = tripService.getTripById(id);
@@ -42,6 +44,7 @@ class TripScheduleController {
         );
     }
 
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
     @PostMapping
     public ResponseEntity<ResponseDTO> addScheduleToTrip(@PathVariable("id") UUID id, @RequestBody CreateTripScheduleDTO dto, HttpServletRequest request) {
         Trip trip = tripService.getTripById(id);
@@ -61,6 +64,7 @@ class TripScheduleController {
         );
     }
 
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
     @PutMapping
     public ResponseEntity<ResponseDTO> updateScheduleInTrip(@PathVariable("id") UUID id, @RequestBody UpdateScheduleDTO dto, HttpServletRequest request) {
         Trip trip = tripService.getTripById(id);
@@ -81,6 +85,7 @@ class TripScheduleController {
         );
     }
 
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
     @DeleteMapping
     public ResponseEntity<ResponseDTO> deleteScheduleFromTrip(@PathVariable("id") UUID id, @RequestParam("scheduleId") UUID scheduleId, HttpServletRequest request) {
         Trip trip = tripService.getTripById(id);

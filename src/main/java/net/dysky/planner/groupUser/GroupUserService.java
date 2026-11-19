@@ -26,7 +26,14 @@ public class GroupUserService {
     }
 
     public boolean isUserOwnerOrAdminOfGroup(Group group, String email) {
+        if (group == null) {
+            return false;
+        }
         return groupUserRepository.existsByGroupAndUser_EmailAndRoleNot(group, email, GroupRole.MEMBER);
+    }
+
+    public boolean isUserMemberOfGroup(Group group, String email) {
+        return group != null && groupUserRepository.existsByGroupAndUser_Email(group, email);
     }
 
     public GroupUser add(CreateGroupUserDTO createGroupUserDTO) {

@@ -12,6 +12,15 @@ interface GroupUserRepository extends JpaRepository<GroupUser, GroupUserId> {
 
     List<GroupUser> findByGroup(Group group);
 
+    @Query("""
+    SELECT COUNT(gu) > 0
+    FROM GroupUser gu
+    JOIN gu.user u
+    WHERE gu.group = :group
+      AND u.email = :email
+    """)
+    boolean existsByGroupAndUser_Email(@Param("group") Group group, @Param("email") String email);
+
     List<GroupUser> findAllByUser_EmailAndRoleNot(String userEmail, GroupRole role);
 
     @Query("""

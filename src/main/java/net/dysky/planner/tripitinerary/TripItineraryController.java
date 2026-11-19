@@ -5,6 +5,7 @@ import net.dysky.planner.response.ResponseDTO;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ class TripItineraryController {
 
     private final TripItineraryService tripItineraryService;
 
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
     @PostMapping
     public ResponseEntity<ResponseDTO> addTripItem(@PathVariable UUID id, @RequestBody CreateTripItineraryDTO createTripItineraryDTO) {
         Trip trip = tripService.getTripById(id);
@@ -36,6 +38,7 @@ class TripItineraryController {
         );
     }
 
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
     @PutMapping
     public ResponseEntity<ResponseDTO> updateTripItem(@PathVariable UUID id, @RequestBody UpdateTripItineraryDTO updateTripItineraryDTO) {
         Trip trip = tripService.getTripById(id);
@@ -53,6 +56,7 @@ class TripItineraryController {
         );
     }
 
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
     @DeleteMapping
     public ResponseEntity<ResponseDTO> deleteTripItem(@PathVariable UUID id, @RequestParam UUID tripItemId) {
         tripItineraryService.deleteTripItinerary(id, tripItemId);

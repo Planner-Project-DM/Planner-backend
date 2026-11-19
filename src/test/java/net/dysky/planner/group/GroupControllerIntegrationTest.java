@@ -11,6 +11,7 @@ import net.dysky.planner.groupUser.GroupUser;
 import net.dysky.planner.groupUser.GroupUserService;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
+import net.dysky.planner.trip.TripSecurityEvaluator;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,11 +53,16 @@ public class GroupControllerIntegrationTest extends AbstractIntegrationTest {
     @MockitoBean
     private TripService tripService;
 
+    @MockitoBean(name = "tripSecurity")
+    private TripSecurityEvaluator tripSecurity;
+
     private User testUser;
 
     @BeforeEach
     void setUp() {
         when(jwtService.extractEmail(any(HttpServletRequest.class))).thenReturn("user@example.com");
+        when(tripSecurity.isMemberOfTrip(any(), any())).thenReturn(true);
+        when(tripSecurity.hasRoleInTrip(any(), any())).thenReturn(true);
 
         RegisterDTO registerDTO = new RegisterDTO(
                 "Jan",

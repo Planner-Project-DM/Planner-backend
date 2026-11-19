@@ -8,6 +8,7 @@ import net.dysky.planner.schedule.ScheduleResponseDTO;
 import net.dysky.planner.schedule.TripItemSummaryDTO;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
+import net.dysky.planner.trip.TripSecurityEvaluator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
     @MockitoBean
     private TripService tripService;
 
+    @MockitoBean(name = "tripSecurity")
+    private TripSecurityEvaluator tripSecurity;
+
     @MockitoBean
     private TripScheduleService tripScheduleService;
 
@@ -43,6 +47,8 @@ public class TripScheduleControllerIntegrationTest extends AbstractIntegrationTe
     @BeforeEach
     void setUp() {
         when(jwtService.extractEmail(any(HttpServletRequest.class))).thenReturn("user@example.com");
+        when(tripSecurity.isMemberOfTrip(any(), any())).thenReturn(true);
+        when(tripSecurity.hasRoleInTrip(any(), any())).thenReturn(true);
     }
 
     @Test

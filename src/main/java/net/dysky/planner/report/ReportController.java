@@ -6,6 +6,7 @@ import net.dysky.planner.trip.TripService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ class ReportController {
 
     private final TripService tripService;
 
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
     @GetMapping("{id}/funds-summary")
     public ResponseEntity<byte[]> generateFundsSummaryReport(@PathVariable("id") UUID id) {
         Trip trip = tripService.getTripById(id);

@@ -7,6 +7,9 @@ import net.dysky.planner.auth.JwtService;
 import net.dysky.planner.auth.RegisterDTO;
 import net.dysky.planner.group.CreateGroupDTO;
 import net.dysky.planner.group.GroupService;
+import net.dysky.planner.groupUser.CreateGroupUserDTO;
+import net.dysky.planner.groupUser.GroupRole;
+import net.dysky.planner.groupUser.GroupUserService;
 import net.dysky.planner.user.User;
 import net.dysky.planner.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +22,9 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -37,6 +42,9 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private GroupUserService groupUserService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -122,7 +130,7 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void getTripById_shouldReturnTrip_whenIdIsValid() throws Exception {
-        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED, "");
         UUID id = savedTrip.getId();
 
         mockMvc.perform(get("/api/trips/{id}", id)
@@ -219,7 +227,7 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void updateTrip_shouldPartiallyUpdateTrip_whenDataIsValid() throws Exception {
-        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED, "");
         UUID id = savedTrip.getId();
 
         UpdateTripDTO updateDto = new UpdateTripDTO("Włochy 2024", null, null, 2000.0, null, null, null);
@@ -253,7 +261,7 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void updateTrip_shouldNotChangeAnything_whenAllFieldsInDtoAreNull() throws Exception {
         // Given
-        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED);
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED, "");
         UUID id = savedTrip.getId();
 
         UpdateTripDTO emptyDto = new UpdateTripDTO(null, null, null, null, null, null, null);
@@ -293,5 +301,68 @@ public class TripControllerIntegrationTest extends AbstractIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
+    }
+
+    private User createOtherUser(String email) {
+        return userService.createUser(new RegisterDTO("Adam", "Nowak", email, "987654321", "securePassword456"));
+    }
+
+    @Test
+    void getTripById_shouldReturnForbidden_whenUserIsNotInTripGroup() throws Exception {
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED, "");
+        createOtherUser("outsider@example.com");
+
+        mockMvc.perform(get("/api/trips/{id}", savedTrip.getId())
+                        .with(user("outsider@example.com").roles("USER")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void updateTrip_shouldReturnForbidden_whenUserIsNotInTripGroup() throws Exception {
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED, "");
+        createOtherUser("outsider@example.com");
+        UpdateTripDTO dto = new UpdateTripDTO("Hacked", null, null, null, null, null, null);
+
+        mockMvc.perform(patch("/api/trips/{id}", savedTrip.getId())
+                        .with(user("outsider@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isForbidden());
+
+        assertEquals("Rzym 2024", tripRepository.findById(savedTrip.getId()).orElseThrow().getName());
+    }
+
+    @Test
+    void deleteTrip_shouldReturnForbidden_whenUserIsNotInTripGroup() throws Exception {
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED, "");
+        createOtherUser("outsider@example.com");
+
+        mockMvc.perform(delete("/api/trips/{id}", savedTrip.getId())
+                        .with(user("outsider@example.com").roles("USER")))
+                .andExpect(status().isForbidden());
+
+        assertTrue(tripRepository.findById(savedTrip.getId()).isPresent());
+    }
+
+    @Test
+    void memberOfTripGroup_shouldReadButNotModifyTrip() throws Exception {
+        Trip savedTrip = createAndSaveTrip("Rzym 2024", "Rzym", TripStatus.PLANNED, "");
+        User member = createOtherUser("member@example.com");
+        groupUserService.add(new CreateGroupUserDTO(savedTrip.getTripGroup(), member, GroupRole.MEMBER));
+        UpdateTripDTO dto = new UpdateTripDTO("Zmiana", null, null, null, null, null, null);
+
+        mockMvc.perform(get("/api/trips/{id}", savedTrip.getId())
+                        .with(user("member@example.com").roles("USER")))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(patch("/api/trips/{id}", savedTrip.getId())
+                        .with(user("member@example.com").roles("USER"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(delete("/api/trips/{id}", savedTrip.getId())
+                        .with(user("member@example.com").roles("USER")))
+                .andExpect(status().isForbidden());
     }
 }
