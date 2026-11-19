@@ -21,10 +21,6 @@ jobs:
     permissions:
       contents: read
       checks: write
-    env:
-      DATABASE_TEST_URL: ${{ secrets.DATABASE_TEST_URL }}
-      DATABASE_TEST_USERNAME: ${{ secrets.DATABASE_TEST_USERNAME }}
-      DATABASE_TEST_PASSWORD: ${{ secrets.DATABASE_TEST_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

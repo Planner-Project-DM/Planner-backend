@@ -349,9 +349,6 @@ PRs to `main` run the first two jobs only (no image push).
 
 | Secret | Description |
 |---|---|
-| `DATABASE_TEST_URL` | JDBC URL for test DB on VPS |
-| `DATABASE_TEST_USERNAME` | Test DB user |
-| `DATABASE_TEST_PASSWORD` | Test DB password |
 | `VPS_SSH_HOST` | VPS IP / domain |
 | `VPS_SSH_USER` | SSH user |
 | `VPS_SSH_KEY` | SSH private key |
