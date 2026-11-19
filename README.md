@@ -341,9 +341,11 @@ A GitHub Actions workflow runs build & test, security scan, image build/push, an
 | `build-and-test` | push / PR → `main` | Build, tests, JaCoCo, publish reports |
 | `security-scan` | push / PR → `main` | Trivy filesystem scan (fails on CRITICAL, reports HIGH) |
 | `build-and-push-docker` | after previous jobs | Build image, Trivy image scan (fails on CRITICAL, reports HIGH), push to GHCR only on push to `main` |
-| `deploy-vps` | after image push (on push) | SSH to VPS and run `docker compose pull` + `docker compose up -d` |
+| `deploy-vps` | after image push (on push) | Calls `deploy.yml`: SSH to VPS, deploy the `sha-<commit>` image, wait for the container health check, roll back automatically if it is not healthy |
 
 PRs to `main` build and scan the image but never push it or deploy.
+
+**Manual deploy / rollback:** Actions → *Deploy* → *Run workflow* → enter an image tag (e.g. `sha-abc1234`). The VPS compose file must use `image: ghcr.io/<owner>/<repo>:${IMAGE_TAG:-latest}`.
 
 ### Required secrets
 
