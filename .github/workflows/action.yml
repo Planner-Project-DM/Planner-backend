@@ -38,6 +38,35 @@ jobs:
       - name: Build with Gradle & Run Tests
         run: ./gradlew build jacocoTestReport
 
+      - name: Coverage summary
+        if: always()
+        run: |
+          XML=$(find build/reports -name 'jacocoTestReport.xml' | head -1)
+          if [ -z "$XML" ]; then
+            echo "No JaCoCo XML report found." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # The last <counter> of each type in the file is the report-wide total.
+          row() {
+            line=$(grep -o "<counter type=\"$1\"[^>]*/>" "$XML" | tail -1)
+            missed=$(echo "$line" | sed -E 's/.*missed="([0-9]+)".*/\1/')
+            covered=$(echo "$line" | sed -E 's/.*covered="([0-9]+)".*/\1/')
+            awk -v n="$2" -v m="$missed" -v c="$covered" 'BEGIN { printf "| %s | %.1f%% | %d / %d |\n", n, 100*c/(m+c), c, m+c }'
+          }
+
+          {
+            echo "### Test coverage (JaCoCo)"
+            echo
+            echo "| Metric | Covered | Covered / total |"
+            echo "|---|---|---|"
+            row INSTRUCTION "Instructions (build gate, min. 70%)"
+            row LINE "Lines"
+            row BRANCH "Branches"
+            echo
+            echo "_Packages excluded from the report: report, groupUser, geocoding, weather, trip DTOs._"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@db71d41eb79864e25ab0337e395c352e84523afe # v4
         if: always()

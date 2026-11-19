@@ -6,8 +6,8 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.0-brightgreen?style=flat-square)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?style=flat-square)
 ![Kafka](https://img.shields.io/badge/Apache%20Kafka-3.x-black?style=flat-square)
-![Coverage](https://img.shields.io/badge/coverage-70%25-green?style=flat-square)
-![CI](https://img.shields.io/badge/CI-passing-brightgreen?style=flat-square)
+![Coverage gate](https://img.shields.io/badge/coverage%20gate-%E2%89%A570%25-green?style=flat-square)
+[![CI](https://github.com/Planner-Project-DM/Planner-backend/actions/workflows/action.yml/badge.svg)](https://github.com/Planner-Project-DM/Planner-backend/actions/workflows/action.yml)
 
 ---
 
@@ -333,6 +333,8 @@ open build/reports/jacoco/test/html/index.html
 ## ⚙️ CI/CD
 
 A GitHub Actions workflow runs build & test, security scan, image build/push, and deploy to VPS.
+Actions are pinned to commit SHAs; Dependabot (`.github/dependabot.yml`) opens weekly PRs for GitHub Actions, Gradle and Docker updates.
+Each run shows a JaCoCo coverage table in the job summary.
 
 ### Workflow jobs
 
@@ -355,7 +357,8 @@ PRs to `main` build and scan the image but never push it or deploy.
 | `VPS_SSH_USER` | SSH user |
 | `VPS_SSH_KEY` | SSH private key |
 | `VPS_SSH_PORT` | SSH port (default 22) |
-| `GITHUB_TOKEN` | GitHub token used for GHCR & deployment |
+
+`GITHUB_TOKEN` is provided automatically by GitHub Actions and does not need to be created. Deployments run in the `production` GitHub environment.
 
 ---
 
