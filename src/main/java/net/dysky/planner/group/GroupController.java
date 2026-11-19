@@ -7,6 +7,7 @@ import net.dysky.planner.response.ResponseDTO;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ class GroupController {
     private final GroupService groupService;
     private final JwtService jwtService;
 
+    @PreAuthorize("@tripSecurity.hasRoleInTrip(#id, authentication)")
     @PostMapping("/members")
     public ResponseEntity<ResponseDTO> addToGroup(@PathVariable UUID id, @RequestBody AddToGroupDTO addToGroupDTO, HttpServletRequest request) {
         Group group = tripService.getTripById(id).getTripGroup();
@@ -40,6 +42,7 @@ class GroupController {
         );
     }
 
+    @PreAuthorize("@tripSecurity.hasRoleInTrip(#id, authentication)")
     @PutMapping("/members")
     public ResponseEntity<ResponseDTO> updateGroupMember(@PathVariable UUID id, @RequestBody List<UpdateGroupMemberDTO> updateGroupMemberDTO) {
         Trip trip = tripService.getTripById(id);
@@ -57,6 +60,7 @@ class GroupController {
         );
     }
 
+    @PreAuthorize("@tripSecurity.hasRoleInTrip(#id, authentication)")
     @PutMapping
     public ResponseEntity<ResponseDTO> updateGroupName(@PathVariable UUID id, @RequestBody CreateGroupDTO createGroupDTO) {
         Trip trip = tripService.getTripById(id);
@@ -74,6 +78,7 @@ class GroupController {
         );
     }
 
+    @PreAuthorize("@tripSecurity.hasRoleInTrip(#id, authentication)")
     @DeleteMapping("/members")
     public ResponseEntity<ResponseDTO> removeFromGroup(@PathVariable UUID id, @RequestBody RemoveFromGroupDTO removeFromGroupDTO, HttpServletRequest request) {
         Group group = tripService.getTripById(id).getTripGroup();

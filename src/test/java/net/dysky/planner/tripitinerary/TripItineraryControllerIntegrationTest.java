@@ -3,6 +3,8 @@ package net.dysky.planner.tripitinerary;
 import net.dysky.planner.AbstractIntegrationTest;
 import net.dysky.planner.trip.Trip;
 import net.dysky.planner.trip.TripService;
+import net.dysky.planner.trip.TripSecurityEvaluator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -27,8 +29,16 @@ public class TripItineraryControllerIntegrationTest extends AbstractIntegrationT
     @MockitoBean
     private TripService tripService;
 
+    @MockitoBean(name = "tripSecurity")
+    private TripSecurityEvaluator tripSecurity;
+
     @MockitoBean
     private TripItineraryService tripItineraryService;
+
+    @BeforeEach
+    void setUp() {
+        when(tripSecurity.isMemberOfTrip(any(), any())).thenReturn(true);
+    }
 
     @Test
     void addTripItem_shouldReturnOk_whenSuccessfullyAdded() throws Exception {

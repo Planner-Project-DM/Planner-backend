@@ -37,6 +37,7 @@ class TripController {
         return ResponseEntity.ok(responseDTO);
     }
 
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
     @GetMapping("/{id}")
     public ResponseEntity<ResponseDTO> getTripById(@PathVariable UUID id) {
         TripDetailsDTO trip = tripService.getTripDetailsForApi(id);
@@ -53,6 +54,7 @@ class TripController {
         return ResponseEntity.accepted().body(new ResponseDTO(LocalDateTime.now(), 201, "Trip created successfully", "/api/trips", trip));
     }
 
+    @PreAuthorize("@tripSecurity.hasRoleInTrip(#id, authentication)")
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseDTO> updateTrip(@PathVariable UUID id, @RequestBody UpdateTripDTO updateTripDTO) {
         Trip updatedTrip = tripService.updateTrip(id, updateTripDTO);
