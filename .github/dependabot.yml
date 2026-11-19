@@ -1,26 +1,47 @@
 version: 2
 
 updates:
-  # Workflow actions (also updates the commit SHAs the actions are pinned to)
+  # Workflow actions (also updates the commit SHAs the actions are pinned to).
+  # Minor/patch bumps are batched into one PR; major bumps get their own PR.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
+    groups:
+      actions-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
-  # Gradle dependencies and plugins (build.gradle.kts)
+  # Gradle dependencies and plugins (build.gradle.kts).
+  # Minor/patch bumps are batched into one PR. Spring Boot major upgrades are done manually.
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
+    groups:
+      gradle-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "org.springframework.boot*"
+        update-types: ["version-update:semver-major"]
 
-  # Base images in Dockerfile and docker-compose.yml
+  # Base images in Dockerfile and docker-compose.yml.
+  # The Java major version (build toolchain and runtime image) is changed manually.
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: "eclipse-temurin"
+        update-types: ["version-update:semver-major"]
