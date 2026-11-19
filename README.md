@@ -339,11 +339,11 @@ A GitHub Actions workflow runs build & test, security scan, image build/push, an
 | Job | Trigger | Purpose |
 |---|---|---|
 | `build-and-test` | push / PR → `main` | Build, tests, JaCoCo, publish reports |
-| `security-scan` | push / PR → `main` | Vulnerability scan with Trivy |
-| `build-and-push-docker` | after previous jobs (on push) | Build Docker image and push to GHCR |
+| `security-scan` | push / PR → `main` | Trivy filesystem scan (fails on CRITICAL, reports HIGH) |
+| `build-and-push-docker` | after previous jobs | Build image, Trivy image scan (fails on CRITICAL, reports HIGH), push to GHCR only on push to `main` |
 | `deploy-vps` | after image push (on push) | SSH to VPS and run `docker compose pull` + `docker compose up -d` |
 
-PRs to `main` run the first two jobs only (no image push).
+PRs to `main` build and scan the image but never push it or deploy.
 
 ### Required secrets
 
