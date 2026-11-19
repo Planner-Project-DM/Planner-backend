@@ -1,7 +1,8 @@
-FROM gradle:8.12-jdk21-alpine AS builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
 WORKDIR /build
 
+# The Gradle version comes only from gradle/wrapper/gradle-wrapper.properties
 COPY gradlew .
 COPY gradle ./gradle
 COPY build.gradle.kts .
@@ -22,6 +23,14 @@ COPY --from=builder /build/build/libs/*.jar app.jar
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
+# Exit on OOM so the container is restarted instead of running in a broken state.
+# Add e.g. -XX:MaxRAMPercentage=70 via JAVA_OPTS in docker-compose to tune the heap.
+ENV JAVA_OPTS="-XX:+ExitOnOutOfMemoryError"
+
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Djava.net.preferIPv4Stack=true", "-jar", "app.jar"]
+# 127.0.0.1 on purpose: the app runs with preferIPv4Stack, "localhost" may resolve to ::1.
+HEALTHCHECK --interval=15s --timeout=5s --start-period=90s --retries=5 \
+  CMD wget -q -O /dev/null http://127.0.0.1:8080/actuator/health || exit 1
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -Djava.net.preferIPv4Stack=true -jar app.jar"]

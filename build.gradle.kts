@@ -101,7 +101,8 @@ tasks.jacocoTestReport {
     finalizedBy(tasks.jacocoTestCoverageVerification)
 
     reports {
-        xml.required = false
+        xml.required = true
+        xml.outputLocation = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml")
         csv.required = false
         html.outputLocation = layout.buildDirectory.dir("reports/jacoco/test")
     }
