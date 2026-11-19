@@ -36,7 +36,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-flyway:4.0.1")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.apache.poi:poi:4.1.2")
+    implementation("org.apache.poi:poi:6.0.0")
     implementation("org.apache.poi:poi-ooxml:4.1.2")
 
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
