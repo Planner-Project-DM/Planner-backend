@@ -90,7 +90,7 @@ jobs:
 
       # HIGH: report only (does not fail the build)
       - name: Trivy FS scan - report HIGH and CRITICAL
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: 'fs'
           ignore-unfixed: true
@@ -100,7 +100,7 @@ jobs:
 
       # CRITICAL: fail the build
       - name: Trivy FS scan - fail on CRITICAL
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: 'fs'
           ignore-unfixed: true
@@ -159,7 +159,7 @@ jobs:
 
       # HIGH: report only (does not fail the build)
       - name: Trivy image scan - report HIGH and CRITICAL
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: planner-scan:ci
           ignore-unfixed: true
@@ -169,7 +169,7 @@ jobs:
 
       # CRITICAL: fail before anything is pushed to GHCR
       - name: Trivy image scan - fail on CRITICAL
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: planner-scan:ci
           ignore-unfixed: true
