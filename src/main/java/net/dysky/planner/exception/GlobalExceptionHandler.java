@@ -6,10 +6,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -186,6 +188,66 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidNotesException.class)
+    public ResponseEntity<ResponseDTO> handleInvalidNotes(InvalidNotesException ex, HttpServletRequest request) {
+        ResponseDTO error = new ResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotesConflictException.class)
+    public ResponseEntity<ResponseDTO> handleNotesConflict(NotesConflictException ex, HttpServletRequest request) {
+        ResponseDTO error = new ResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(NotesTooLargeException.class)
+    public ResponseEntity<ResponseDTO> handleNotesTooLarge(NotesTooLargeException ex, HttpServletRequest request) {
+        ResponseDTO error = new ResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.CONTENT_TOO_LARGE.value(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.CONTENT_TOO_LARGE);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseDTO> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .sorted()
+                .collect(Collectors.joining("; "));
+        if (message.isBlank()) {
+            message = "Validation failed";
+        }
+
+        ResponseDTO error = new ResponseDTO(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                message,
                 request.getRequestURI(),
                 null
         );

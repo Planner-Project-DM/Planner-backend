@@ -33,6 +33,8 @@ public class TripSecurityEvaluator {
 
     /**
      * Any member of the trip's group (member, admin or owner).
+     * Also used for trip notes (GET/PUT /api/trips/{id}/notes); in the future notes access
+     * is meant to be restricted by role.
      */
     public boolean isMemberOfTrip(UUID id, Authentication authentication) {
         String email = resolveEmail(authentication);
