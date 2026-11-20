@@ -1,5 +1,10 @@
 package net.dysky.planner.exception;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -107,8 +112,25 @@ class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.message", is("Unexpected runtime error")));
     }
 
+    @Test
+    void handleMethodArgumentNotValid_shouldReturn400WithFieldMessages() throws Exception {
+        mockMvc.perform(post("/test/exceptions/validation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"content\":\"\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(400)))
+                .andExpect(jsonPath("$.message", is("content: must not be blank")));
+    }
+
+    record ValidatedBody(@NotBlank String content) {
+    }
+
     @RestController
     static class ExceptionTestController {
+
+        @PostMapping("/test/exceptions/validation")
+        public void validate(@Valid @RequestBody ValidatedBody body) {
+        }
 
         @GetMapping("/test/exceptions/friendship-exists")
         public void throwFriendshipExists() {

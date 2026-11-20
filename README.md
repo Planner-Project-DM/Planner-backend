@@ -113,6 +113,7 @@ This project was created as a portfolio piece demonstrating production-oriented 
 - CRUD for trips
 - Trip schedules — add, update, delete days
 - Itinerary — detailed items inside schedules
+- Shared notes — one tldraw document per trip, stored as a JSON string with optimistic locking (`version`)
 
 ### Groups
 - Add/remove members from trip groups
@@ -199,6 +200,9 @@ Fill values in `.env` according to the table below.
 | `KAFKA_BOOTSTRAP_SERVERS` | Kafka bootstrap servers | `localhost:9092` |
 | `REDIS_HOST` | Redis host | `localhost` |
 | `REDIS_PORT` | Redis port | `6379` |
+| `APP_TRIP_NOTES_MAX_SIZE_BYTES` | Optional. Max trip notes size in bytes (UTF-8). Property: `app.trip-notes.max-size-bytes` | `5242880` (default, 5 MB) |
+
+> **Note on `APP_TRIP_NOTES_MAX_SIZE_BYTES`:** the property is read with `@Value("${app.trip-notes.max-size-bytes:5242880}")`. It is picked up when set as a real environment variable (e.g. in docker compose or on the VPS). Entries in the local `.env` file are loaded as a properties file and are not mapped to this key automatically; to use `.env` locally, add `app.trip-notes.max-size-bytes=${APP_TRIP_NOTES_MAX_SIZE_BYTES:5242880}` to `application.properties`.
 
 ---
 
@@ -235,6 +239,18 @@ POST   /api/trips/{id}/item                   Add an itinerary item
 PUT    /api/trips/{id}/item                   Update an item
 DELETE /api/trips/{id}/item                   Delete an item
 ```
+
+#### Trip Notes
+```
+GET    /api/trips/{id}/notes                  Get notes: { content, version } (no document yet: content null, version 0)
+PUT    /api/trips/{id}/notes                  Save notes: body { content, version? } -> { content, version }
+```
+
+- Access: any member of the trip's group (403 for non-members, 404 if the trip does not exist).
+- `content` is a required, non-blank JSON string (e.g. `JSON.stringify(document)`); invalid JSON gives 400.
+- `version` is optional. If sent and it differs from the stored version, the API returns 409 (reload the latest state and retry). If omitted, the last write wins.
+- Content above `app.trip-notes.max-size-bytes` (default 5 MB) returns 413.
+- Frontend: save only the `document` part of the tldraw snapshot (not `session`) and do not embed images inline as base64.
 
 #### Groups
 ```
@@ -347,6 +363,8 @@ Each run shows a JaCoCo coverage table in the job summary.
 
 PRs to `main` build and scan the image but never push it or deploy.
 
+**Deploy note (trip notes):** the nginx reverse proxy in front of the API must accept request bodies of at least 6 MB, i.e. `client_max_body_size 6m;` (or larger). Otherwise large `PUT /api/trips/{id}/notes` requests are rejected by nginx before reaching the app.
+
 **Manual deploy / rollback:** Actions → *Deploy* → *Run workflow* → enter an image tag (e.g. `sha-abc1234`). The VPS compose file must use `image: ghcr.io/<owner>/<repo>:${IMAGE_TAG:-latest}`.
 
 ### Required secrets
@@ -395,7 +413,7 @@ src/main/java/net/dysky/planner/
 ├── auth/                   # JWT, registration, login
 ├── user/                   # User entity
 ├── usersettings/           # Per-user settings, Redis cache
-├── trip/                   # Trip CRUD
+├── trip/                   # Trip CRUD, trip notes
 ├── tripschedule/           # Trip schedule (days)
 ├── tripitinerary/          # Itinerary items per day
 ├── tripitem/               # City attractions / items
@@ -408,7 +426,7 @@ src/main/java/net/dysky/planner/
                             # CaffeineConfig, RedisConfig
 
 src/main/resources/
-├── db/migration/           # Flyway migrations (V1__initial_schema.sql present)
+├── db/migration/           # Flyway migrations (V1–V4, e.g. V4__add_trip_notes.sql)
 ├── application.properties
 
 src/test/java/net/dysky/planner/

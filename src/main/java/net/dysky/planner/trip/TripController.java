@@ -20,6 +20,8 @@ class TripController {
 
     private final TripService tripService;
 
+    private final TripNotesService tripNotesService;
+
     private final JwtService jwtService;
 
     @GetMapping
@@ -68,6 +70,24 @@ class TripController {
         tripService.deleteTrip(id);
 
         return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Trip deleted successfully", "/api/trips/" + id, null));
+    }
+
+    // TODO: notes access is currently open to all group members; restrict by role in the future.
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
+    @GetMapping("/{id}/notes")
+    public ResponseEntity<ResponseDTO> getNotes(@PathVariable UUID id) {
+        TripNotesDTO notes = tripNotesService.getNotes(id);
+
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Trip notes retrieved successfully", "/api/trips/" + id + "/notes", notes));
+    }
+
+    @PreAuthorize("@tripSecurity.isMemberOfTrip(#id, authentication)")
+    @PutMapping("/{id}/notes")
+    public ResponseEntity<ResponseDTO> saveNotes(@PathVariable UUID id, @Valid @RequestBody SaveTripNotesDTO saveTripNotesDTO, HttpServletRequest request) {
+        String email = jwtService.extractEmail(request);
+        TripNotesDTO notes = tripNotesService.saveNotes(id, saveTripNotesDTO, email);
+
+        return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), 200, "Trip notes saved successfully", "/api/trips/" + id + "/notes", notes));
     }
 
 }
