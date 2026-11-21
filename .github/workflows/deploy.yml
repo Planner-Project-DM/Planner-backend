@@ -100,6 +100,11 @@ jobs:
 
             if wait_healthy; then
               echo "Deploy OK: $IMAGE_TAG is healthy."
+
+              touch .env
+              sed -i '/^IMAGE_TAG=/d' .env
+              echo "IMAGE_TAG=$IMAGE_TAG" >> .env
+              echo "Pinned IMAGE_TAG=$IMAGE_TAG in $(pwd)/.env"
             else
               echo "Deploy FAILED: $IMAGE_TAG is not healthy. Last container logs:"
               docker logs --tail 80 "$SERVICE" || true
