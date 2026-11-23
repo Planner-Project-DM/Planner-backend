@@ -43,7 +43,7 @@ jobs:
           echo "repo=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
       - name: Deploy via SSH (with health check and automatic rollback)
-        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
         env:
           IMAGE_TAG: ${{ inputs.tag }}
           IMAGE_REPO: ghcr.io/${{ steps.vars.outputs.repo }}
